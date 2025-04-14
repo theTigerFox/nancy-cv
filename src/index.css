@@ -1,69 +1,175 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
-@layer base {
-    :root {
-        /* Définir les couleurs de base comme variables CSS si vous préférez */
-        /* --background: 0 0% 100%;
-        --foreground: 240 10% 3.9%;
-        --card: 0 0% 100%;
-        --card-foreground: 240 10% 3.9%; */
-        /* ... etc pour toutes les couleurs définies dans tailwind.config.js */
 
-        --radius: 0.5rem; /* Variable pour border-radius */
-        --header-height: 4rem; /* Hauteur du header pour calculs comme sticky sidebar/graph height */
-    }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-    /* Vous pouvez définir un mode sombre ici avec .dark */
-    /* .dark { ... } */
-
-    * {
-    }
-
-    body {
-        font-feature-settings: "rlig" 1, "calt" 1; /* Ligatures standard */
-        /* Considérer d'ajouter une police plus "Apple-like" comme Inter ou San Francisco (si licence permet) */
-        /* @apply font-sans; (si vous configurez une police personnalisée dans tailwind.config.js) */
-    }
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f5f7fa; /* ou bg-gray-100 si tu préfères Tailwind */
+  -webkit-font-smoothing: antialiased; /* Amélioration rendu typo */
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Styles spécifiques pour la scrollbar (optionnel, style moderne) */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+/* Styles spécifiques non couverts par Tailwind ou pour l'aperçu */
+.cv-preview {
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   /* A4 Dimensions approx en pixels pour un écran standard, mais attention à l'échelle */
+   /* Il est souvent mieux de laisser la largeur s'adapter et contrôler via container */
+  width: 210mm;
+  min-height: 297mm; /* Ou utiliser aspect-ratio si supporté/voulu */
+  /* Important: Ne pas forcer la hauteur si le contenu peut dépasser */
 }
-::-webkit-scrollbar-track {
-    background: hsl(240 4.8% 95.9% / 0.5); /* muted/50 */
-    border-radius: 10px;
+
+.header-bg {
+  background-color: #2c3e50; /* bg-gray-800 ou autre classe tailwind */
+  color: white; /* text-white */
 }
-::-webkit-scrollbar-thumb {
-    background: hsl(240 5.9% 90%); /* border */
-    border-radius: 10px;
+
+.section-title {
+  color: #2c3e50; /* text-gray-800 */
+  border-bottom: 2px solid #2c3e50; /* border-b-2 border-gray-800 */
 }
-::-webkit-scrollbar-thumb:hover {
-    background: hsl(240 3.8% 46.1%); /* muted-foreground */
+
+/* Skill bars */
+.skill-level-bg { /* Renommé pour clarté */
+  height: 8px;
+  background-color: #e0e0e0; /* bg-gray-200 */
+  border-radius: 4px; /* rounded */
+  overflow: hidden; /* Pour que le fill ne dépasse pas */
 }
-canvas{
-    min-height: 500px;
+
+.skill-level-fill {
+  height: 100%;
+  border-radius: 4px; /* rounded */
+  background-color: #3498db; /* bg-blue-500 */
+  transition: width 0.3s ease-in-out; /* Animation douce */
+}
+
+/* Language dots */
+.language-level {
+  display: inline-block;
+  width: 12px; /* w-3 */
+  height: 12px; /* h-3 */
+  border-radius: 50%; /* rounded-full */
+  margin-right: 3px; /* mr-1 */
+  background-color: #e0e0e0; /* bg-gray-300 */
+}
+
+.language-level.filled {
+  background-color: #3498db; /* bg-blue-500 */
+}
+
+/* Print Styles */
+@media print {
+  body * {
+    visibility: hidden; /* Cache tout par défaut */
+  }
+  /* Rend visible seulement l'aperçu et son contenu */
+  .cv-preview, .cv-preview * {
+    visibility: visible;
+  }
+  .cv-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%; /* Prend toute la largeur de la page imprimée */
+    height: auto; /* Hauteur automatique */
+    min-height: 0; /* Override min-height */
+    box-shadow: none; /* Pas d'ombre à l'impression */
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+  /* Cache explicitement les éléments non désirés */
+  .print\:hidden {
+    display: none !important;
+  }
 }
 
 input{
-    outline: none;
+  color: gray;
+}
 
+
+/* Variables globales */
+:root {
+  --accent-color: #6366f1;
+  --accent-light: #818cf8;
+  --accent-dark: #4f46e5;
 }
-input:focus {
-    outline: none;
-    box-shadow: none;
-    border-color: inherit; /* Optionnel - conserve la couleur de bordure normale */
+
+/* Styles pour l'impression */
+@media print {
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Assurez-vous que le CV est bien formaté pour l'impression */
+  #cvPreview {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-shadow: none !important; 
+    border-radius: 0 !important;
+  }
+  
+  /* Assurer que les couleurs s'impriment correctement */
+  #cvPreview * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
 }
-select:focus {
-    outline: none;
-    box-shadow: none;
-    border-color: inherit; /* Optionnel - conserve la couleur de bordure normale */
+
+/* Animations subtiles */
+@keyframes gentle-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: none;
-    padding-right: 1.5rem; /* Espace pour icône personnalisée */
+
+.animate-pulse {
+  animation: gentle-pulse 3s infinite;
+}
+
+/* Styles de transition généraux */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Style pour les barres de compétences et de langues */
+.skill-level-bg {
+  height: 0.5rem;
+  background-color: rgba(243, 244, 246, 1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.skill-level-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-color), var(--accent-light));
+  border-radius: 9999px;
+  transition: width 0.5s ease-out;
+}
+
+.language-level {
+  display: inline-block;
+  width: 1rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: rgba(243, 244, 246, 1);
+}
+
+.language-level.filled {
+  background-color: var(--accent-color);
 }
