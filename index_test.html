@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de CV Professionnel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        .cv-preview {
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-height: 297mm;
+            width: 210mm;
+        }
+        
+        .header-bg {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #2c3e50;
+        }
+        
+        .skill-level {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+        }
+        
+        .skill-level-fill {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #3498db;
+        }
+        
+        .language-level {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 3px;
+            background-color: #e0e0e0;
+        }
+        
+        .language-level.filled {
+            background-color: #3498db;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .cv-preview, .cv-preview * {
+                visibility: visible;
+            }
+            .cv-preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-8 px-4">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Générateur de CV Professionnel</h1>
+        
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Formulaire -->
+            <div class="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md no-print">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Informations Personnelles</h2>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Photo (facultative)</label>
+                    <input type="file" id="photo" accept="image/*" class="hidden">
+                    <div class="flex items-center">
+                        <div id="photoPreview" class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mr-4">
+                            <i class="fas fa-user text-gray-400 text-2xl"></i>
+                        </div>
+                        <button onclick="document.getElementById('photo').click()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                            <i class="fas fa-upload mr-2"></i>Choisir une photo
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Prénom</label>
+                        <input type="text" id="firstName" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Nom</label>
+                        <input type="text" id="lastName" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Titre professionnel</label>
+                    <input type="text" id="jobTitle" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Adresse</label>
+                    <input type="text" id="address" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Téléphone</label>
+                        <input type="tel" id="phone" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Email</label>
+                        <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Description</label>
+                    <textarea id="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                
+                <h2 class="text-xl font-semibold mb-4 mt-8 text-gray-700">Formation</h2>
+                <div id="educationContainer">
+                    <div class="education-item mb-4 p-4 border border-gray-200 rounded">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-medium">Nouvelle formation</h3>
+                            <button onclick="removeEducation(this)" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-gray-700 mb-1">Diplôme</label>
+                            <input type="text" class="education-degree w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-gray-700 mb-1">Établissement</label>
+                            <input type="text" class="education-school w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-2">
+                            <div>
+                                <label class="block text-gray-700 mb-1">Date de début</label>
+                                <input type="text" class="education-start w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/AAAA">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-1">Date de fin</label>
+                                <input type="text" class="education-end w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/AAAA">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-1">Description</label>
+                            <textarea class="education-description w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="addEducation()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2">
+                    <i class="fas fa-plus mr-2"></i>Ajouter une formation
+                </button>
+                
+                <h2 class="text-xl font-semibold mb-4 mt-8 text-gray-700">Expérience Professionnelle</h2>
+                <div id="experienceContainer">
+                    <div class="experience-item mb-4 p-4 border border-gray-200 rounded">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-medium">Nouvelle expérience</h3>
+                            <button onclick="removeExperience(this)" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-gray-700 mb-1">Poste</label>
+                            <input type="text" class="experience-title w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-gray-700 mb-1">Entreprise</label>
+                            <input type="text" class="experience-company w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-2">
+                            <div>
+                                <label class="block text-gray-700 mb-1">Date de début</label>
+                                <input type="text" class="experience-start w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/AAAA">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-1">Date de fin</label>
+                                <input type="text" class="experience-end w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/AAAA">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-1">Description</label>
+                            <textarea class="experience-description w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="addExperience()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2">
+                    <i class="fas fa-plus mr-2"></i>Ajouter une expérience
+                </button>
+                
+                <h2 class="text-xl font-semibold mb-4 mt-8 text-gray-700">Compétences</h2>
+                <div id="skillsContainer">
+                    <div class="skill-item mb-4 p-4 border border-gray-200 rounded">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-medium">Nouvelle compétence</h3>
+                            <button onclick="removeSkill(this)" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-gray-700 mb-1">Compétence</label>
+                            <input type="text" class="skill-name w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-gray-700 mb-1">Niveau (1-10)</label>
+                            <input type="range" min="1" max="10" value="5" class="skill-level w-full">
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>Débutant</span>
+                                <span>Expert</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="addSkill()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2">
+                    <i class="fas fa-plus mr-2"></i>Ajouter une compétence
+                </button>
+                
+                <h2 class="text-xl font-semibold mb-4 mt-8 text-gray-700">Langues</h2>
+                <div id="languagesContainer">
+                    <div class="language-item mb-4 p-4 border border-gray-200 rounded">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-medium">Nouvelle langue</h3>
+                            <button onclick="removeLanguage(this)" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-gray-700 mb-1">Langue</label>
+                            <input type="text" class="language-name w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-gray-700 mb-1">Niveau</label>
+                            <select class="language-level-select w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="1">Débutant</option>
+                                <option value="2">Intermédiaire</option>
+                                <option value="3">Avancé</option>
+                                <option value="4">Courant</option>
+                                <option value="5">Bilingue</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="addLanguage()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2">
+                    <i class="fas fa-plus mr-2"></i>Ajouter une langue
+                </button>
+                
+                <div class="mt-8 flex justify-center">
+                    <button onclick="generateCV()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
+                        <i class="fas fa-file-pdf mr-2"></i>Générer le CV en PDF
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Aperçu du CV -->
+            <div class="w-full lg:w-1/2 flex flex-col items-center">
+                <div class="mb-4 w-full flex justify-center no-print">
+                    <button onclick="printCV()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-2">
+                        <i class="fas fa-print mr-2"></i>Imprimer
+                    </button>
+                    <button onclick="downloadPDF()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded">
+                        <i class="fas fa-download mr-2"></i>Télécharger PDF
+                    </button>
+                </div>
+                
+                <div id="cvPreview" class="cv-preview">
+                    <div class="header-bg p-8">
+                        <div class="flex items-center">
+                            <div id="cvPhotoPreview" class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mr-6">
+                                <i class="fas fa-user text-gray-400 text-4xl"></i>
+                            </div>
+                            <div>
+                                <h1 id="cvName" class="text-3xl font-bold">Prénom Nom</h1>
+                                <h2 id="cvJobTitle" class="text-xl font-medium">Titre professionnel</h2>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                            <div>
+                                <h3 class="font-semibold text-gray-700 mb-2"><i class="fas fa-phone mr-2"></i>Téléphone</h3>
+                                <p id="cvPhone" class="text-gray-600">+33 6 12 34 56 78</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-700 mb-2"><i class="fas fa-envelope mr-2"></i>Email</h3>
+                                <p id="cvEmail" class="text-gray-600">email@example.com</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-700 mb-2"><i class="fas fa-map-marker-alt mr-2"></i>Adresse</h3>
+                                <p id="cvAddress" class="text-gray-600">123 Rue de la République, Paris</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <h3 class="section-title text-xl font-semibold mb-4 pb-2">Profil</h3>
+                            <p id="cvDescription" class="text-gray-700">Description professionnelle détaillant votre parcours, vos compétences et vos objectifs de carrière.</p>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <h3 class="section-title text-xl font-semibold mb-4 pb-2">Formation</h3>
+                            <div id="cvEducation">
+                                <div class="mb-6">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-semibold text-gray-800">Diplôme</h4>
+                                        <span class="text-gray-500">MM/AAAA - MM/AAAA</span>
+                                    </div>
+                                    <p class="text-gray-600 mb-1">Établissement</p>
+                                    <p class="text-gray-700">Description de la formation.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <h3 class="section-title text-xl font-semibold mb-4 pb-2">Expérience Professionnelle</h3>
+                            <div id="cvExperience">
+                                <div class="mb-6">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-semibold text-gray-800">Poste</h4>
+                                        <span class="text-gray-500">MM/AAAA - MM/AAAA</span>
+                                    </div>
+                                    <p class="text-gray-600 mb-1">Entreprise</p>
+                                    <p class="text-gray-700">Description des responsabilités et réalisations.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="section-title text-xl font-semibold mb-4 pb-2">Compétences</h3>
+                                <div id="cvSkills">
+                                    <div class="mb-3">
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-gray-800">Compétence</span>
+                                            <span class="text-gray-500">50%</span>
+                                        </div>
+                                        <div class="skill-level w-full h-2 bg-gray-200 rounded">
+                                            <div class="skill-level-fill h-full rounded" style="width: 50%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="section-title text-xl font-semibold mb-4 pb-2">Langues</h3>
+                                <div id="cvLanguages">
+                                    <div class="mb-3">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-800">Langue</span>
+                                            <div class="language-levels">
+                                                <span class="language-level filled"></span>
+                                                <span class="language-level filled"></span>
+                                                <span class="language-level filled"></span>
+                                                <span class="language-level"></span>
+                                                <span class="language-level"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion de la photo
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('photoPreview').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                    document.getElementById('cvPhotoPreview').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Mise à jour en temps réel de l'aperçu
+        document.querySelectorAll('input, textarea, select').forEach(element => {
+            element.addEventListener('input', updatePreview);
+        });
+        
+        function updatePreview() {
+            // Informations personnelles
+            document.getElementById('cvName').textContent = `${document.getElementById('firstName').value || 'Prénom'} ${document.getElementById('lastName').value || 'Nom'}`;
+            document.getElementById('cvJobTitle').textContent = document.getElementById('jobTitle').value || 'Titre professionnel';
+            document.getElementById('cvPhone').textContent = document.getElementById('phone').value || '+33 6 12 34 56 78';
+            document.getElementById('cvEmail').textContent = document.getElementById('email').value || 'email@example.com';
+            document.getElementById('cvAddress').textContent = document.getElementById('address').value || '123 Rue de la République, Paris';
+            document.getElementById('cvDescription').textContent = document.getElementById('description').value || 'Description professionnelle détaillant votre parcours, vos compétences et vos objectifs de carrière.';
+            
+            // Formation
+            const educationItems = document.querySelectorAll('.education-item');
+            let educationHTML = '';
+            educationItems.forEach(item => {
+                const degree = item.querySelector('.education-degree').value || 'Diplôme';
+                const school = item.querySelector('.education-school').value || 'Établissement';
+                const start = item.querySelector('.education-start').value || 'MM/AAAA';
+                const end = item.querySelector('.education-end').value || 'MM/AAAA';
+                const description = item.querySelector('.education-description').value || 'Description de la formation.';
+                
+                educationHTML += `
+                    <div class="mb-6">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-semibold text-gray-800">${degree}</h4>
+                            <span class="text-gray-500">${start} - ${end}</span>
+                        </div>
+                        <p class="text-gray-600 mb-1">${school}</p>
+                        <p class="text-gray-700">${description}</p>
+                    </div>
+                `;
+            });
+            document.getElementById('cvEducation').innerHTML = educationHTML || '<div class="mb-6"><p class="text-gray-600">Aucune formation ajoutée.</p></div>';
+            
+            // Expérience professionnelle
+            const experienceItems = document.querySelectorAll('.experience-item');
+            let experienceHTML = '';
+            experienceItems.forEach(item => {
+                const title = item.querySelector('.experience-title').value || 'Poste';
+                const company = item.querySelector('.experience-company').value || 'Entreprise';
+                const start = item.querySelector('.experience-start').value || 'MM/AAAA';
+                const end = item.querySelector('.experience-end').value || 'MM/AAAA';
+                const description = item.querySelector('.experience-description').value || 'Description des responsabilités et réalisations.';
+                
+                experienceHTML += `
+                    <div class="mb-6">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-semibold text-gray-800">${title}</h4>
+                            <span class="text-gray-500">${start} - ${end}</span>
+                        </div>
+                        <p class="text-gray-600 mb-1">${company}</p>
+                        <p class="text-gray-700">${description}</p>
+                    </div>
+                `;
+            });
+            document.getElementById('cvExperience').innerHTML = experienceHTML || '<div class="mb-6"><p class="text-gray-600">Aucune expérience ajoutée.</p></div>';
+            
+            // Compétences
+            const skillItems = document.querySelectorAll('.skill-item');
+            let skillsHTML = '';
+            skillItems.forEach(item => {
+                const name = item.querySelector('.skill-name').value || 'Compétence';
+                const level = item.querySelector('.skill-level').value || 5;
+                const percentage = (level / 10) * 100;
+                
+                skillsHTML += `
+                    <div class="mb-3">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-800">${name}</span>
+                            <span class="text-gray-500">${percentage}%</span>
+                        </div>
+                        <div class="skill-level w-full h-2 bg-gray-200 rounded">
+                            <div class="skill-level-fill h-full rounded" style="width: ${percentage}%;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('cvSkills').innerHTML = skillsHTML || '<p class="text-gray-600">Aucune compétence ajoutée.</p>';
+            
+            // Langues
+            const languageItems = document.querySelectorAll('.language-item');
+            let languagesHTML = '';
+            languageItems.forEach(item => {
+                const name = item.querySelector('.language-name').value || 'Langue';
+                const level = parseInt(item.querySelector('.language-level-select').value) || 3;
+                
+                let levelsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    levelsHTML += `<span class="language-level ${i <= level ? 'filled' : ''}"></span>`;
+                }
+                
+                languagesHTML += `
+                    <div class="mb-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-800">${name}</span>
+                            <div class="language-levels">
+                                ${levelsHTML}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('cvLanguages').innerHTML = languagesHTML || '<p class="text-gray-600">Aucune langue ajoutée.</p>';
+        }
+        
+        // Ajout d'éléments
+        function addEducation() {
+            const container = document.getElementById('educationContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'education-item mb-4 p-4 border border-gray-200 rounded';
+            newItem.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-medium">Nouvelle formation</h3>
+                    <button onclick="removeEducation(this)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 mb-1">Diplôme</label>
+                    <input type="text" class="education-degree w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 mb-1">Établissement</label>
+                    <input type="text" class="education-school w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-2">
+                    <div>
+                        <label class="block text-gray-700 mb-1">Date de début</label>
+                        <input type="text" class="education-start w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/AAAA">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1">Date de fin</label>
+                        <input type="text" class="education-end w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/AAAA">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-1">Description</label>
+                    <textarea class="education-description w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2"></textarea>
+                </div>
+            `;
+            container.appendChild(newItem);
+            
+            // Ajouter des écouteurs d'événements aux nouveaux champs
+            newItem.querySelectorAll('input, textarea').forEach(element => {
+                element.addEventListener('input', updatePreview);
+            });
+            
+            updatePreview();
+        }
+        
+        function addExperience() {
+            const container = document.getElementById('experienceContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'experience-item mb-4 p-4 border border-gray-200 rounded';
+            newItem.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-medium">Nouvelle expérience</h3>
+                    <button onclick="removeExperience(this)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 mb-1">Poste</label>
+                    <input type="text" class="experience-title w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 mb-1">Entreprise</label>
+                    <input type="text" class="experience-company w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-2">
+                    <div>
+                        <label class="block text-gray-700 mb-1">Date de début</label>
+                        <input type="text" class="experience-start w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/AAAA">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1">Date de fin</label>
+                        <input type="text" class="experience-end w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/AAAA">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-1">Description</label>
+                    <textarea class="experience-description w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                </div>
+            `;
+            container.appendChild(newItem);
+            
+            // Ajouter des écouteurs d'événements aux nouveaux champs
+            newItem.querySelectorAll('input, textarea').forEach(element => {
+                element.addEventListener('input', updatePreview);
+            });
+            
+            updatePreview();
+        }
+        
+        function addSkill() {
+            const container = document.getElementById('skillsContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'skill-item mb-4 p-4 border border-gray-200 rounded';
+            newItem.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-medium">Nouvelle compétence</h3>
+                    <button onclick="removeSkill(this)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 mb-1">Compétence</label>
+                    <input type="text" class="skill-name w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 mb-1">Niveau (1-10)</label>
+                    <input type="range" min="1" max="10" value="5" class="skill-level w-full">
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>Débutant</span>
+                        <span>Expert</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newItem);
+            
+            // Ajouter des écouteurs d'événements aux nouveaux champs
+            newItem.querySelectorAll('input').forEach(element => {
+                element.addEventListener('input', updatePreview);
+            });
+            
+            updatePreview();
+        }
+        
+        function addLanguage() {
+            const container = document.getElementById('languagesContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'language-item mb-4 p-4 border border-gray-200 rounded';
+            newItem.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-medium">Nouvelle langue</h3>
+                    <button onclick="removeLanguage(this)" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 mb-1">Langue</label>
+                    <input type="text" class="language-name w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 mb-1">Niveau</label>
+                    <select class="language-level-select w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="1">Débutant</option>
+                        <option value="2">Intermédiaire</option>
+                        <option value="3">Avancé</option>
+                        <option value="4">Courant</option>
+                        <option value="5">Bilingue</option>
+                    </select>
+                </div>
+            `;
+            container.appendChild(newItem);
+            
+            // Ajouter des écouteurs d'événements aux nouveaux champs
+            newItem.querySelectorAll('input, select').forEach(element => {
+                element.addEventListener('input', updatePreview);
+            });
+            
+            updatePreview();
+        }
+        
+        // Suppression d'éléments
+        function removeEducation(button) {
+            if (document.querySelectorAll('.education-item').length > 1) {
+                button.closest('.education-item').remove();
+                updatePreview();
+            } else {
+                alert('Vous devez avoir au moins une formation.');
+            }
+        }
+        
+        function removeExperience(button) {
+            if (document.querySelectorAll('.experience-item').length > 1) {
+                button.closest('.experience-item').remove();
+                updatePreview();
+            } else {
+                alert('Vous devez avoir au moins une expérience.');
+            }
+        }
+        
+        function removeSkill(button) {
+            if (document.querySelectorAll('.skill-item').length > 1) {
+                button.closest('.skill-item').remove();
+                updatePreview();
+            } else {
+                alert('Vous devez avoir au moins une compétence.');
+            }
+        }
+        
+        function removeLanguage(button) {
+            if (document.querySelectorAll('.language-item').length > 1) {
+                button.closest('.language-item').remove();
+                updatePreview();
+            } else {
+                alert('Vous devez avoir au moins une langue.');
+            }
+        }
+        
+        // Génération du PDF
+        function generateCV() {
+            updatePreview();
+            alert('Le CV a été mis à jour. Vous pouvez maintenant l\'imprimer ou le télécharger en PDF.');
+        }
+        
+        function printCV() {
+            window.print();
+        }
+        
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('cvPreview');
+            
+            html2canvas(element, {
+                scale: 2,
+                logging: true,
+                useCORS: true,
+                allowTaint: true
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210;
+                const pageHeight = 295;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                const name = document.getElementById('firstName').value || 'cv';
+                const lastName = document.getElementById('lastName').value || '';
+                pdf.save(`${name}_${lastName}_cv.pdf`);
+            });
+        }
+        
+        // Initialisation
+        updatePreview();
+    </script>
+</body>
+</html>
