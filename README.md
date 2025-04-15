@@ -4,7 +4,7 @@ Marre des CV moches qui finissent direct à la poubelle (numérique) ? Fatigué 
 
 Bienvenue dans **NancyCV** ! L'objectif ? Créer une application web permettant de générer **LE** CV parfait : professionnel, élégant, moderne, bref, le genre de CV qui fait dire "Wow !" au recruteur avant même qu'il ait lu la première ligne. (Bon, ok, on vise haut !)
 
-Ce projet, né d'une ambition démesurée (on vise le design niveau Apple/Google, rien que ça !) et d'une amitié solide (❤️ Dédicace spéciale à **Nancy**, la meilleure amie qui inspire ce projet ! Tu auras ton petit avatar !), est une application React + TypeScript + TailwindCSS.
+Ce projet, né d'une amitié solide (❤️ Dédicace spéciale à **Nancy**, la meilleure amie qui inspire ce projet ! Tu auras ton petit avatar !), est une application React + TypeScript + TailwindCSS.
 
 Au début, soyons honnêtes, le résultat était... *nuuuuuul*. Mais on est en pleine mission **"Extreme Makeover: CV Edition"** pour transformer ça en pépite !
 
@@ -13,7 +13,8 @@ Au début, soyons honnêtes, le résultat était... *nuuuuuul*. Mais on est en p
 Voici un petit avant-goût de ce à quoi ça ressemble (ou ressemblera bientôt de manière encore plus bluffante !) :
 
 ![Aperçu de NancyCV](screens/1.png)
-*Admirez cette (future) splendeur ! (Capture d'écran actuelle : `screens/1.png`)*
+### Apercu d'un CV (expérimental)
+<img src="screens/2.png" height=500px>
 
 ## Fonctionnalités Clés (Actuelles et Voulues)
 

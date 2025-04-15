@@ -46,7 +46,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
             transition={{ duration: 0.3 }}
             className="mb-6 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
         >
-            <div className="bg-gradient-to-r from-pink-500 to-purple-600 to-indigo-600 px-6 py-4">
+            <div className="bg-gradient-to-r from-pink-500  to-indigo-600 px-6 py-4">
                 <h2 className="text-xl font-semibold text-white">Informations Personnelles</h2>
             </div>
             

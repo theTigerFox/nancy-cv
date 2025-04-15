@@ -1,20 +1,19 @@
-// src/pages/HomePage.tsx
-import  { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { v4 as uuidv4 } from 'uuid';
-import { motion } from 'framer-motion'; // Nécessite: npm install framer-motion
+import { motion } from 'framer-motion';
 
 import CvForm from '../components/CvForm/CvForm';
 import CvPreview from '../components/CvPreview/CvPreview';
 import {
     CvData,
     PersonalInfo,
-
 } from '../types/cv';
 
-// Pour l'avatar de Nancy dans un cercle
-import nancyAvatar from '../assets/nancy.jpg'; // Assurez-vous que ce chemin est correct
+// Assets
+import nancyAvatar from '../assets/nancy.jpg';
+import foxLogo from '../assets/logo-fox-dark.png';
 
 const initialCvData: CvData = {
     personalInfo: {
@@ -43,7 +42,7 @@ const initialCvData: CvData = {
 
 function HomePage() {
     const [cvData, setCvData] = useState<CvData>(() => {
-        // Charger les données du CV depuis le localStorage si disponibles
+        // Load CV data from localStorage if available
         const savedData = localStorage.getItem('nancyCvData');
         return savedData ? JSON.parse(savedData) : initialCvData;
     });
@@ -51,12 +50,12 @@ function HomePage() {
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const previewRef = useRef<HTMLDivElement>(null);
 
-    // Sauvegarde automatique des données dans localStorage
+    // Auto-save data to localStorage
     useEffect(() => {
         localStorage.setItem('nancyCvData', JSON.stringify(cvData));
     }, [cvData]);
 
-    // --- Handlers pour mettre à jour l'état ---
+    // --- State update handlers ---
     const handlePersonalInfoChange = useCallback(<K extends keyof PersonalInfo>(field: K, value: PersonalInfo[K]) => {
         setCvData(prev => ({
             ...prev,
@@ -121,7 +120,7 @@ function HomePage() {
         if (!element) return;
 
         setIsGeneratingPDF(true);
-        
+
         try {
             const canvas = await html2canvas(element, {
                 scale: 2,
@@ -129,7 +128,7 @@ function HomePage() {
                 logging: false,
                 allowTaint: true,
             });
-            
+
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -157,7 +156,7 @@ function HomePage() {
             const lastName = cvData.personalInfo.lastName || '';
             pdf.save(`${firstName}_${lastName}_cv.pdf`);
         } catch (error) {
-            console.error("Erreur lors de la génération du PDF:", error);
+            console.error("Error generating PDF:", error);
         } finally {
             setIsGeneratingPDF(false);
         }
@@ -168,106 +167,139 @@ function HomePage() {
     };
 
     const handleResetForm = () => {
-        if (window.confirm("Êtes-vous sûr de vouloir réinitialiser le formulaire? Toutes les données seront perdues.")) {
+        if (window.confirm("Are you sure you want to reset the form? All data will be lost.")) {
             setCvData(initialCvData);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-purple-800 text-white">
+        <div className="min-h-screen bg-white text-gray-800 relative overflow-hidden">
+            {/* Background gradient circles - Apple/Google style */}
+            <div
+                className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-gradient-to-r from-pink-500  to-indigo-300 opacity-50 blur-3xl"></div>
+            <div
+                className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-gradient-to-r from-pink-500  to-indigo-300 opacity-50 blur-3xl"></div>
+
+            <div
+                className="absolute top-1/4 -right-40 w-96 h-96 rounded-full bg-gradient-to-br from-pink-100 to-purple-800 opacity-50 blur-3xl"></div>
+            <div
+                className="absolute bottom-0 left-1/3 w-96 h-96 rounded-full bg-gradient-to-br from-blue-100 to-indigo-800 opacity-40 blur-3xl"></div>
+
             {/* Header with Nancy dedication */}
-            <header className="w-full ">
+            <header className="w-full  fixed z-1000 border-b border-gray-100 bg-white/70 backdrop-blur-md">
                 <div className="container mx-auto py-4 px-6 flex items-center justify-between">
-                    <div className="flex items-center">
-                        <div className="h-12 w-12 rounded-full overflow-hidden border-2 border-pink-400 shadow-lg shadow-pink-500/30">
-                            <img src={nancyAvatar} alt="Nancy" className="w-full h-full object-cover" />
+                    <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full overflow-hidden border border-purple-200 shadow-lg">
+                            <img src={nancyAvatar} alt="Nancy" className="w-full h-full object-cover"/>
                         </div>
-                        <div className="ml-3">
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
-                                NancyCV
+                        <div>
+                            <h1 className="text-2xl font-semibold text-gray-800">
+                                Nancy<span className="text-purple-600">CV</span>
                             </h1>
-                            <p className="text-xs text-white/70">For Nancy</p>
+                            <p className="text-xs text-gray-500">For Nancy</p>
                         </div>
                     </div>
-                    
+
                     <nav className="hidden md:block">
-                        <ul className="flex space-x-6">
-                            <li className="hover:text-pink-400 transition-colors">
-                                <a href="#features">Fonctionnalités</a>
+                        <ul className="flex space-x-8">
+                            <li>
+                                <a href="#contact"
+                                   className="text-gray-600 hover:text-purple-600 transition-colors font-medium">
+                                    Contact
+                                </a>
                             </li>
-                            <li className="hover:text-pink-400 transition-colors">
-                                <a href="#templates">Templates</a>
+                            <li>
+                                <a href="https://the-fox.tech"
+                                   className="text-gray-600 hover:text-purple-600 transition-colors font-medium">
+                                    Developer
+                                </a>
                             </li>
-                            <li className="hover:text-pink-400 transition-colors">
-                                <a href="#faq">FAQ</a>
+                            <li>
+                                <a href="#faq"
+                                   className="text-gray-600 hover:text-purple-600 transition-colors font-medium">
+                                    FAQ
+                                </a>
                             </li>
                         </ul>
                     </nav>
                 </div>
             </header>
 
-            <main className="container mx-auto py-8 px-4">
-                {/* Title with glass effect */}
-                <motion.div 
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className=" rounded-xl p-8 mb-8 "
+
+            <main className="container mt-20 mx-auto py-10 px-4 relative z-10">
+                {/* Title Section */}
+                <motion.div
+                    initial={{opacity: 0, y: -20}}
+                    animate={{opacity: 1, y: 0}}
+                    transition={{duration: 0.5}}
+                    className="mb-12 text-center"
                 >
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-                        Allez fais ton CV rapide !
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-pink-500  to-indigo-600 bg-clip-text text-transparent">
+                        Create Your Professional CV
                     </h2>
-                    <p className="text-center text-white/80 max-w-2xl mx-auto">
-                        Un générateur de CV fait de base pour que nancy arrête de m'embêter.
+                    <p className="text-gray-600 max-w-2xl mx-auto mb-6">
+                        A simple and elegant CV generator built for Nancy.
                     </p>
+
+                    <div className="flex justify-center items-center">
+                        <span className="text-gray-500 text-sm">Developed by</span>
+                        <div className="ml-2 h-8">
+                            <img src={foxLogo} alt="Fox Logo" className="h-full w-auto object-contain"/>
+                        </div>
+                    </div>
                 </motion.div>
 
-                {/* View toggle */}
-                <div className="flex justify-center mb-8">
-                    <div className="inline-flex rounded-md backdrop-blur-md bg-white/10 p-1 shadow-inner">
+                {/* View Toggle */}
+                <div className="flex justify-center mb-10">
+                    <div className="inline-flex rounded-full bg-gray-100 p-1 shadow-inner">
                         <button
                             onClick={() => handleViewToggle('form')}
-                            className={`px-6 py-2 rounded-md font-medium transition-all ${
-                                activeView === 'form' 
-                                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg' 
-                                    : 'text-white/70 hover:text-white'
+                            className={`px-6 py-2 rounded-full font-medium transition-all ${
+                                activeView === 'form'
+                                    ? 'bg-white text-purple-600 shadow-md'
+                                    : 'text-gray-600 hover:text-gray-800'
                             }`}
                         >
-                            Formulaire
+                            Form
                         </button>
                         <button
                             onClick={() => handleViewToggle('preview')}
-                            className={`px-6 py-2 rounded-md font-medium transition-all ${
-                                activeView === 'preview' 
-                                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg' 
-                                    : 'text-white/70 hover:text-white'
+                            className={`px-6 py-2 rounded-full font-medium transition-all ${
+                                activeView === 'preview'
+                                    ? 'bg-white text-purple-600 shadow-md'
+                                    : 'text-gray-600 hover:text-gray-800'
                             }`}
                         >
-                            Aperçu
+                            Preview
                         </button>
                     </div>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Formulaire */}
-                    <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ 
+                    {/* Form */}
+                    <motion.div
+                        initial={{opacity: 0, x: -20}}
+                        animate={{
                             opacity: activeView === 'form' || window.innerWidth >= 1024 ? 1 : 0,
                             x: 0,
                             display: activeView === 'form' || window.innerWidth >= 1024 ? 'block' : 'none'
                         }}
-                        transition={{ duration: 0.4 }}
+                        transition={{duration: 0.4}}
                         className="w-full lg:w-1/2 print:hidden"
                     >
-                        <div className="backdrop-blur-md bg-white/10 rounded-xl border border-white/20 shadow-xl p-6">
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6">
                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-semibold">Informations du CV</h3>
-                                <button 
+                                <h3 className="text-xl font-semibold text-gray-800">CV Information</h3>
+                                <button
                                     onClick={handleResetForm}
-                                    className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                                    className="text-sm text-red-500 hover:text-red-600 transition-colors flex items-center gap-1"
                                 >
-                                    Réinitialiser
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none"
+                                         viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    Reset
                                 </button>
                             </div>
                             <CvForm
@@ -281,66 +313,83 @@ function HomePage() {
                         </div>
                     </motion.div>
 
-                    {/* Aperçu */}
-                    <motion.div 
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ 
+                    {/* Preview */}
+                    <motion.div
+                        initial={{opacity: 0, x: 20}}
+                        animate={{
                             opacity: activeView === 'preview' || window.innerWidth >= 1024 ? 1 : 0,
                             x: 0,
                             display: activeView === 'preview' || window.innerWidth >= 1024 ? 'flex' : 'none'
                         }}
-                        transition={{ duration: 0.4 }}
+                        transition={{duration: 0.4}}
                         className="w-full lg:w-1/2 flex flex-col items-center"
                     >
-                        {/* Boutons d'action */}
+                        {/* Action Buttons */}
                         <div className="mb-6 w-full flex justify-center gap-4 print:hidden">
                             <button
                                 onClick={handlePrint}
                                 disabled={isGeneratingPDF}
-                                className="bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+                                className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-3 rounded-full shadow-sm hover:shadow transition-all flex items-center justify-center"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                                 </svg>
-                                Imprimer
+                                Print
                             </button>
                             <button
                                 onClick={handleDownloadPdf}
                                 disabled={isGeneratingPDF}
-                                className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+                                className="bg-gradient-to-r from-pink-500  to-indigo-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center"
                             >
                                 {isGeneratingPDF ? (
                                     <>
-                                        <svg className="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        <svg className="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg"
+                                             fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                    strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor"
+                                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        Génération...
+                                        Generating...
                                     </>
                                 ) : (
                                     <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
-                                        Télécharger PDF
+                                        Download PDF
                                     </>
                                 )}
                             </button>
                         </div>
-                        
-                        {/* Preview avec effet d'ombre */}
-                        <div className="w-full shadow-2xl transform hover:scale-[1.01] transition-transform duration-300  overflow-hidden">
-                            <CvPreview ref={previewRef} cvData={cvData} />
+
+                        {/* CV Preview with shadow effect */}
+                        <div className="w-full relative">
+                            {/* Subtle shadow effect behind the CV */}
+                            <div
+                                className="absolute -inset-1 bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 blur-md rounded-xl"></div>
+
+                            {/* The actual CV preview */}
+                            <div
+                                className="relative bg-white shadow-xl rounded-xl overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
+                                <CvPreview ref={previewRef} cvData={cvData}/>
+                            </div>
                         </div>
                     </motion.div>
                 </div>
             </main>
-            
+
             {/* Footer */}
-            <footer className="mt-16 border-t border-white/10 py-8 backdrop-blur-md bg-black/20">
+            <footer className="mt-20 py-8 border-t border-gray-200 bg-white/70 backdrop-blur-sm relative z-10">
                 <div className="container mx-auto px-4 text-center">
-                    <p className="text-white/60 text-sm">
-                        NancyCV © {new Date().getFullYear()} - Créé avec 💖 pour Nancy par <a href="https://the-fox.tech">Fox</a>
+                    <p className="text-gray-500 text-sm">
+                        NancyCV © {new Date().getFullYear()} - Created with <span
+                        className="text-purple-600">♥</span> for Nancy by <a href="https://the-fox.tech"
+                                                                             className="text-purple-600 hover:text-purple-700 font-medium">Fox</a>
                     </p>
                 </div>
             </footer>
