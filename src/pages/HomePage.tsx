@@ -387,7 +387,7 @@ function HomePage() {
             <footer className="mt-20 py-8 border-t border-gray-200 bg-white/70 backdrop-blur-sm relative z-10">
                 <div className="container mx-auto px-4 text-center">
                     <p className="text-gray-500 text-sm">
-                        NancyCV © {new Date().getFullYear()} - Created with <span
+                        NanCV © {new Date().getFullYear()} - Created with <span
                         className="text-purple-600">♥</span> for Nancy by <a href="https://the-fox.tech"
                                                                              className="text-purple-600 hover:text-purple-700 font-medium">Fox</a>
                     </p>

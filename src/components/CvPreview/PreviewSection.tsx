@@ -1,4 +1,3 @@
-// src/components/CvPreview/PreviewSection.tsx
 import React, { ReactNode } from 'react';
 
 interface PreviewSectionProps {
@@ -7,47 +6,46 @@ interface PreviewSectionProps {
     noMarginBottom?: boolean;
     icon?: ReactNode;
     accentColor?: string;
+    compact?: boolean;
 }
 
-const PreviewSection: React.FC<PreviewSectionProps> = ({ 
-    title, 
-    children, 
-    noMarginBottom = false,
-    icon,
-    accentColor = "#6366f1" // Couleur par défaut
-}) => {
+const PreviewSection: React.FC<PreviewSectionProps> = ({
+                                                           title,
+                                                           children,
+                                                           noMarginBottom = false,
+                                                           icon,
+                                                           accentColor = "#6366f1",
+                                                           compact = false
+                                                       }) => {
     return (
-        <section className={`mb-${noMarginBottom ? '0' : '3'} group`}>
-            {/* En-tête de section avec animation au survol */}
-            <div className="flex items-center mb-5 pb-2 border-b border-gray-100 relative overflow-hidden">
+        <section className={`mb-${noMarginBottom ? '0' : '4'} group`}>
+            {/* Section header with simplified animation */}
+            <div className="flex items-center mb-3 pb-1 border-b border-gray-100">
                 {icon && (
-                    <div className="mr-3 p-2 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 shadow-sm transform group-hover:scale-110 transition-all duration-300">
+                    <div
+                        className={`mr-2 ${compact ? 'p-1' : 'p-1.5'} rounded-md bg-gradient-to-br from-gray-50 to-gray-100 shadow-sm`}
+                        style={{ color: accentColor }}
+                    >
                         {icon}
                     </div>
                 )}
-                
-                <h3 className="text-xm font-bold tracking-tight text-gray-800 relative">
+
+                <h3
+                    className={`${compact ? 'text-sm' : 'text-base'} font-bold uppercase tracking-wide text-gray-800`}
+                    style={{ color: accentColor }}
+                >
                     {title}
-                    {/* Ligne d'accent avec animation */}
-                    <span 
-                        className="absolute -bottom-2 left-0 h-1 w-16 rounded-full transform group-hover:w-24 transition-all duration-500 ease-out"
-                        style={{ 
-                            background: `linear-gradient(90deg, ${accentColor}, ${accentColor}90)`
-                        }}
-                    ></span>
                 </h3>
-                
-                {/* Élément de design subtil */}
-                <div 
-                    className="absolute right-0 bottom-0 h-8 w-16 opacity-10 transform translate-x-4 translate-y-4"
-                    style={{ 
-                        background: `radial-gradient(circle, ${accentColor}80, transparent)` 
-                    }}
+
+                {/* Accent line */}
+                <div
+                    className="ml-2 flex-grow h-px"
+                    style={{ backgroundColor: `${accentColor}30` }}
                 ></div>
             </div>
-            
-            {/* Contenu de la section avec animation subtile d'apparition */}
-            <div className="transform transition-all duration-500 ease-out">
+
+            {/* Section content */}
+            <div>
                 {children}
             </div>
         </section>

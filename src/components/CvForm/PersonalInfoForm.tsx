@@ -212,7 +212,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
                         <textarea
                             id="description"
                             rows={4}
-                            value={personalInfo.description}
+                            value={personalInfo.description|| "Je suis rigoureuse et passionnée"}
                             onChange={(e) => onInfoChange('description', e.target.value)}
                             className="w-full px-4 py-3 border text-gray-700  border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all duration-200 resize-none"
                             placeholder="Présentez-vous en quelques phrases. Quelles sont vos compétences clés et vos principales réalisations?"

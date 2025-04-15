@@ -159,7 +159,7 @@ const IntroPage = () => {
                     >
                         {/* Slightly smaller heading, reduced bottom margin */}
                         <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-5 bg-gradient-to-r from-pink-500 to-indigo-600 bg-clip-text text-transparent">
-                            Create Your Perfect CV
+                            Create your CV quickly
                         </h2>
 
                         {/* Slightly smaller text, reduced bottom margin, adjusted max-width */}
@@ -232,7 +232,7 @@ const IntroPage = () => {
                 {/* Footer: Added padding top */}
                 <footer className="w-full text-center mt-auto pt-6 pb-4 border-t border-gray-100/80">
                     <p className="text-gray-500 text-xs sm:text-sm">
-                        NancyCV © {new Date().getFullYear()} - Created by <a href="https://the-fox.tech" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:text-indigo-600 transition-colors font-medium">Fox</a>
+                        NanCV © {new Date().getFullYear()} - Created by <a href="https://the-fox.tech" target="_blank" rel="noopener noreferrer" className="text-pink-500 hover:text-indigo-600 transition-colors font-medium">Fox</a>
                     </p>
                 </footer>
             </div>
