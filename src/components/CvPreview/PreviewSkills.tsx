@@ -3,10 +3,10 @@ import { SkillItem } from '../../types/cv';
 
 interface PreviewSkillsProps {
   skills: SkillItem[];
-}
+  accentColor : string;
+} 
 
-const PreviewSkills: React.FC<PreviewSkillsProps> = ({ skills }) => {
-  const accentColor = "#6366f1"; // Indigo
+const PreviewSkills: React.FC<PreviewSkillsProps> = ({ skills, accentColor = "#6366f1" }) => {
   
   // Helper pour vérifier s'il y a au moins une compétence avec un nom
   const hasVisibleSkills = skills.some(skill => skill.name.trim() !== '');

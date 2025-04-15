@@ -3,10 +3,11 @@ import { LanguageItem } from '../../types/cv';
 
 interface PreviewLanguagesProps {
   languages: LanguageItem[];
+   accentColor : "#6366f1";
 }
 
-const PreviewLanguages: React.FC<PreviewLanguagesProps> = ({ languages }) => {
-  const accentColor = "#6366f1"; // Indigo
+const PreviewLanguages: React.FC<PreviewLanguagesProps> = ({ languages ,accentColor = "#6366f1"}) => {
+   // Indigo
   const lightAccentColor = "#e0e7ff"; // Indigo très clair
   
   // Helper pour vérifier s'il y a au moins une langue avec un nom

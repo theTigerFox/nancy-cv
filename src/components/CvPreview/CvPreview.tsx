@@ -1,5 +1,5 @@
 // src/components/CvPreview/CvPreview.tsx
-import React, { forwardRef } from 'react';
+import  { forwardRef } from 'react';
 import { CvData } from '../../types/cv';
 import PreviewHeader from './PreviewHeader';
 import PreviewContact from './PreviewContact';

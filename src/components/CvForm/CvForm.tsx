@@ -45,7 +45,7 @@ const CvForm: React.FC<CvFormProps> = ({
              <FormSection
                 title="Formation"
                 items={cvData.education}
-                renderItem={(item, index) => (
+                renderItem={(item) => (
                     <EducationForm
                         item={item}
                         onChange={(field, value) => onListChange('education', item.id, field, value)}
@@ -60,7 +60,7 @@ const CvForm: React.FC<CvFormProps> = ({
              <FormSection
                 title="Expérience Professionnelle"
                 items={cvData.experience}
-                renderItem={(item, index) => (
+                renderItem={(item) => (
                     <ExperienceForm
                         item={item}
                         onChange={(field, value) => onListChange('experience', item.id, field, value)}
@@ -75,7 +75,7 @@ const CvForm: React.FC<CvFormProps> = ({
              <FormSection
                 title="Compétences"
                 items={cvData.skills}
-                renderItem={(item, index) => (
+                renderItem={(item) => (
                     <SkillsForm
                         item={item}
                         onChange={(field, value) => onListChange('skills', item.id, field, value)}
@@ -90,7 +90,7 @@ const CvForm: React.FC<CvFormProps> = ({
             <FormSection
                 title="Langues"
                 items={cvData.languages}
-                renderItem={(item, index) => (
+                renderItem={(item) => (
                     <LanguagesForm
                         item={item}
                         onChange={(field, value) => onListChange('languages', item.id, field, value)}

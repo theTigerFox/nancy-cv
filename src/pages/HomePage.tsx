@@ -1,5 +1,5 @@
 // src/pages/HomePage.tsx
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import  { useState, useRef, useCallback, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,10 +10,7 @@ import CvPreview from '../components/CvPreview/CvPreview';
 import {
     CvData,
     PersonalInfo,
-    EducationItem,
-    ExperienceItem,
-    SkillItem,
-    LanguageItem,
+
 } from '../types/cv';
 
 // Pour l'avatar de Nancy dans un cercle
@@ -87,7 +84,7 @@ function HomePage() {
     ) => {
         setCvData(prev => ({
             ...prev,
-            [listName]: (prev[listName] as T[]).map(item =>
+            [listName]: (prev[listName] as unknown as T[]).map(item =>
                 item.id === id ? { ...item, [field]: value } : item
             ),
         }));
@@ -277,7 +274,7 @@ function HomePage() {
                                 cvData={cvData}
                                 onPersonalInfoChange={handlePersonalInfoChange}
                                 onPhotoChange={handlePhotoChange}
-                                onListChange={handleListChange}
+                                onListChange={handleListChange as (listName: keyof CvData, id: string, field: string, value: any) => void}
                                 onAddItem={addListItem}
                                 onRemoveItem={removeListItem}
                             />
