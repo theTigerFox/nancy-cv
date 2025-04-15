@@ -217,8 +217,7 @@ const CvPreview = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData }, ref) =
                 )}
             </div>
             
-            {/* Footer avec design élégant et dégradé */}
-            
+
        
         </div>
     );
