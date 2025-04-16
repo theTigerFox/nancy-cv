@@ -1,5 +1,5 @@
 import { forwardRef, useState } from 'react';
-import { CvData } from '../../types/cv';
+import { CvData } from '../../../types/cv';
 import PreviewHeader from './PreviewHeader';
 import PreviewContact from './PreviewContact';
 import PreviewSection from './PreviewSection';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SkillItem } from '../../types/cv';
+import { SkillItem } from '../../../types/cv';
 
 interface PreviewSkillsProps {
   skills: SkillItem[];

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PersonalInfo } from '../../types/cv';
+import { PersonalInfo } from '../../../types/cv';
 
 interface PreviewHeaderProps {
   personalInfo: PersonalInfo;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LanguageItem } from '../../types/cv';
+import { LanguageItem } from '../../../types/cv';
 
 interface PreviewLanguagesProps {
   languages: LanguageItem[];
