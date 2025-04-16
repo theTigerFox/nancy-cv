@@ -26,9 +26,9 @@ const CvPreview = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData }, ref) =
     return (
         <div className="w-full flex flex-col items-center">
             {/* Color picker centered above the CV - visible only in edit mode */}
-            <div className="w-full text-center mb-4 print:hidden">
-                <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200">
-                    <label htmlFor="headerColor" className="text-sm text-gray-600">Couleur du header:</label>
+            <div className="w-full fixed z-1000 text-center mb-4 print:hidden">
+                <div className="inline-flex mt-3 items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200">
+                    <label htmlFor="headerColor" className="text-sm  text-gray-600">Couleur Principale :</label>
                     <input
                         type="color"
                         id="headerColor"
@@ -166,118 +166,131 @@ const CvPreview = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData }, ref) =
 
                         {/* Education */}
                         {hasContent(education) && (
-                            <PreviewSection
-                                title="Formation"
-                                icon={
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" style={{color: accentColor}} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                                        <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-                                    </svg>
-                                }
-                                accentColor={accentColor}
-                                compact
-                            >
-                                <div className="space-y-3">
-                                    {education.map((item, index) => (
-                                        <div
-                                            key={item.id}
-                                            className={`p-2 rounded-md ${
-                                                index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                                            }`}
-                                        >
-                                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 mb-1">
-                                                <div>
-                                                    <h4 className="font-bold text-gray-800 text-base">{item.degree || 'Diplôme'}</h4>
-                                                    <p className="text-gray-600 text-sm">{item.school || 'Établissement'}</p>
+                            <div className="mt-12">
+                                <PreviewSection
+                                    title="Formation"
+                                    icon={
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" style={{color: accentColor}} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                                        </svg>
+                                    }
+                                    accentColor={accentColor}
+                                    compact
+                                >
+                                    <div className="space-y-3">
+                                        {education.map((item, index) => (
+                                            <div
+                                                key={item.id}
+                                                className={`p-2 rounded-md ${
+                                                    index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                                                }`}
+                                            >
+                                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 mb-1">
+                                                    <div>
+                                                        <h4 className="font-bold text-gray-800 text-base">{item.degree || 'Diplôme'}</h4>
+                                                        <p className="text-gray-600 text-sm">{item.school || 'Établissement'}</p>
+                                                    </div>
+                                                    {item.startDate && (
+                                                        <div
+                                                            className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+                                                            style={{
+                                                                background: `${accentColor}15`,
+                                                                color: accentColor
+                                                            }}
+                                                        >
+                                                            {item.startDate} - {item.endDate || 'présent'}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                {item.startDate && (
-                                                    <div
-                                                        className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
-                                                        style={{
-                                                            background: `${accentColor}15`,
-                                                            color: accentColor
-                                                        }}
-                                                    >
-                                                        {item.startDate} - {item.endDate || 'présent'}
+                                                {item.description && (
+                                                    <div className="mt-1 text-xs leading-relaxed text-gray-700 pl-2 border-l-2" style={{borderColor: `${accentColor}40`}}>
+                                                        {item.description}
                                                     </div>
                                                 )}
                                             </div>
-                                            {item.description && (
-                                                <div className="mt-1 text-xs leading-relaxed text-gray-700 pl-2 border-l-2" style={{borderColor: `${accentColor}40`}}>
-                                                    {item.description}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </PreviewSection>
+                                        ))}
+                                    </div>
+                                </PreviewSection>
+                            </div>
+
+
                         )}
 
                         {/* Experience */}
                         {hasContent(experience) && (
-                            <PreviewSection
-                                title="Expérience Professionnelle"
-                                icon={
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" style={{color: accentColor}} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                }
-                                accentColor={accentColor}
-                                compact
-                            >
-                                <div className="relative">
-                                    {/* Timeline design - simplified for saving space */}
-                                    <div className="absolute left-1.5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-400 to-purple-400 hidden sm:block"></div>
+                            <div className="mt-12">
+                                <PreviewSection
+                                    title="Expérience "
+                                    icon={
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4"
+                                             style={{color: accentColor}} fill="none" viewBox="0 0 24 24"
+                                             stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                    }
+                                    accentColor={accentColor}
+                                    compact
+                                >
+                                    <div className="relative">
+                                        {/* Timeline design - simplified for saving space */}
+                                        <div
+                                            className="absolute left-1.5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-400 to-purple-400 hidden sm:block"></div>
 
-                                    <div className="space-y-4">
-                                        {experience.map((item) => (
-                                            <div
-                                                key={item.id}
-                                                className="relative pl-0 sm:pl-6"
-                                            >
-                                                {/* Timeline dot */}
+                                        <div className="space-y-4">
+                                            {experience.map((item) => (
                                                 <div
-                                                    className="absolute left-0 top-0 w-3 h-3 rounded-full bg-white border hidden sm:block"
-                                                    style={{borderColor: accentColor, top: '0.3rem', left: '0'}}
-                                                ></div>
+                                                    key={item.id}
+                                                    className="relative pl-0 sm:pl-6"
+                                                >
+                                                    {/* Timeline dot */}
+                                                    <div
+                                                        className="absolute left-0 top-0 w-3 h-3 rounded-full bg-white border hidden sm:block"
+                                                        style={{borderColor: accentColor, top: '0.3rem', left: '0'}}
+                                                    ></div>
 
-                                                {/* Experience card */}
-                                                <div className="bg-white pt-0 rounded-md">
-                                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 mb-1">
-                                                        <div>
-                                                            <h4 className="font-bold text-gray-800 text-base">{item.title || 'Poste'}</h4>
-                                                            <p className="text-gray-600 text-sm flex items-center">
+                                                    {/* Experience card */}
+                                                    <div className="bg-white pt-0 rounded-md">
+                                                        <div
+                                                            className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 mb-1">
+                                                            <div>
+                                                                <h4 className="font-bold text-gray-800 text-base">{item.title || 'Poste'}</h4>
+                                                                <p className="text-gray-600 text-sm flex items-center">
                                                                 <span
                                                                     className="inline-block w-1.5 h-1.5 rounded-full mr-1.5"
                                                                     style={{backgroundColor: accentColor}}
                                                                 ></span>
-                                                                {item.company || 'Entreprise'}
-                                                            </p>
+                                                                    {item.company || 'Entreprise'}
+                                                                </p>
+                                                            </div>
+                                                            {item.startDate && (
+                                                                <div
+                                                                    className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+                                                                    style={{
+                                                                        background: `${accentColor}15`,
+                                                                        color: accentColor
+                                                                    }}
+                                                                >
+                                                                    {item.startDate} - {item.endDate || 'présent'}
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                        {item.startDate && (
+                                                        {item.description && (
                                                             <div
-                                                                className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
-                                                                style={{
-                                                                    background: `${accentColor}15`,
-                                                                    color: accentColor
-                                                                }}
-                                                            >
-                                                                {item.startDate} - {item.endDate || 'présent'}
+                                                                className="text-xs text-gray-700 leading-relaxed mt-1 pl-2 border-l-2"
+                                                                style={{borderColor: `${accentColor}40`}}>
+                                                                {item.description}
                                                             </div>
                                                         )}
                                                     </div>
-                                                    {item.description && (
-                                                        <div className="text-xs text-gray-700 leading-relaxed mt-1 pl-2 border-l-2" style={{borderColor: `${accentColor}40`}}>
-                                                            {item.description}
-                                                        </div>
-                                                    )}
                                                 </div>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            </PreviewSection>
+                                </PreviewSection>
+                            </div>
                         )}
 
                         {/* Skills & Languages only if no sidebar */}

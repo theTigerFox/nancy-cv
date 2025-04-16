@@ -32,6 +32,11 @@ const CvForm: React.FC<CvFormProps> = ({
     onAddItem,
     onRemoveItem
 }) => {
+
+    function handleDlBtn2(){
+        document.getElementById("btn-dl")?.click();
+    }
+
     return (
         <div className="space-y-8">
             {/* Personal Info */}
@@ -102,11 +107,11 @@ const CvForm: React.FC<CvFormProps> = ({
             />
 
             {/* Maybe a final submit/generate button if needed, although download/print are on preview */}
-             {/* <div className="mt-8 flex justify-center">
-                <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">
-                    <i className="fas fa-file-pdf mr-2"></i>Mettre à jour l'aperçu (si pas en temps réel)
+              <div className="mt-8 flex justify-center">
+                <button onClick={handleDlBtn2} className="bg-gradient-to-r from-pink-500  to-indigo-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center">
+                    <i className="fas fa-file-pdf mr-2"></i>Download CV
                 </button>
-            </div> */}
+            </div>
         </div>
     );
 };

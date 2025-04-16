@@ -3,13 +3,19 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { v4 as uuidv4 } from 'uuid';
 import { motion } from 'framer-motion';
+import { BrainCircuit } from 'lucide-react';
 
 import CvForm from '../components/CvForm/CvForm';
 import CvPreview from '../components/CvPreview/CvPreview';
+import AiModal from '../components/AiModal/AiModal';
+// import { generateCvFromPrompt } from '../services/aiService';
 import {
     CvData,
     PersonalInfo,
 } from '../types/cv';
+
+
+
 
 // Assets
 import nancyAvatar from '../assets/nancy.jpg';
@@ -48,6 +54,7 @@ function HomePage() {
     });
     const [activeView, setActiveView] = useState<'form' | 'preview'>('form');
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+    const [isAiModalOpen, setIsAiModalOpen] = useState(false);
     const previewRef = useRef<HTMLDivElement>(null);
 
     // Auto-save data to localStorage
@@ -130,7 +137,7 @@ function HomePage() {
             });
 
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdf = new jsPDF('p', 'mm', 'a4',true);
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
             const canvasWidth = canvas.width;
@@ -148,6 +155,7 @@ function HomePage() {
             while (heightLeft > 0) {
                 position = heightLeft - imgHeight;
                 pdf.addPage();
+
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pdfHeight;
             }
@@ -172,6 +180,23 @@ function HomePage() {
         }
     };
 
+    // Fonction pour gérer les données générées par l'IA
+    // const handleAiGenerated = (generatedData: CvData) => {
+    //     setCvData(generatedData);
+    //     // Afficher la vue du formulaire pour que l'utilisateur puisse ajuster si nécessaire
+    //     setActiveView('form');
+    // };
+// Fonction pour gérer les données générées par l'IA
+    const handleAiGenerated = (generatedData: CvData) => {
+        // Mise à jour de l'état principal
+        setCvData(generatedData);
+
+        // Sauvegarder dans localStorage immédiatement pour garantir la persistance
+        localStorage.setItem('nancyCvData', JSON.stringify(generatedData));
+
+        // Afficher la vue du formulaire pour que l'utilisateur puisse ajuster si nécessaire
+        setActiveView('form');
+    };
     return (
         <div className="min-h-screen bg-white text-gray-800 relative overflow-hidden">
             {/* Background gradient circles - Apple/Google style */}
@@ -186,7 +211,7 @@ function HomePage() {
                 className="absolute bottom-0 left-1/3 w-96 h-96 rounded-full bg-gradient-to-br from-blue-100 to-indigo-800 opacity-40 blur-3xl"></div>
 
             {/* Header with Nancy dedication */}
-            <header className="w-full  fixed z-1000 border-b border-gray-100 bg-white/70 backdrop-blur-md">
+            <header className="w-full  fixed z-50 border-b border-gray-100 bg-white/70 backdrop-blur-md">
                 <div className="container mx-auto py-4 px-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full overflow-hidden border border-purple-200 shadow-lg">
@@ -241,7 +266,19 @@ function HomePage() {
                         A simple and elegant CV generator built for Nancy.
                     </p>
 
-                    <div className="flex justify-center items-center">
+                    {/* AI Button */}
+                    <motion.button
+                        onClick={() => setIsAiModalOpen(true)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="mt-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-full
+                                 shadow-lg hover:shadow-xl transition-all flex items-center mx-auto"
+                    >
+                        <BrainCircuit className="mr-2" size={20} />
+                        Utiliser l'IA pour créer plus vite
+                    </motion.button>
+
+                    <div className="flex justify-center items-center mt-8">
                         <span className="text-gray-500 text-sm">Developed by</span>
                         <div className="ml-2 h-8">
                             <img src={foxLogo} alt="Fox Logo" className="h-full w-auto object-contain"/>
@@ -339,6 +376,7 @@ function HomePage() {
                                 Print
                             </button>
                             <button
+                                id={"btn-dl"}
                                 onClick={handleDownloadPdf}
                                 disabled={isGeneratingPDF}
                                 className="bg-gradient-to-r from-pink-500  to-indigo-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center"
@@ -382,6 +420,13 @@ function HomePage() {
                     </motion.div>
                 </div>
             </main>
+
+            {/* AI Modal */}
+            <AiModal
+                isOpen={isAiModalOpen}
+                onClose={() => setIsAiModalOpen(false)}
+                onAiGenerated={handleAiGenerated}
+            />
 
             {/* Footer */}
             <footer className="mt-20 py-8 border-t border-gray-200 bg-white/70 backdrop-blur-sm relative z-10">
