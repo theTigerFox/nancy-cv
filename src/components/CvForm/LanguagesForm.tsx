@@ -8,11 +8,11 @@ interface LanguagesFormProps {
 }
 
 const languageLevels = [
-    { value: 1, label: "A1 - Débutant", description: "Connaissances élémentaires" },
-    { value: 2, label: "A2 - Élémentaire", description: "Communication simple" },
-    { value: 3, label: "B1 - Intermédiaire", description: "Communication courante" },
-    { value: 4, label: "B2 - Avancé", description: "Communication aisée" },
-    { value: 5, label: "C1/C2 - Courant/Bilingue", description: "Maîtrise complète" }
+    { value: 1, label: "Débutant", description: "Connaissances élémentaires" },
+    { value: 2, label: "Élém", description: "Comm simple" },
+    { value: 3, label: "Interm", description: "Comm courante" },
+    { value: 4, label: "Avancé", description: "Comm aisée" },
+    { value: 5, label: "Courant", description: "Maîtrise complète" }
 ];
 
 const LanguagesForm: React.FC<LanguagesFormProps> = ({ item, onChange }) => {
@@ -65,7 +65,7 @@ const LanguagesForm: React.FC<LanguagesFormProps> = ({ item, onChange }) => {
                                 ))}
                             </div>
                             <div>
-                                <div className="font-medium">{level.label}</div>
+                                <div className="font-medium text-1.2xs">{level.label}</div>
                                 <div className="text-xs text-gray-500">{level.description}</div>
                             </div>
                         </div>
