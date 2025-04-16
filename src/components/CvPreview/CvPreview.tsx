@@ -166,7 +166,7 @@ const CvPreview = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData }, ref) =
 
                         {/* Education */}
                         {hasContent(education) && (
-                            <div className="mt-12">
+                            <div className="mt-15">
                                 <PreviewSection
                                     title="Formation"
                                     icon={

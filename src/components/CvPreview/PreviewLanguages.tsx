@@ -24,13 +24,13 @@ const PreviewLanguages: React.FC<PreviewLanguagesProps> = ({ languages, accentCo
   };
 
   return (
-      <div className="space-y-3">
+      <div className="space-y-3 mt-6">
         {languages
             .filter(lang => lang.name.trim() !== '')
             .map(language => (
-                <div key={language.id} className="group">
+                <div key={language.id} className="group mt-4">
                   <div className="flex justify-between items-center text-xs mb-1">
-              <span className="text-gray-800 font-medium group-hover:text-indigo-600 transition-colors duration-300">
+              <span className="text-gray-800 font-medium group-hover:text-indigo-600 mb-2 transition-colors duration-300">
                 {language.name}
               </span>
                     <span className="text-gray-600 text-xs font-medium">

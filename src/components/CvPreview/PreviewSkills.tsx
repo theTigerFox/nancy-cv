@@ -23,9 +23,9 @@ const PreviewSkills: React.FC<PreviewSkillsProps> = ({ skills, accentColor = "#6
               const percentage = Math.max(10, Math.min(100, (skill.level / 10) * 100));
 
               return (
-                  <div key={skill.id} className="group">
+                  <div key={skill.id} className="group mt-4">
                     <div className="flex justify-between mb-0.5 text-xs">
-                <span className="text-gray-800 font-medium group-hover:text-indigo-600 transition-colors duration-300">
+                <span className="text-gray-800 mb-2 font-medium group-hover:text-indigo-600 transition-colors duration-300">
                   {skill.name}
                 </span>
                       <span className="text-gray-500 font-medium opacity-80">
