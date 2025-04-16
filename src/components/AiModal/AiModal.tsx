@@ -62,6 +62,7 @@ const AiModal: React.FC<AiModalProps> = ({ isOpen, onClose, onAiGenerated }) => 
 
             // Fermer le modal après succès
             onClose();
+            alert("Votre CV a été généré avec succès !");
         } catch (err) {
             setError(err instanceof Error ? err.message : "Une erreur est survenue lors de la génération du CV");
         } finally {

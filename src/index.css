@@ -173,3 +173,7 @@ input{
 .language-level.filled {
   background-color: var(--accent-color);
 }
+
+#cvPreview{
+  transform: scale(0.85);
+}

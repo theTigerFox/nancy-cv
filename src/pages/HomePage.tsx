@@ -533,12 +533,12 @@ function HomePage() {
                         </div>
 
                         {/* CV Preview with shadow effect */}
-                        <div className="w-full relative">
+                        <div className="w-full  relative" id={'CVpreview'}>
                             {/* Subtle shadow effect behind the CV */}
                             <div className="absolute -inset-1 bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 blur-md rounded-xl"></div>
 
                             {/* The actual CV preview */}
-                            <div className="relative bg-white shadow-xl rounded-xl overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
+                            <div className="relative bg-white  shadow-xl items-center rounded-xl overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
                                 <CurrentTemplateComponent
                                     ref={previewRef}
                                     cvData={cvData}
