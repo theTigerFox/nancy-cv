@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import { BrainCircuit } from 'lucide-react';
 
 import CvForm from '../components/CvForm/CvForm';
-import CvPreview from '../components/CvPreview/CvPreview';
 import AiModal from '../components/AiModal/AiModal';
 // import { generateCvFromPrompt } from '../services/aiService';
 import {
@@ -20,6 +19,7 @@ import {
 // Assets
 import nancyAvatar from '../assets/nancy.jpg';
 import foxLogo from '../assets/logo-fox-dark.png';
+import CvPreviewTemplate1 from "../components/CvPreview/Template 1/CvPreviewTemplate1.tsx";
 
 const initialCvData: CvData = {
     personalInfo: {
@@ -275,7 +275,7 @@ function HomePage() {
                                  shadow-lg hover:shadow-xl transition-all flex items-center mx-auto"
                     >
                         <BrainCircuit className="mr-2" size={20} />
-                        Utiliser l'IA pour créer plus vite
+                        Use the AI tool
                     </motion.button>
 
                     <div className="flex justify-center items-center mt-8">
@@ -414,7 +414,7 @@ function HomePage() {
                             {/* The actual CV preview */}
                             <div
                                 className="relative bg-white shadow-xl rounded-xl overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
-                                <CvPreview ref={previewRef} cvData={cvData}/>
+                                <CvPreviewTemplate1 ref={previewRef} cvData={cvData}/>
                             </div>
                         </div>
                     </motion.div>

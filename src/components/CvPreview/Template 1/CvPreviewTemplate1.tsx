@@ -10,7 +10,7 @@ interface CvPreviewProps {
     cvData: CvData;
 }
 
-const CvPreview = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData }, ref) => {
+const CvPreviewTemplate1 = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData }, ref) => {
     const { personalInfo, education, experience, skills, languages } = cvData;
 
     // Default accent color with option to customize
@@ -338,6 +338,6 @@ const CvPreview = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData }, ref) =
     );
 });
 
-CvPreview.displayName = 'CvPreview';
+CvPreviewTemplate1.displayName = 'CvPreview';
 
-export default CvPreview;
+export default CvPreviewTemplate1;
