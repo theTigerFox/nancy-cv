@@ -77,7 +77,7 @@ const CvPreviewTemplate2 = forwardRef<HTMLDivElement, CvPreviewProps>(
                                 <h1 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">
                                     {personalInfo.firstName || 'Prénom'} {personalInfo.lastName || 'Nom'}
                                 </h1>
-                                <div className="mt-2 inline-block px-3 py-1 rounded-md text-white text-lg" >
+                                <div className="mt-2 inline-block px-3 py-1 rounded-md text-black text-lg" >
                                     {personalInfo.jobTitle || 'Titre professionnel'}
                                 </div>
 

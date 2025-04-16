@@ -25,34 +25,43 @@ import foxLogo from '../assets/logo-fox-dark.png';
 import template1Thumb from '../assets/template1-thumb.jpg'; // Create this thumbnail image
 import template2Thumb from '../assets/template2-thumb.jpg'; // Create this thumbnail image
 import template3Thumb from '../assets/template3-thumb.jpg';
-import CvPreviewTemplate3 from "../components/CvPreview/Template 3/CvPreviewTemplate3.tsx"; // Create this thumbnail image
+import CvPreviewTemplate3 from "../components/CvPreview/Template 3/CvPreviewTemplate3.tsx";
+import CvPreviewTemplate4 from "../components/CvPreview/Template 4/CvPreviewTemplate4.tsx"; // Create this thumbnail image
 
 
 // Template definitions
 const templates = [
     {
-        id: 1,
-        name: "Créatif & Moderne",
-        description: "Design coloré avec une mise en page moderne et dynamique.",
-        thumbnail: template1Thumb,
-        component: CvPreviewTemplate1,
-        accentColor: "#6366f1" // Default color for template 1
+        "id": 1,
+        "name": "Creative & Modern",
+        "description": "Colorful design with a modern and dynamic layout.",
+        "thumbnail": template1Thumb,
+        "component": CvPreviewTemplate1,
+        "accentColor": "#6366f1" // Default color for template 1
     },
     {
-        id: 2,
-        name: "Professionnel & Épuré",
-        description: "Design minimaliste et élégant, parfait pour un CV traditionnel.",
-        thumbnail: template2Thumb,
-        component: CvPreviewTemplate2,
-        accentColor: "#374151" // Default color for template 2
+        "id": 2,
+        "name": "Professional & Clean",
+        "description": "Minimalist and elegant design, perfect for a traditional resume.",
+        "thumbnail": template2Thumb,
+        "component": CvPreviewTemplate2,
+        "accentColor": "#374151" // Default color for template 2
     },
     {
-        id: 3,
-        name: "Professionnel & Épuré",
-        description: "Vraiment Minimaliste.",
-        thumbnail: template3Thumb,
-        component: CvPreviewTemplate3,
-        accentColor: "#374151" // Default color for template 2
+        "id": 3,
+        "name": "Professional & Minimalist",
+        "description": "Truly Minimalist.",
+        "thumbnail": template3Thumb,
+        "component": CvPreviewTemplate3,
+        "accentColor": "#374151" // Default color for template 2
+    },
+    {
+        "id": 4,
+        "name": "Simple",
+        "description": "The most Minimalist.",
+        "thumbnail": template3Thumb,
+        "component": CvPreviewTemplate4,
+        "accentColor": "#374151" // Default color for template 2
     }
 ];
 
