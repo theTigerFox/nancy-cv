@@ -19,7 +19,7 @@ const PreviewLanguages: React.FC<PreviewLanguagesProps> = ({ languages, accentCo
 
   // Map numeric levels to text descriptions
   const getLevelText = (level: number): string => {
-    const levels = ["Débutant", "Élémentaire", "Intermédiaire", "Avancé", "Bilingue"];
+    const levels = ["Débutant", "Élémentaire", "Intermédiaire", "Avancé", "Très avancé"];
     return levels[Math.min(Math.max(0, level - 1), 4)];
   };
 
