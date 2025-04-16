@@ -3,7 +3,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { v4 as uuidv4 } from 'uuid';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BrainCircuit, ChevronDown, Check, Eye } from 'lucide-react';
+import {BrainCircuit, ChevronDown, Check, Eye, View} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import CvForm from '../components/CvForm/CvForm';
@@ -533,7 +533,7 @@ function HomePage() {
                         </div>
 
                         {/* CV Preview with shadow effect */}
-                        <div className="w-full  relative" id={'CVpreview'}>
+                        <div className="w-full relative" id={'CVpreview'}>
                             {/* Subtle shadow effect behind the CV */}
                             <div className="absolute -inset-1 bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 blur-md rounded-xl"></div>
 

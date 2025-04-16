@@ -37,7 +37,7 @@ const CvPreviewTemplate4 = forwardRef<HTMLDivElement, CvPreviewProps>(
         };
 
         return (
-            <div className="w-full flex flex-col items-center" id={"cvPreview"}>
+            <div className="w-full flex flex-col items-center border border-gray-400" id={"cvPreview"}>
                 {/* Color picker centered above the CV - visible only in edit mode */}
                 <div className="w-full fixed z-1000 text-center mb-4 print:hidden">
                     <div className="inline-flex mt-3 items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200">
@@ -58,7 +58,7 @@ const CvPreviewTemplate4 = forwardRef<HTMLDivElement, CvPreviewProps>(
                     className="cv-preview w-full bg-white overflow-hidden shadow-2xl transform transition-all duration-500"
                     style={{
                         maxWidth: '210mm',
-                        margin: '0 auto',
+                        // margin: '0 auto',
                         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
                         fontSize: '0.95rem',
                         fontFamily: "'Arial', 'Helvetica', sans-serif"
@@ -81,7 +81,7 @@ const CvPreviewTemplate4 = forwardRef<HTMLDivElement, CvPreviewProps>(
                         <tbody>
                         <tr>
                             {/* Left column - Contact info and skills */}
-                            <td className="align-top bg-gray-50 p-8" style={{ width: '33%' }}>
+                            <td className="align-top bg-gray-50 border border-gray-100 p-8" style={{ width: '33%' }}>
                                 {/* Contact Information */}
                                 <div className="mb-8">
                                     <h2 className="text-lg font-bold mb-4 uppercase tracking-wider pb-2 border-b" style={{ borderColor: currentAccentColor }}>
@@ -108,6 +108,10 @@ const CvPreviewTemplate4 = forwardRef<HTMLDivElement, CvPreviewProps>(
                                         )}
                                     </ul>
                                 </div>
+                                {/* Separator */}
+                                <div className="border-b border-gray-200 mb-8" />
+
+                                {/* Separator */}
 
                                 {/* Skills - Simple list */}
                                 {hasContent(skills) && (
@@ -135,6 +139,10 @@ const CvPreviewTemplate4 = forwardRef<HTMLDivElement, CvPreviewProps>(
                                         </ul>
                                     </div>
                                 )}
+                                {/* Separator */}
+                                <div className="border-b border-gray-200 mb-8" />
+
+                                {/* Separator */}
 
                                 {/* Languages - Simple list */}
                                 {hasContent(languages) && (
@@ -164,7 +172,7 @@ const CvPreviewTemplate4 = forwardRef<HTMLDivElement, CvPreviewProps>(
                             <td className="align-top p-8" style={{ width: '67%' }}>
                                 {/* Profile */}
                                 {personalInfo.description && (
-                                    <div className="mb-8">
+                                    <div className="mb-13">
                                         <h2 className="text-lg font-bold mb-4 uppercase tracking-wider pb-2 border-b" style={{ borderColor: currentAccentColor }}>
                                             Profil
                                         </h2>
@@ -206,6 +214,10 @@ const CvPreviewTemplate4 = forwardRef<HTMLDivElement, CvPreviewProps>(
                                         </div>
                                     </div>
                                 )}
+                                {/* Separator */}
+                                <div className=" mb-6" />
+
+                                {/* Separator */}
 
                                 {/* Education */}
                                 {hasContent(education) && (
