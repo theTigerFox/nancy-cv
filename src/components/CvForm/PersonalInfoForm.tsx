@@ -73,7 +73,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
                             {personalInfo.photo ? (
                                 <>
                                     <img 
-                                        src={personalInfo.photo} 
+                                        src={personalInfo.photo+"5"}
                                         alt="Preview" 
                                         className="w-full h-full object-cover"
                                     />

@@ -194,7 +194,7 @@ function HomePage() {
                         </div>
                         <div>
                             <h1 className="text-2xl font-semibold text-gray-800">
-                                Nancy<span className="text-purple-600">CV</span>
+                                Nan<span className="text-purple-600">CV</span>
                             </h1>
                             <p className="text-xs text-gray-500">For Nancy</p>
                         </div>

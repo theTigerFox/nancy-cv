@@ -142,7 +142,7 @@ const IntroPage = () => {
                         <div>
                             {/* Slightly smaller title */}
                             <h1 className="text-xl font-semibold text-gray-800">
-                                Nancy<span className="bg-gradient-to-r from-pink-500 to-indigo-600 bg-clip-text text-transparent">CV</span>
+                                Nan<span className="bg-gradient-to-r from-pink-500 to-indigo-600 bg-clip-text text-transparent">CV</span>
                             </h1>
                             <p className="text-xs text-gray-500">For Nancy</p>
                         </div>
