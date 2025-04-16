@@ -240,9 +240,10 @@ function HomePage() {
                                 </a>
                             </li>
                             <li>
-                                <a href="#faq"
+
+                                <a href="/faq"
                                    className="text-gray-600 hover:text-purple-600 transition-colors font-medium">
-                                    FAQ
+                                    Questions ??
                                 </a>
                             </li>
                         </ul>
@@ -433,7 +434,7 @@ function HomePage() {
                 <div className="container mx-auto px-4 text-center">
                     <p className="text-gray-500 text-sm">
                         NanCV © {new Date().getFullYear()} - Created with <span
-                        className="text-purple-600">♥</span> for Nancy by <a href="https://the-fox.tech"
+                        className="text-purple-600">a lot of annoyance</span> for Nancy by <a href="https://the-fox.tech"
                                                                              className="text-purple-600 hover:text-purple-700 font-medium">Fox</a>
                     </p>
                 </div>
