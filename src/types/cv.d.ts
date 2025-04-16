@@ -47,6 +47,8 @@ export interface PersonalInfo {
     experience: ExperienceItem[];
     skills: SkillItem[];
     languages: LanguageItem[];
+    [key: string]: any; // Signature d'index
+
   }
   
   // Type pour les fonctions de mise à jour passées aux composants enfants
