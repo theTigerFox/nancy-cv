@@ -10,6 +10,7 @@ notes.txt
 notes*.txt
 TEST RO
 TEST RO/*
+indexArticle.html
 
 node_modules
 dist
