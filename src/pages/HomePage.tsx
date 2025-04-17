@@ -360,7 +360,7 @@ function HomePage() {
                         onClick={() => setIsAiModalOpen(true)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.98 }}
-                        className="mt-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-full
+                        className="mt-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-full
                                  shadow-lg hover:shadow-xl transition-all flex items-center mx-auto"
                     >
                         <BrainCircuit className="mr-2" size={20} />
