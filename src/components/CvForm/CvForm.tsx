@@ -108,7 +108,7 @@ const CvForm: React.FC<CvFormProps> = ({
 
             {/* Maybe a final submit/generate button if needed, although download/print are on preview */}
               <div className="mt-8 flex justify-center">
-                  <p className="text-center"> Allez dans <span className="text-red-600">"Preview"</span>  en haut pour télécharger votre pdf</p>
+                  <p className="text-center"> Si vous êtes sur mobile , Allez dans <span className="text-red-600">"Preview"</span>  en haut pour télécharger votre pdf</p>
 
             </div>
         </div>
