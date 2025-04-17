@@ -108,9 +108,8 @@ const CvForm: React.FC<CvFormProps> = ({
 
             {/* Maybe a final submit/generate button if needed, although download/print are on preview */}
               <div className="mt-8 flex justify-center">
-                <button onClick={handleDlBtn2} className="bg-gradient-to-r from-pink-500  to-indigo-600 hover:bg-purple-700 text-white px-6 py-3 rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center">
-                    <i className="fas fa-file-pdf mr-2"></i>Download CV
-                </button>
+                  <p className="text-center"> Allez dans <span className="text-red-600">"Preview"</span>  en haut pour télécharger votre pdf</p>
+
             </div>
         </div>
     );
