@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import  { forwardRef } from 'react';
 import { CvData } from '../../../types/cv'; // Ajuste le chemin si nécessaire
 import { Phone, Mail, MapPin } from 'lucide-react'; // Ou tes propres icônes
 
@@ -25,13 +25,13 @@ const CvPreviewTemplate5 = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData 
     // --- Section Placeholder: Centres d'intérêt ---
     // NOTE: 'interests' n'est pas dans le type CvData actuel.
     // Ajoute-le au type ou remplace cette section par des données réelles si disponibles.
-    const interests = [
-        { id: '1', name: 'Natation' },
-        { id: '2', name: 'Tennis en compétition' },
-        { id: '3', name: 'Lecture et théâtre' },
-    ];
-    const hasInterests = interests.length > 0;
-    // --- Fin Placeholder ---
+    // const interests = [
+    //     { id: '1', name: 'Natation' },
+    //     { id: '2', name: 'Tennis en compétition' },
+    //     { id: '3', name: 'Lecture et théâtre' },
+    // ];
+    // const hasInterests = interests.length > 0;
+    // // --- Fin Placeholder ---
 
 
     return (
@@ -144,7 +144,7 @@ const CvPreviewTemplate5 = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData 
                             <div className="space-y-4">
                                 {education.map((edu) => (
                                     <div key={edu.id}>
-                                        <p className={`text-2xs ${secondaryTextColor} mb-0.5`}>{edu.startDate} - {edu.endDate || '-'} | {edu.location || ''}</p> {/* Ajout location si disponible */}
+                                        <p className={`text-2xs ${secondaryTextColor} mb-0.5`}>{edu.startDate} - {edu.endDate || '-'} </p> {/* Ajout location si disponible */}
                                         <h3 className="font-bold text-3xs text-base">{edu.degree || ''}</h3>
                                         <p className={`${secondaryTextColor} text-sm`}>{edu.school || ''}</p>
                                         {edu.description && (
@@ -169,7 +169,7 @@ const CvPreviewTemplate5 = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData 
                                 {experience.map((exp) => (
                                     <div key={exp.id}>
                                         <h3 className="font-bold text-base text-2xs">{exp.company || ''} | <span className="font-normal text-sm">{exp.startDate} - {exp.endDate || 'Présent'}</span></h3>
-                                        <p className={`${secondaryTextColor} text-2xs mb-1`}>{exp.title || ''}, {exp.location || ''}</p> {/* Ajout location si disponible */}
+                                        <p className={`${secondaryTextColor} text-2xs mb-1`}>{exp.title || ''}</p> {/* Ajout location si disponible */}
                                         {exp.description && (
                                             <>
                                                 <h4 className="font-semibold text-2xs mt-1">Tâches :</h4>

@@ -33,9 +33,9 @@ const CvForm: React.FC<CvFormProps> = ({
     onRemoveItem
 }) => {
 
-    function handleDlBtn2(){
-        document.getElementById("btn-dl")?.click();
-    }
+    // function handleDlBtn2(){
+    //     document.getElementById("btn-dl")?.click();
+    // }
 
     return (
         <div className="space-y-8">

@@ -3,7 +3,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { v4 as uuidv4 } from 'uuid';
 import { motion, AnimatePresence } from 'framer-motion';
-import {BrainCircuit, ChevronDown, Check, Eye, View} from 'lucide-react';
+import {BrainCircuit, ChevronDown, Check, Eye} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { generatePdf } from '../services/pdfService';
 
@@ -200,9 +200,9 @@ function HomePage() {
     }, []);
 
     // --- Actions ---
-    const handlePrint = () => {
-        window.print();
-    };
+    // const handlePrint = () => {
+    //     window.print();
+    // };
 
     const handleDownloadPdf = async () => {
         const element = previewRef.current;

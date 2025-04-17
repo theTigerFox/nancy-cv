@@ -58,11 +58,9 @@ const AiModal: React.FC<AiModalProps> = ({ isOpen, onClose, onAiGenerated }) => 
         if (SpeechRecognitionAPI) {
             setIsSpeechRecognitionSupported(true);
             recognitionRef.current = new SpeechRecognitionAPI();
-            recognitionRef.current.continuous = true; // Continue l'écoute même après une pause
-            recognitionRef.current.interimResults = true; // Obtient des résultats temporaires pendant la parole
-            recognitionRef.current.lang = 'fr-FR'; // Définit la langue
-
-            recognitionRef.current.onresult = (event: any) => {
+            if (recognitionRef.current) recognitionRef.current.continuous = true; // Continue l'écoute même après une pause            recognitionRef.current.interimResults = true; // Obtient des résultats temporaires pendant la parole
+            if (recognitionRef.current) recognitionRef.current.continuous = true; // Continue l'écoute même après une pause
+            if (recognitionRef.current) recognitionRef.current.onresult = (event: any) => {
                 let interimTranscript = '';
                 let finalTranscript = '';
 
@@ -82,7 +80,7 @@ const AiModal: React.FC<AiModalProps> = ({ isOpen, onClose, onAiGenerated }) => 
                 // console.log("Interim:", interimTranscript);
             };
 
-            recognitionRef.current.onerror = (event: any) => {
+            if (recognitionRef.current) recognitionRef.current.onerror = (event: any) => {
                 console.error('Speech recognition error', event.error);
                 if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
                     setError("L'accès au microphone est refusé. Veuillez vérifier les permissions.");
@@ -92,7 +90,7 @@ const AiModal: React.FC<AiModalProps> = ({ isOpen, onClose, onAiGenerated }) => 
                 setIsListening(false);
             };
 
-            recognitionRef.current.onend = () => {
+            if (recognitionRef.current) recognitionRef.current.onend = () => {
                 // Ne désactive isListening que si ce n'est pas nous qui l'arrêtons manuellement
                 // (évite les arrêts intempestifs si continuous=true)
                 // Si on a explicitement appelé stop(), isListening sera déjà false.
