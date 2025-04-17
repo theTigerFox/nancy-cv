@@ -27,8 +27,11 @@ import foxLogo from '../assets/logo-fox-dark.png';
 import template1Thumb from '../assets/template1-thumb.jpg'; // Create this thumbnail image
 import template2Thumb from '../assets/template2-thumb.jpg'; // Create this thumbnail image
 import template3Thumb from '../assets/template3-thumb.jpg';
+import template5Thumb from '../assets/template5-thumb.jpg';
+
 import CvPreviewTemplate3 from "../components/CvPreview/Template 3/CvPreviewTemplate3.tsx";
-import CvPreviewTemplate4 from "../components/CvPreview/Template 4/CvPreviewTemplate4.tsx"; // Create this thumbnail image
+import CvPreviewTemplate4 from "../components/CvPreview/Template 4/CvPreviewTemplate4.tsx";
+import CvPreviewTemplate5 from "../components/CvPreview/Template 5/CvPreviewTemplate5.tsx"; // Create this thumbnail image
 
 
 // Template definitions
@@ -63,6 +66,14 @@ const templates = [
         "description": "The most Minimalist.",
         "thumbnail": template3Thumb,
         "component": CvPreviewTemplate4,
+        "accentColor": "#374151" // Default color for template 2
+    },
+    {
+        "id": 5,
+        "name": "Standard",
+        "description": "The standard template.",
+        "thumbnail": template5Thumb,
+        "component": CvPreviewTemplate5,
         "accentColor": "#374151" // Default color for template 2
     }
 ];
@@ -415,7 +426,7 @@ function HomePage() {
                                     <div className="p-3 border-b border-gray-100 bg-gray-50">
                                         <h3 className="text-sm font-semibold text-gray-700">Choisir un modèle</h3>
                                     </div>
-                                    <div className="py-2">
+                                    <div className="py-2 overflow-auto h-75">
                                         {templates.map(template => (
                                             <button
                                                 key={template.id}
