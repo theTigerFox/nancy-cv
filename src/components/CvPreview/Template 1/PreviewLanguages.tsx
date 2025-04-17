@@ -11,7 +11,7 @@ const PreviewLanguages: React.FC<PreviewLanguagesProps> = ({ languages, accentCo
   const lightAccentColor = `${accentColor}30`;
 
   // Helper to check if there's at least one language with a name
-  const hasVisibleLanguages = languages.some(lang => lang.name.trim() !== '');
+  const hasVisibleLanguages = languages.some(lang => lang.name && lang.name.trim() !== '');
 
   if (!hasVisibleLanguages) {
     return null; // Hide section if empty
@@ -26,7 +26,7 @@ const PreviewLanguages: React.FC<PreviewLanguagesProps> = ({ languages, accentCo
   return (
       <div className="space-y-3 mt-6">
         {languages
-            .filter(lang => lang.name.trim() !== '')
+            .filter(lang => lang.name && lang.name.trim() !== '')
             .map(language => (
                 <div key={language.id} className="group mt-4">
                   <div className="flex justify-between items-center text-xs mb-1">

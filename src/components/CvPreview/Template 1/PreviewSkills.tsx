@@ -9,7 +9,7 @@ interface PreviewSkillsProps {
 const PreviewSkills: React.FC<PreviewSkillsProps> = ({ skills, accentColor = "#6366f1" }) => {
 
   // Helper to check if there's at least one skill with a name
-  const hasVisibleSkills = skills.some(skill => skill.name.trim() !== '');
+  const hasVisibleSkills =  skills.some(skill => skill.name && (skill.name.trim() !== ''));
 
   if (!hasVisibleSkills) {
     return null; // Hide section if empty
@@ -18,7 +18,7 @@ const PreviewSkills: React.FC<PreviewSkillsProps> = ({ skills, accentColor = "#6
   return (
       <div className="space-y-2">
         {skills
-            .filter(skill => skill.name.trim() !== '')
+            .filter(skill => skill.name && skill.name.trim() !== '')
             .map(skill => {
               const percentage = Math.max(10, Math.min(100, (skill.level / 10) * 100));
 
