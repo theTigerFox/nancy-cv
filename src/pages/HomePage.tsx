@@ -585,7 +585,7 @@ function HomePage() {
 
                             {/* The actual CV preview */}
                             <div
-                                className="relative bg-white  shadow-xl items-center rounded-xl overflow-hidden transform hover:scale-[1.01] transition-transform duration-300">
+                                className="relative bg-white  shadow-xl items-center rounded-xl overflow-x-auto transform hover:scale-[1.01] transition-transform duration-300">
                                 <CurrentTemplateComponent
                                     ref={previewRef}
                                     cvData={cvData}

@@ -38,11 +38,11 @@ const CvPreviewTemplate5 = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData 
         <div
             ref={ref}
             id={"cvPreview"}
-            className="cv-preview w-full bg-white shadow-lg border border-gray-400"
+            className="cv-preview w-full  bg-white shadow-lg border border-gray-400"
             style={{
                 maxWidth: '210mm', // Format A4 approximatif
                 minHeight: '297mm',
-                margin: '0 auto', // Centrer
+
             }}
 
         >
@@ -134,6 +134,31 @@ const CvPreviewTemplate5 = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData 
 
                 {/* Colonne Principale (Droite) */}
                 <div className={`w-2/3 ${mainTextColor} p-8`}>
+
+                    {/* Formation */}
+                    {hasContent(education) && (
+                        <div className="mb-8">
+                            <div className={`${sectionTitleBgColor} p-2 mb-4 -ml-8 pl-8`}> {/* Barre de titre */}
+                                <h2 className="text-xl font-semibold uppercase tracking-wider">Formation</h2>
+                            </div>
+                            <div className="space-y-4">
+                                {education.map((edu) => (
+                                    <div key={edu.id}>
+                                        <p className={`text-2xs ${secondaryTextColor} mb-0.5`}>{edu.startDate} - {edu.endDate || '-'} | {edu.location || ''}</p> {/* Ajout location si disponible */}
+                                        <h3 className="font-bold text-3xs text-base">{edu.degree || ''}</h3>
+                                        <p className={`${secondaryTextColor} text-sm`}>{edu.school || ''}</p>
+                                        {edu.description && (
+                                            <p className={`text-2xs ${secondaryTextColor} mt-1 italic`}>{edu.description}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+
+                    <div className="mt-18"></div>
+
                     {/* Expérience Professionnelle */}
                     {hasContent(experience) && (
                         <div className="mb-8">
@@ -166,6 +191,7 @@ const CvPreviewTemplate5 = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData 
                         </div>
                     )}
 
+
                     <div className="mt-18"></div>
 
                     {/* Langues */}
@@ -186,7 +212,7 @@ const CvPreviewTemplate5 = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData 
 
                                     return (
                                         <p key={lang.id}>
-                                            <span className="font-medium">{lang.name+(lang.name?":":'') || ''} </span> { (lang.name?levelText:'') || ``}
+                                            <span className="text-lg">{lang.name+(lang.name?":":'') || ''} </span> { (lang.name?levelText:'') || ``}
                                         </p>
                                     );
                                 })}
@@ -194,28 +220,7 @@ const CvPreviewTemplate5 = forwardRef<HTMLDivElement, CvPreviewProps>(({ cvData 
                         </div>
                     )}
 
-                    <div className="mt-18"></div>
 
-                    {/* Formation */}
-                    {hasContent(education) && (
-                        <div className="mb-8">
-                            <div className={`${sectionTitleBgColor} p-2 mb-4 -ml-8 pl-8`}> {/* Barre de titre */}
-                                <h2 className="text-xl font-semibold uppercase tracking-wider">Formation</h2>
-                            </div>
-                            <div className="space-y-4">
-                                {education.map((edu) => (
-                                    <div key={edu.id}>
-                                        <p className={`text-2xs ${secondaryTextColor} mb-0.5`}>{edu.startDate} - {edu.endDate || '-'} | {edu.location || ''}</p> {/* Ajout location si disponible */}
-                                        <h3 className="font-bold text-3xs text-base">{edu.degree || ''}</h3>
-                                        <p className={`${secondaryTextColor} text-sm`}>{edu.school || ''}</p>
-                                        {edu.description && (
-                                            <p className={`text-2xs ${secondaryTextColor} mt-1 italic`}>{edu.description}</p>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

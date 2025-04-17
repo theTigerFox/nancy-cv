@@ -37,7 +37,7 @@ const CvPreviewTemplate4 = forwardRef<HTMLDivElement, CvPreviewProps>(
         };
 
         return (
-            <div className="w-full flex flex-col items-center border border-gray-400" id={"cvPreview"}>
+            <div className="w-full flex flex-col items-center  border border-gray-400" id={"cvPreview"}>
                 {/* Color picker centered above the CV - visible only in edit mode */}
                 <div className="w-full fixed z-1000 text-center mb-4 print:hidden">
                     <div className="inline-flex mt-3 items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200">
@@ -55,7 +55,7 @@ const CvPreviewTemplate4 = forwardRef<HTMLDivElement, CvPreviewProps>(
                 {/* CV Document - Clean and Minimal */}
                 <div
                     ref={ref}
-                    className="cv-preview w-full bg-white overflow-hidden shadow-2xl transform transition-all duration-500"
+                    className="cv-preview w-full bg-white overflow-auto shadow-2xl transform transition-all duration-500"
                     style={{
                         maxWidth: '210mm',
                         // margin: '0 auto',
