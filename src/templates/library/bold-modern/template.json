@@ -1,0 +1,74 @@
+{
+    "metadata": {
+        "id": "bold-modern",
+        "name": "Bold Modern",
+        "description": "Design contemporain avec header coloré et mise en page dynamique",
+        "version": "1.0.0",
+        "author": "Nancy CV Team",
+        "createdAt": "2026-02-01",
+        "updatedAt": "2026-02-01",
+        "category": "modern",
+        "tags": ["moderne", "coloré", "dynamique", "tech", "startup"],
+        "isPremium": false,
+        "industries": ["tech", "startup", "digital", "marketing", "design"],
+        "experienceLevel": "mid"
+    },
+    "previewImage": "./preview.png",
+    "componentPath": "./BoldModernTemplate.tsx",
+    "colors": {
+        "primary": "#6366f1",
+        "secondary": "#8b5cf6",
+        "text": "#1e1b4b",
+        "textLight": "#6b7280",
+        "background": "#ffffff",
+        "backgroundAlt": "#f5f3ff",
+        "border": "#e0e7ff",
+        "accent": "#06b6d4"
+    },
+    "typography": {
+        "fontHeading": "'Poppins', sans-serif",
+        "fontBody": "'Inter', sans-serif",
+        "baseFontSize": 14,
+        "nameSize": 2.5,
+        "jobTitleSize": 1.2,
+        "sectionTitleSize": 1.0,
+        "bodySize": 0.875,
+        "smallSize": 0.75,
+        "lineHeight": 1.6,
+        "letterSpacing": "-0.01em"
+    },
+    "spacing": {
+        "pageMargin": 0,
+        "sectionGap": 24,
+        "sectionPadding": 20,
+        "itemGap": 14
+    },
+    "layout": {
+        "type": "sidebar-left",
+        "sidebarWidth": 35,
+        "sidebarSections": ["contact", "skills", "languages"],
+        "mainSections": ["description", "experience", "education"],
+        "showPhoto": true,
+        "photoPosition": "sidebar",
+        "photoShape": "rounded",
+        "photoSize": 120
+    },
+    "sections": {
+        "skills": {
+            "type": "tags",
+            "showLevel": false
+        },
+        "languages": {
+            "type": "bars",
+            "showLevelText": true
+        },
+        "timeline": {
+            "showLine": true,
+            "showDots": true,
+            "position": "left",
+            "dotStyle": "circle"
+        },
+        "useIcons": true,
+        "titleStyle": "background"
+    }
+}

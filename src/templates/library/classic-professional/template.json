@@ -1,0 +1,74 @@
+{
+    "metadata": {
+        "id": "classic-professional",
+        "name": "Classic Professional",
+        "description": "Template traditionnel et sobre pour les secteurs corporate",
+        "version": "1.0.0",
+        "author": "Nancy CV Team",
+        "createdAt": "2026-02-01",
+        "updatedAt": "2026-02-01",
+        "category": "classic",
+        "tags": ["classique", "professionnel", "corporate", "traditionnel", "sobre"],
+        "isPremium": false,
+        "industries": ["finance", "juridique", "banque", "assurance", "consulting", "administration"],
+        "experienceLevel": "senior"
+    },
+    "previewImage": "./preview.png",
+    "componentPath": "./ClassicProfessionalTemplate.tsx",
+    "colors": {
+        "primary": "#1e3a5f",
+        "secondary": "#2c5282",
+        "text": "#1a202c",
+        "textLight": "#718096",
+        "background": "#ffffff",
+        "backgroundAlt": "#f7fafc",
+        "border": "#cbd5e0",
+        "accent": "#c9a227"
+    },
+    "typography": {
+        "fontHeading": "'Merriweather', serif",
+        "fontBody": "'Source Sans Pro', sans-serif",
+        "baseFontSize": 14,
+        "nameSize": 2.2,
+        "jobTitleSize": 1.15,
+        "sectionTitleSize": 1.0,
+        "bodySize": 0.9,
+        "smallSize": 0.8,
+        "lineHeight": 1.65,
+        "letterSpacing": "0"
+    },
+    "spacing": {
+        "pageMargin": 20,
+        "sectionGap": 24,
+        "sectionPadding": 16,
+        "itemGap": 14
+    },
+    "layout": {
+        "type": "single",
+        "sidebarWidth": 0,
+        "sidebarSections": [],
+        "mainSections": ["description", "experience", "education", "skills", "languages"],
+        "showPhoto": true,
+        "photoPosition": "header",
+        "photoShape": "square",
+        "photoSize": 90
+    },
+    "sections": {
+        "skills": {
+            "type": "dots",
+            "showLevel": true
+        },
+        "languages": {
+            "type": "dots",
+            "showLevelText": true
+        },
+        "timeline": {
+            "showLine": false,
+            "showDots": false,
+            "position": "none",
+            "dotStyle": "circle"
+        },
+        "useIcons": false,
+        "titleStyle": "underline"
+    }
+}

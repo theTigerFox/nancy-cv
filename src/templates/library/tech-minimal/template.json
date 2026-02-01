@@ -1,0 +1,71 @@
+{
+    "metadata": {
+        "id": "tech-minimal",
+        "name": "Tech Minimal",
+        "description": "Design epure pour les profils tech et developpeurs",
+        "version": "1.0.0",
+        "author": "Nancy CV",
+        "createdAt": "2025-01-18",
+        "updatedAt": "2025-01-18",
+        "category": "minimal",
+        "tags": ["tech", "developer", "minimal", "clean", "modern"],
+        "isPremium": false,
+        "industries": ["technology", "software", "startup", "engineering"],
+        "experienceLevel": "all"
+    },
+    "previewImage": "/templates/previews/tech-minimal.png",
+    "componentPath": "./TechMinimalTemplate",
+    "colors": {
+        "primary": "#0ea5e9",
+        "secondary": "#6366f1",
+        "text": "#0f172a",
+        "textLight": "#64748b",
+        "background": "#ffffff",
+        "backgroundAlt": "#f8fafc",
+        "border": "#e2e8f0",
+        "accent": "#22d3ee"
+    },
+    "typography": {
+        "fontHeading": "'JetBrains Mono', monospace",
+        "fontBody": "'Inter', sans-serif",
+        "baseFontSize": 14,
+        "nameSize": 2.2,
+        "jobTitleSize": 1.1,
+        "sectionTitleSize": 1.0,
+        "bodySize": 0.875,
+        "smallSize": 0.75,
+        "lineHeight": 1.6,
+        "letterSpacing": "0"
+    },
+    "spacing": {
+        "pageMargin": 20,
+        "sectionGap": 24,
+        "sectionPadding": 16,
+        "itemGap": 14
+    },
+    "layout": {
+        "type": "single",
+        "showPhoto": false,
+        "photoPosition": "header",
+        "photoShape": "rounded",
+        "photoSize": 70
+    },
+    "sections": {
+        "skills": {
+            "type": "tags",
+            "showLevel": false
+        },
+        "languages": {
+            "type": "text",
+            "showLevelText": true
+        },
+        "timeline": {
+            "showLine": false,
+            "showDots": false,
+            "position": "none",
+            "dotStyle": "circle"
+        },
+        "useIcons": true,
+        "titleStyle": "simple"
+    }
+}

@@ -8,7 +8,11 @@ export interface PersonalInfo {
     address: string;
     phone: string;
     email: string;
-    description: string;
+    description?: string;
+    summary?: string;
+    city?: string;
+    linkedIn?: string;
+    website?: string;
   }
   
   export interface EducationItem {

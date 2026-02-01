@@ -51,7 +51,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                                 <img src={nancyAvatar} alt="Nancy" className="w-full h-full object-cover" />
                             </div>
                             <div className="absolute -bottom-2 -right-2 bg-brutal-pink text-white text-xs font-bold px-2 py-1 border-2 border-black -rotate-12">
-                                For Nancy
+                                Nancy
                             </div>
                         </div>
                         <div className="flex flex-col">

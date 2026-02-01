@@ -1,0 +1,74 @@
+{
+    "metadata": {
+        "id": "minimal-elegance",
+        "name": "Minimal Elegance",
+        "description": "Template épuré et sophistiqué avec beaucoup d'espace blanc et typographie raffinée",
+        "version": "1.0.0",
+        "author": "Nancy CV Team",
+        "createdAt": "2026-02-01",
+        "updatedAt": "2026-02-01",
+        "category": "minimal",
+        "tags": ["minimal", "elegant", "clean", "moderne", "simple", "sophistique"],
+        "isPremium": false,
+        "industries": ["design", "marketing", "communication", "luxe", "mode", "art"],
+        "experienceLevel": "all"
+    },
+    "previewImage": "./preview.png",
+    "componentPath": "./MinimalEleganceTemplate.tsx",
+    "colors": {
+        "primary": "#1a1a1a",
+        "secondary": "#404040",
+        "text": "#1a1a1a",
+        "textLight": "#737373",
+        "background": "#ffffff",
+        "backgroundAlt": "#fafafa",
+        "border": "#e5e5e5",
+        "accent": "#1a1a1a"
+    },
+    "typography": {
+        "fontHeading": "'Cormorant Garamond', serif",
+        "fontBody": "'Inter', sans-serif",
+        "baseFontSize": 14,
+        "nameSize": 3.2,
+        "jobTitleSize": 1.1,
+        "sectionTitleSize": 0.85,
+        "bodySize": 0.9,
+        "smallSize": 0.75,
+        "lineHeight": 1.7,
+        "letterSpacing": "0.15em"
+    },
+    "spacing": {
+        "pageMargin": 25,
+        "sectionGap": 32,
+        "sectionPadding": 0,
+        "itemGap": 16
+    },
+    "layout": {
+        "type": "single",
+        "sidebarWidth": 0,
+        "sidebarSections": [],
+        "mainSections": ["description", "experience", "education", "skills", "languages"],
+        "showPhoto": false,
+        "photoPosition": "header",
+        "photoShape": "circle",
+        "photoSize": 80
+    },
+    "sections": {
+        "skills": {
+            "type": "simple",
+            "showLevel": false
+        },
+        "languages": {
+            "type": "text",
+            "showLevelText": true
+        },
+        "timeline": {
+            "showLine": false,
+            "showDots": false,
+            "position": "none",
+            "dotStyle": "circle"
+        },
+        "useIcons": false,
+        "titleStyle": "simple"
+    }
+}

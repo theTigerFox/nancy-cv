@@ -1,0 +1,76 @@
+{
+    "metadata": {
+        "id": "executive-pro",
+        "name": "Executive Pro",
+        "description": "Template professionnel haut de gamme pour cadres et dirigeants",
+        "version": "1.0.0",
+        "author": "Nancy CV Team",
+        "createdAt": "2026-02-01",
+        "updatedAt": "2026-02-01",
+        "category": "professional",
+        "tags": ["corporate", "executive", "luxe", "business", "cadre", "direction"],
+        "isPremium": false,
+        "industries": ["finance", "consulting", "management", "juridique", "banque"],
+        "experienceLevel": "senior"
+    },
+    "previewImage": "./preview.png",
+    "componentPath": "./ExecutiveProTemplate.tsx",
+    "colors": {
+        "primary": "#1e3a5f",
+        "secondary": "#4a6fa5",
+        "text": "#1a1a1a",
+        "textLight": "#6b7280",
+        "background": "#ffffff",
+        "backgroundAlt": "#f8fafc",
+        "border": "#e2e8f0",
+        "accent": "#c9a227"
+    },
+    "typography": {
+        "fontHeading": "'Playfair Display', serif",
+        "fontBody": "'Source Sans Pro', sans-serif",
+        "baseFontSize": 15,
+        "nameSize": 2.8,
+        "jobTitleSize": 1.3,
+        "sectionTitleSize": 1.1,
+        "bodySize": 0.9,
+        "smallSize": 0.8,
+        "lineHeight": 1.6,
+        "letterSpacing": "0.02em"
+    },
+    "spacing": {
+        "pageMargin": 20,
+        "sectionGap": 28,
+        "sectionPadding": 20,
+        "itemGap": 16
+    },
+    "layout": {
+        "type": "sidebar-left",
+        "sidebarWidth": 32,
+        "sidebarSections": ["contact", "skills", "languages", "certifications"],
+        "mainSections": ["description", "experience", "education"],
+        "showPhoto": true,
+        "photoPosition": "sidebar",
+        "photoShape": "square",
+        "photoSize": 140
+    },
+    "sections": {
+        "skills": {
+            "type": "bars",
+            "showLevel": true,
+            "fillColor": "#c9a227",
+            "backgroundColor": "#e2e8f0"
+        },
+        "languages": {
+            "type": "dots",
+            "showLevelText": true
+        },
+        "timeline": {
+            "showLine": true,
+            "showDots": true,
+            "position": "left",
+            "dotStyle": "square"
+        },
+        "useIcons": false,
+        "titleStyle": "border-left"
+    }
+}
