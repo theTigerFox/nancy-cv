@@ -1,0 +1,71 @@
+{
+    "metadata": {
+        "id": "elegant-serif",
+        "name": "Elegant Serif",
+        "description": "Design sophistique avec typographie serif pour profils seniors",
+        "version": "1.0.0",
+        "author": "Nancy CV",
+        "createdAt": "2025-01-18",
+        "updatedAt": "2025-01-18",
+        "category": "classic",
+        "tags": ["elegant", "serif", "classic", "executive", "sophisticated"],
+        "isPremium": true,
+        "industries": ["finance", "law", "consulting", "academia", "executive"],
+        "experienceLevel": "senior"
+    },
+    "previewImage": "/templates/previews/elegant-serif.png",
+    "componentPath": "./ElegantSerifTemplate",
+    "colors": {
+        "primary": "#1f2937",
+        "secondary": "#b45309",
+        "text": "#111827",
+        "textLight": "#6b7280",
+        "background": "#ffffff",
+        "backgroundAlt": "#faf8f5",
+        "border": "#d1d5db",
+        "accent": "#92400e"
+    },
+    "typography": {
+        "fontHeading": "'Cormorant Garamond', serif",
+        "fontBody": "'Source Serif Pro', serif",
+        "baseFontSize": 14,
+        "nameSize": 2.8,
+        "jobTitleSize": 1.2,
+        "sectionTitleSize": 1.1,
+        "bodySize": 0.9,
+        "smallSize": 0.8,
+        "lineHeight": 1.7,
+        "letterSpacing": "0.02em"
+    },
+    "spacing": {
+        "pageMargin": 25,
+        "sectionGap": 28,
+        "sectionPadding": 16,
+        "itemGap": 18
+    },
+    "layout": {
+        "type": "single",
+        "showPhoto": true,
+        "photoPosition": "header",
+        "photoShape": "rounded",
+        "photoSize": 100
+    },
+    "sections": {
+        "skills": {
+            "type": "simple",
+            "showLevel": false
+        },
+        "languages": {
+            "type": "text",
+            "showLevelText": true
+        },
+        "timeline": {
+            "showLine": false,
+            "showDots": false,
+            "position": "none",
+            "dotStyle": "circle"
+        },
+        "useIcons": false,
+        "titleStyle": "underline"
+    }
+}

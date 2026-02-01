@@ -37,7 +37,7 @@ import {
 interface TemplateWrapperProps {
     children: React.ReactNode;
     config: TemplateConfig;
-    mode?: 'preview' | 'print' | 'export';
+    mode?: 'preview' | 'print' | 'export' | 'edit';
     scale?: number;
     className?: string;
 }

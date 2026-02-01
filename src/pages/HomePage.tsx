@@ -264,7 +264,7 @@ const HomePage = () => {
                                     <div className={cn("absolute inset-0 border-3 border-black translate-x-3 translate-y-3 transition-transform duration-200 group-hover:translate-x-5 group-hover:translate-y-5", step.color)}></div>
                                     <div className="relative bg-white border-3 border-black p-8 h-full flex flex-col justify-between group-hover:-translate-y-1 transition-transform duration-200">
                                         <div>
-                                            <span className="text-8xl font-black text-gray-100 absolute -top-4 -right-4 z-0 group-hover:text-black/5 transition-colors">{step.num}</span>
+                                            <span className="text-8xl font-black text-green-400 absolute -top-4 -right-4 z-0 group-hover:text-black/8 transition-colors">{step.num}</span>
                                             <div className="relative z-10">
                                                 <div className="w-16 h-16 bg-black text-white flex items-center justify-center mb-6 border-3 border-transparent group-hover:bg-transparent group-hover:text-black group-hover:border-black transition-colors">
                                                     <step.icon size={32} strokeWidth={2.5} />

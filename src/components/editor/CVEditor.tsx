@@ -12,7 +12,9 @@ import {
     FileText, Image as ImageIcon, Trash2, RefreshCw,
     ChevronLeft, ChevronRight, Menu, FileDown, Save, Cloud, CloudOff,
     Check, Loader2, Home, LogOut, Palette, BrainCircuit, Mail, Phone, MapPin,
-    X, Settings2, Type, Maximize2
+    X, Settings2, Type, Maximize2, Edit3, ZoomIn, ZoomOut, RotateCcw,
+    Layers, Grid3X3, Circle, Square, RectangleHorizontal, 
+    AlignLeft, AlignCenter, AlignRight, Minus, Plus
 } from 'lucide-react';
 import { useCVStore, useTemporalStore } from '../../store/cvStore';
 import { downloadJSON, importFromFile, exportToPDF, exportToPlainText, exportToImage } from '../../utils/export';
@@ -20,10 +22,11 @@ import { useFirestoreSync } from '../../hooks/useFirestoreSync';
 import { useAuth } from '../../contexts/AuthContext';
 import { templateRegistry, getTemplateConfig, getTemplateComponent } from '../../templates/registry';
 import { registerAllTemplates, TEMPLATE_IDS } from '../../templates/library';
-import type { TemplateConfig, TemplateCustomization, TemplateColors, TemplateTypography } from '../../templates/types';
+import type { TemplateConfig, TemplateCustomization, TemplateColors, TemplateTypography, TemplateSpacing, TemplateLayout } from '../../templates/types';
 import type { CvData } from '../../types/cv.d';
 import AiModal from '../AiModal/AiModal';
 import type { CVData, Experience, Education, Skill, Language, Project } from '../../types/cv';
+import { InteractivePreviewContainer, EditableElement, useInteractivePreview } from './InteractivePreview';
 
 // Import all form components
 import { PersonalInfoForm } from './PersonalInfoForm';
@@ -659,7 +662,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Customization Panel Component
+// Advanced Customization Panel Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface CustomizationPanelProps {
@@ -677,7 +680,7 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
     isOpen,
     onClose,
 }) => {
-    const [activeTab, setActiveTab] = React.useState<'colors' | 'typography' | 'layout'>('colors');
+    const [activeTab, setActiveTab] = React.useState<'colors' | 'typography' | 'layout' | 'spacing' | 'advanced'>('colors');
     
     const updateColors = (key: keyof TemplateColors, value: string) => {
         onCustomizationChange({
@@ -699,23 +702,32 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
         });
     };
     
-    // Preset de couleurs
+    // Preset de couleurs - beaucoup plus riche
     const colorPresets = [
-        { name: 'Pro', primary: '#1e3a5f', secondary: '#2563eb', accent: '#f59e0b' },
-        { name: 'Elegant', primary: '#0f172a', secondary: '#334155', accent: '#a855f7' },
-        { name: 'Fresh', primary: '#059669', secondary: '#10b981', accent: '#fbbf24' },
-        { name: 'Bold', primary: '#dc2626', secondary: '#f97316', accent: '#fbbf24' },
-        { name: 'Creative', primary: '#8b5cf6', secondary: '#ec4899', accent: '#06b6d4' },
-        { name: 'Minimal', primary: '#18181b', secondary: '#3f3f46', accent: '#71717a' },
+        { name: 'Pro Blue', primary: '#1e3a5f', secondary: '#2563eb', accent: '#f59e0b', text: '#1f2937', background: '#ffffff', backgroundAlt: '#f8fafc' },
+        { name: 'Elegant Dark', primary: '#0f172a', secondary: '#334155', accent: '#a855f7', text: '#1e293b', background: '#ffffff', backgroundAlt: '#f1f5f9' },
+        { name: 'Fresh Green', primary: '#059669', secondary: '#10b981', accent: '#fbbf24', text: '#064e3b', background: '#ffffff', backgroundAlt: '#ecfdf5' },
+        { name: 'Bold Red', primary: '#dc2626', secondary: '#f97316', accent: '#fbbf24', text: '#1f2937', background: '#ffffff', backgroundAlt: '#fef2f2' },
+        { name: 'Creative Purple', primary: '#8b5cf6', secondary: '#ec4899', accent: '#06b6d4', text: '#1e1b4b', background: '#ffffff', backgroundAlt: '#faf5ff' },
+        { name: 'Minimal Gray', primary: '#18181b', secondary: '#3f3f46', accent: '#71717a', text: '#27272a', background: '#ffffff', backgroundAlt: '#fafafa' },
+        { name: 'Ocean Blue', primary: '#0369a1', secondary: '#0ea5e9', accent: '#38bdf8', text: '#0c4a6e', background: '#ffffff', backgroundAlt: '#f0f9ff' },
+        { name: 'Sunset Orange', primary: '#c2410c', secondary: '#ea580c', accent: '#fb923c', text: '#431407', background: '#ffffff', backgroundAlt: '#fff7ed' },
+        { name: 'Forest', primary: '#166534', secondary: '#22c55e', accent: '#86efac', text: '#14532d', background: '#ffffff', backgroundAlt: '#f0fdf4' },
+        { name: 'Royal', primary: '#4c1d95', secondary: '#7c3aed', accent: '#c4b5fd', text: '#2e1065', background: '#ffffff', backgroundAlt: '#f5f3ff' },
+        { name: 'Rose', primary: '#be123c', secondary: '#f43f5e', accent: '#fda4af', text: '#881337', background: '#ffffff', backgroundAlt: '#fff1f2' },
+        { name: 'Teal', primary: '#0f766e', secondary: '#14b8a6', accent: '#5eead4', text: '#134e4a', background: '#ffffff', backgroundAlt: '#f0fdfa' },
     ];
     
-    // Presets de polices
+    // Presets de polices - plus d'options
     const fontPresets = [
-        { name: 'Moderne', heading: "'Inter', sans-serif", body: "'Inter', sans-serif" },
-        { name: 'Classique', heading: "'Playfair Display', serif", body: "'Source Sans Pro', sans-serif" },
-        { name: 'Tech', heading: "'Space Grotesk', sans-serif", body: "'Roboto', sans-serif" },
-        { name: 'Elegant', heading: "'Cormorant Garamond', serif", body: "'Lora', serif" },
-        { name: 'Clean', heading: "'Poppins', sans-serif", body: "'Open Sans', sans-serif" },
+        { name: 'Moderne', heading: "'Inter', sans-serif", body: "'Inter', sans-serif", desc: 'Clean et contemporain' },
+        { name: 'Classique', heading: "'Playfair Display', serif", body: "'Source Sans Pro', sans-serif", desc: 'Elegant et intemporel' },
+        { name: 'Tech', heading: "'Space Grotesk', sans-serif", body: "'Roboto', sans-serif", desc: 'Pour les profils tech' },
+        { name: 'Editorial', heading: "'Cormorant Garamond', serif", body: "'Lora', serif", desc: 'Style magazine' },
+        { name: 'Clean', heading: "'Poppins', sans-serif", body: "'Open Sans', sans-serif", desc: 'Simple et lisible' },
+        { name: 'Bold', heading: "'Montserrat', sans-serif", body: "'Nunito', sans-serif", desc: 'Fort et impactant' },
+        { name: 'Minimal', heading: "'DM Sans', sans-serif", body: "'DM Sans', sans-serif", desc: 'Ultra minimaliste' },
+        { name: 'Creative', heading: "'Abril Fatface', serif", body: "'Quicksand', sans-serif", desc: 'Artistique et unique' },
     ];
     
     if (!isOpen) return null;
@@ -726,12 +738,12 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-80 bg-white border-l-4 border-black shadow-2xl z-50 flex flex-col"
+            className="fixed right-0 top-0 bottom-0 w-96 bg-white border-l-4 border-black shadow-2xl z-50 flex flex-col"
         >
             <div className="bg-black text-white px-4 py-3 flex items-center justify-between">
                 <h3 className="font-black uppercase flex items-center gap-2">
                     <Settings2 size={18} />
-                    Personnalisation
+                    Personnalisation avancee
                 </h3>
                 <button onClick={onClose} className="hover:bg-white/10 p-1.5 transition-colors">
                     <X size={18} />
@@ -739,21 +751,23 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             </div>
             
             {/* Tabs */}
-            <div className="flex border-b-2 border-black">
+            <div className="flex border-b-2 border-black overflow-x-auto">
                 {[
                     { id: 'colors', label: 'Couleurs', icon: Palette },
                     { id: 'typography', label: 'Typo', icon: Type },
-                    { id: 'layout', label: 'Layout', icon: Maximize2 },
+                    { id: 'layout', label: 'Layout', icon: Layers },
+                    { id: 'spacing', label: 'Espaces', icon: Grid3X3 },
+                    { id: 'advanced', label: 'Avance', icon: Settings2 },
                 ].map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
                         className={cn(
-                            "flex-1 py-3 text-xs font-bold uppercase flex flex-col items-center gap-1 transition-colors",
+                            "flex-1 py-2.5 text-[10px] font-bold uppercase flex flex-col items-center gap-0.5 transition-colors min-w-[60px]",
                             activeTab === tab.id ? "bg-brutal-lime" : "hover:bg-gray-100"
                         )}
                     >
-                        <tab.icon size={16} />
+                        <tab.icon size={14} />
                         {tab.label}
                     </button>
                 ))}
@@ -762,13 +776,13 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
             <div className="flex-1 overflow-y-auto p-4">
                 {/* Colors Tab */}
                 {activeTab === 'colors' && (
-                    <div className="space-y-4">
-                        {/* Presets */}
+                    <div className="space-y-5">
+                        {/* Presets Grid */}
                         <div>
                             <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
-                                Presets
+                                Themes de couleurs
                             </label>
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-4 gap-2">
                                 {colorPresets.map(preset => (
                                     <button
                                         key={preset.name}
@@ -778,43 +792,57 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                                                 primary: preset.primary,
                                                 secondary: preset.secondary,
                                                 accent: preset.accent,
+                                                text: preset.text,
+                                                background: preset.background,
+                                                backgroundAlt: preset.backgroundAlt,
                                             },
                                         })}
-                                        className="p-2 border-2 border-black hover:shadow-brutal transition-all text-center"
+                                        className="p-2 border-2 border-black hover:shadow-brutal transition-all text-center group"
+                                        title={preset.name}
                                     >
-                                        <div className="flex gap-1 mb-1 justify-center">
-                                            <div className="w-4 h-4 border border-black" style={{ backgroundColor: preset.primary }} />
-                                            <div className="w-4 h-4 border border-black" style={{ backgroundColor: preset.secondary }} />
-                                            <div className="w-4 h-4 border border-black" style={{ backgroundColor: preset.accent }} />
+                                        <div className="flex gap-0.5 mb-1 justify-center">
+                                            <div className="w-3 h-3 border border-black" style={{ backgroundColor: preset.primary }} />
+                                            <div className="w-3 h-3 border border-black" style={{ backgroundColor: preset.secondary }} />
+                                            <div className="w-3 h-3 border border-black" style={{ backgroundColor: preset.accent }} />
                                         </div>
-                                        <span className="text-[10px] font-bold">{preset.name}</span>
+                                        <span className="text-[8px] font-bold group-hover:text-brutal-blue">{preset.name}</span>
                                     </button>
                                 ))}
                             </div>
                         </div>
                         
-                        {/* Individual Colors */}
+                        {/* All Color Controls */}
                         <div className="space-y-3">
+                            <label className="block text-xs font-bold uppercase text-gray-500">
+                                Couleurs personnalisees
+                            </label>
                             {[
-                                { key: 'primary', label: 'Principale' },
-                                { key: 'secondary', label: 'Secondaire' },
-                                { key: 'accent', label: 'Accent' },
-                                { key: 'text', label: 'Texte' },
-                                { key: 'background', label: 'Fond' },
+                                { key: 'primary', label: 'Couleur principale', desc: 'Headers, accents majeurs' },
+                                { key: 'secondary', label: 'Couleur secondaire', desc: 'Sous-titres, elements' },
+                                { key: 'accent', label: 'Couleur accent', desc: 'Highlights, boutons' },
+                                { key: 'text', label: 'Texte principal', desc: 'Corps du texte' },
+                                { key: 'textLight', label: 'Texte secondaire', desc: 'Descriptions, dates' },
+                                { key: 'background', label: 'Fond principal', desc: 'Arriere-plan' },
+                                { key: 'backgroundAlt', label: 'Fond alternatif', desc: 'Sidebar, sections' },
+                                { key: 'border', label: 'Bordures', desc: 'Lignes, separateurs' },
                             ].map(color => (
-                                <div key={color.key} className="flex items-center gap-3">
+                                <div key={color.key} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded transition-colors">
                                     <input
                                         type="color"
                                         value={(customization.colors as any)?.[color.key] || (config.colors as any)[color.key]}
                                         onChange={(e) => updateColors(color.key as keyof TemplateColors, e.target.value)}
-                                        className="w-10 h-10 border-2 border-black cursor-pointer"
+                                        className="w-10 h-10 border-2 border-black cursor-pointer rounded"
                                     />
                                     <div className="flex-1">
                                         <label className="block text-sm font-bold">{color.label}</label>
-                                        <span className="text-xs text-gray-500">
-                                            {(customization.colors as any)?.[color.key] || (config.colors as any)[color.key]}
-                                        </span>
+                                        <span className="text-[10px] text-gray-400">{color.desc}</span>
                                     </div>
+                                    <input
+                                        type="text"
+                                        value={(customization.colors as any)?.[color.key] || (config.colors as any)[color.key]}
+                                        onChange={(e) => updateColors(color.key as keyof TemplateColors, e.target.value)}
+                                        className="w-20 text-xs font-mono border border-gray-300 px-2 py-1 rounded"
+                                    />
                                 </div>
                             ))}
                         </div>
@@ -823,11 +851,11 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 
                 {/* Typography Tab */}
                 {activeTab === 'typography' && (
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                         {/* Font Presets */}
                         <div>
                             <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
-                                Presets de polices
+                                Combinaisons de polices
                             </label>
                             <div className="space-y-2">
                                 {fontPresets.map(preset => (
@@ -843,9 +871,15 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                                         })}
                                         className="w-full p-3 border-2 border-black text-left hover:shadow-brutal transition-all"
                                     >
-                                        <span className="font-bold text-sm">{preset.name}</span>
-                                        <div className="text-xs text-gray-500 mt-1" style={{ fontFamily: preset.heading }}>
+                                        <div className="flex justify-between items-center">
+                                            <span className="font-bold text-sm">{preset.name}</span>
+                                            <span className="text-[10px] text-gray-400">{preset.desc}</span>
+                                        </div>
+                                        <div className="text-lg mt-1" style={{ fontFamily: preset.heading }}>
                                             Titre exemple
+                                        </div>
+                                        <div className="text-sm text-gray-600" style={{ fontFamily: preset.body }}>
+                                            Corps de texte exemple
                                         </div>
                                     </button>
                                 ))}
@@ -854,52 +888,138 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                         
                         {/* Size Controls */}
                         <div className="space-y-4 pt-4 border-t-2 border-gray-200">
+                            <label className="block text-xs font-bold uppercase text-gray-500">
+                                Tailles de texte
+                            </label>
+                            
+                            {/* Name Size */}
                             <div>
-                                <label className="block text-sm font-bold mb-2">Taille du nom</label>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-sm font-bold">Taille du nom</label>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => updateTypography('nameSize', Math.max(1.5, (customization.typography?.nameSize || config.typography.nameSize) - 0.1))}
+                                            className="p-1 border border-gray-300 hover:bg-gray-100"
+                                        >
+                                            <Minus size={12} />
+                                        </button>
+                                        <span className="text-xs font-mono w-12 text-center">
+                                            {(customization.typography?.nameSize || config.typography.nameSize).toFixed(1)}rem
+                                        </span>
+                                        <button
+                                            onClick={() => updateTypography('nameSize', Math.min(5, (customization.typography?.nameSize || config.typography.nameSize) + 0.1))}
+                                            className="p-1 border border-gray-300 hover:bg-gray-100"
+                                        >
+                                            <Plus size={12} />
+                                        </button>
+                                    </div>
+                                </div>
                                 <input
                                     type="range"
                                     min="1.5"
-                                    max="4"
+                                    max="5"
                                     step="0.1"
                                     value={customization.typography?.nameSize || config.typography.nameSize}
                                     onChange={(e) => updateTypography('nameSize', parseFloat(e.target.value))}
-                                    className="w-full"
+                                    className="w-full accent-brutal-lime"
                                 />
-                                <span className="text-xs text-gray-500">
-                                    {customization.typography?.nameSize || config.typography.nameSize}rem
-                                </span>
                             </div>
                             
+                            {/* Job Title Size */}
                             <div>
-                                <label className="block text-sm font-bold mb-2">Taille des titres</label>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-sm font-bold">Titre du poste</label>
+                                    <span className="text-xs font-mono">
+                                        {(customization.typography?.jobTitleSize || config.typography.jobTitleSize).toFixed(2)}rem
+                                    </span>
+                                </div>
                                 <input
                                     type="range"
                                     min="0.8"
-                                    max="1.6"
+                                    max="2"
+                                    step="0.05"
+                                    value={customization.typography?.jobTitleSize || config.typography.jobTitleSize}
+                                    onChange={(e) => updateTypography('jobTitleSize', parseFloat(e.target.value))}
+                                    className="w-full accent-brutal-lime"
+                                />
+                            </div>
+                            
+                            {/* Section Title Size */}
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-sm font-bold">Titres de section</label>
+                                    <span className="text-xs font-mono">
+                                        {(customization.typography?.sectionTitleSize || config.typography.sectionTitleSize).toFixed(2)}rem
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0.7"
+                                    max="1.8"
                                     step="0.05"
                                     value={customization.typography?.sectionTitleSize || config.typography.sectionTitleSize}
                                     onChange={(e) => updateTypography('sectionTitleSize', parseFloat(e.target.value))}
-                                    className="w-full"
+                                    className="w-full accent-brutal-lime"
                                 />
-                                <span className="text-xs text-gray-500">
-                                    {customization.typography?.sectionTitleSize || config.typography.sectionTitleSize}rem
-                                </span>
                             </div>
                             
+                            {/* Body Size */}
                             <div>
-                                <label className="block text-sm font-bold mb-2">Hauteur de ligne</label>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-sm font-bold">Corps de texte</label>
+                                    <span className="text-xs font-mono">
+                                        {(customization.typography?.bodySize || config.typography.bodySize).toFixed(2)}rem
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0.7"
+                                    max="1.2"
+                                    step="0.025"
+                                    value={customization.typography?.bodySize || config.typography.bodySize}
+                                    onChange={(e) => updateTypography('bodySize', parseFloat(e.target.value))}
+                                    className="w-full accent-brutal-lime"
+                                />
+                            </div>
+                            
+                            {/* Line Height */}
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-sm font-bold">Hauteur de ligne</label>
+                                    <span className="text-xs font-mono">
+                                        {customization.typography?.lineHeight || config.typography.lineHeight}
+                                    </span>
+                                </div>
                                 <input
                                     type="range"
                                     min="1.2"
-                                    max="2"
+                                    max="2.2"
                                     step="0.1"
                                     value={customization.typography?.lineHeight || config.typography.lineHeight}
                                     onChange={(e) => updateTypography('lineHeight', parseFloat(e.target.value))}
-                                    className="w-full"
+                                    className="w-full accent-brutal-lime"
                                 />
-                                <span className="text-xs text-gray-500">
-                                    {customization.typography?.lineHeight || config.typography.lineHeight}
-                                </span>
+                            </div>
+                            
+                            {/* Letter Spacing */}
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-sm font-bold">Espacement lettres</label>
+                                    <span className="text-xs font-mono">
+                                        {customization.typography?.letterSpacing || config.typography.letterSpacing}
+                                    </span>
+                                </div>
+                                <select
+                                    value={customization.typography?.letterSpacing || config.typography.letterSpacing}
+                                    onChange={(e) => updateTypography('letterSpacing', e.target.value)}
+                                    className="w-full border-2 border-black p-2 font-bold"
+                                >
+                                    <option value="-0.02em">Serre</option>
+                                    <option value="0">Normal</option>
+                                    <option value="0.02em">Leger</option>
+                                    <option value="0.05em">Espace</option>
+                                    <option value="0.1em">Large</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -907,77 +1027,409 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 
                 {/* Layout Tab */}
                 {activeTab === 'layout' && (
-                    <div className="space-y-4">
+                    <div className="space-y-5">
+                        {/* Photo Settings */}
                         <div>
-                            <label className="block text-sm font-bold mb-2">Afficher la photo</label>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => onCustomizationChange({
-                                        ...customization,
-                                        layout: { ...customization.layout, showPhoto: true },
-                                    })}
-                                    className={cn(
-                                        "flex-1 py-2 border-2 border-black font-bold text-sm",
-                                        customization.layout?.showPhoto !== false ? "bg-brutal-lime" : "hover:bg-gray-100"
-                                    )}
-                                >
-                                    Oui
-                                </button>
-                                <button
-                                    onClick={() => onCustomizationChange({
-                                        ...customization,
-                                        layout: { ...customization.layout, showPhoto: false },
-                                    })}
-                                    className={cn(
-                                        "flex-1 py-2 border-2 border-black font-bold text-sm",
-                                        customization.layout?.showPhoto === false ? "bg-brutal-lime" : "hover:bg-gray-100"
-                                    )}
-                                >
-                                    Non
-                                </button>
+                            <label className="block text-xs font-bold uppercase text-gray-500 mb-3">
+                                Photo de profil
+                            </label>
+                            
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-sm font-bold mb-2 block">Afficher la photo</label>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => onCustomizationChange({
+                                                ...customization,
+                                                layout: { ...customization.layout, showPhoto: true },
+                                            })}
+                                            className={cn(
+                                                "flex-1 py-2 border-2 border-black font-bold text-sm",
+                                                customization.layout?.showPhoto !== false ? "bg-brutal-lime" : "hover:bg-gray-100"
+                                            )}
+                                        >
+                                            Oui
+                                        </button>
+                                        <button
+                                            onClick={() => onCustomizationChange({
+                                                ...customization,
+                                                layout: { ...customization.layout, showPhoto: false },
+                                            })}
+                                            className={cn(
+                                                "flex-1 py-2 border-2 border-black font-bold text-sm",
+                                                customization.layout?.showPhoto === false ? "bg-brutal-lime" : "hover:bg-gray-100"
+                                            )}
+                                        >
+                                            Non
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label className="text-sm font-bold mb-2 block">Forme de la photo</label>
+                                    <div className="flex gap-2">
+                                        {[
+                                            { value: 'circle', label: 'Cercle', icon: Circle },
+                                            { value: 'square', label: 'Carre', icon: Square },
+                                            { value: 'rounded', label: 'Arrondi', icon: RectangleHorizontal },
+                                        ].map(shape => (
+                                            <button
+                                                key={shape.value}
+                                                onClick={() => onCustomizationChange({
+                                                    ...customization,
+                                                    layout: { ...customization.layout, photoShape: shape.value as any },
+                                                })}
+                                                className={cn(
+                                                    "flex-1 py-2 border-2 border-black font-bold text-xs flex flex-col items-center gap-1",
+                                                    (customization.layout?.photoShape || config.layout.photoShape) === shape.value 
+                                                        ? "bg-brutal-lime" 
+                                                        : "hover:bg-gray-100"
+                                                )}
+                                            >
+                                                <shape.icon size={16} />
+                                                {shape.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="text-sm font-bold">Taille de la photo</label>
+                                        <span className="text-xs font-mono">
+                                            {customization.layout?.photoSize || config.layout.photoSize}px
+                                        </span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="50"
+                                        max="180"
+                                        step="5"
+                                        value={customization.layout?.photoSize || config.layout.photoSize}
+                                        onChange={(e) => onCustomizationChange({
+                                            ...customization,
+                                            layout: { ...customization.layout, photoSize: parseInt(e.target.value) },
+                                        })}
+                                        className="w-full accent-brutal-lime"
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label className="text-sm font-bold mb-2 block">Position de la photo</label>
+                                    <select
+                                        value={customization.layout?.photoPosition || config.layout.photoPosition}
+                                        onChange={(e) => onCustomizationChange({
+                                            ...customization,
+                                            layout: { ...customization.layout, photoPosition: e.target.value as any },
+                                        })}
+                                        className="w-full border-2 border-black p-2 font-bold"
+                                    >
+                                        <option value="header">En-tete</option>
+                                        <option value="sidebar">Sidebar</option>
+                                        <option value="inline">Dans le texte</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         
-                        <div>
-                            <label className="block text-sm font-bold mb-2">Forme de la photo</label>
-                            <div className="flex gap-2">
-                                {['circle', 'square', 'rounded'].map(shape => (
+                        {/* Layout Type */}
+                        <div className="pt-4 border-t-2 border-gray-200">
+                            <label className="block text-xs font-bold uppercase text-gray-500 mb-3">
+                                Type de mise en page
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {[
+                                    { value: 'single', label: 'Une colonne', desc: 'Classique' },
+                                    { value: 'two-column', label: 'Deux colonnes', desc: 'Moderne' },
+                                    { value: 'sidebar-left', label: 'Sidebar gauche', desc: 'Creative' },
+                                    { value: 'sidebar-right', label: 'Sidebar droite', desc: 'Pro' },
+                                ].map(layout => (
                                     <button
-                                        key={shape}
+                                        key={layout.value}
                                         onClick={() => onCustomizationChange({
                                             ...customization,
-                                            layout: { ...customization.layout, photoShape: shape as any },
+                                            layout: { ...customization.layout, type: layout.value as any },
                                         })}
                                         className={cn(
-                                            "flex-1 py-2 border-2 border-black font-bold text-xs capitalize",
-                                            (customization.layout?.photoShape || config.layout.photoShape) === shape 
-                                                ? "bg-brutal-lime" 
+                                            "p-3 border-2 border-black text-left",
+                                            (customization.layout?.type || config.layout.type) === layout.value 
+                                                ? "bg-brutal-lime shadow-brutal" 
                                                 : "hover:bg-gray-100"
                                         )}
                                     >
-                                        {shape === 'circle' ? 'Cercle' : shape === 'square' ? 'Carre' : 'Arrondi'}
+                                        <span className="font-bold text-sm block">{layout.label}</span>
+                                        <span className="text-[10px] text-gray-500">{layout.desc}</span>
                                     </button>
                                 ))}
                             </div>
                         </div>
                         
+                        {/* Sidebar Width */}
+                        {(customization.layout?.type || config.layout.type) !== 'single' && (
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-sm font-bold">Largeur sidebar</label>
+                                    <span className="text-xs font-mono">
+                                        {customization.layout?.sidebarWidth || config.layout.sidebarWidth || 35}%
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="25"
+                                    max="50"
+                                    step="1"
+                                    value={customization.layout?.sidebarWidth || config.layout.sidebarWidth || 35}
+                                    onChange={(e) => onCustomizationChange({
+                                        ...customization,
+                                        layout: { ...customization.layout, sidebarWidth: parseInt(e.target.value) },
+                                    })}
+                                    className="w-full accent-brutal-lime"
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
+                
+                {/* Spacing Tab */}
+                {activeTab === 'spacing' && (
+                    <div className="space-y-5">
+                        <label className="block text-xs font-bold uppercase text-gray-500">
+                            Espacements et marges
+                        </label>
+                        
+                        {/* Page Margin */}
                         <div>
-                            <label className="block text-sm font-bold mb-2">Taille de la photo</label>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm font-bold">Marges de page</label>
+                                <span className="text-xs font-mono">
+                                    {customization.spacing?.pageMargin || config.spacing.pageMargin}mm
+                                </span>
+                            </div>
                             <input
                                 type="range"
-                                min="60"
-                                max="150"
-                                step="10"
-                                value={customization.layout?.photoSize || config.layout.photoSize}
+                                min="10"
+                                max="35"
+                                step="1"
+                                value={customization.spacing?.pageMargin || config.spacing.pageMargin}
                                 onChange={(e) => onCustomizationChange({
                                     ...customization,
-                                    layout: { ...customization.layout, photoSize: parseInt(e.target.value) },
+                                    spacing: { ...customization.spacing, pageMargin: parseInt(e.target.value) },
                                 })}
-                                className="w-full"
+                                className="w-full accent-brutal-lime"
                             />
-                            <span className="text-xs text-gray-500">
-                                {customization.layout?.photoSize || config.layout.photoSize}px
-                            </span>
+                        </div>
+                        
+                        {/* Section Gap */}
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm font-bold">Espace entre sections</label>
+                                <span className="text-xs font-mono">
+                                    {customization.spacing?.sectionGap || config.spacing.sectionGap}px
+                                </span>
+                            </div>
+                            <input
+                                type="range"
+                                min="12"
+                                max="48"
+                                step="2"
+                                value={customization.spacing?.sectionGap || config.spacing.sectionGap}
+                                onChange={(e) => onCustomizationChange({
+                                    ...customization,
+                                    spacing: { ...customization.spacing, sectionGap: parseInt(e.target.value) },
+                                })}
+                                className="w-full accent-brutal-lime"
+                            />
+                        </div>
+                        
+                        {/* Section Padding */}
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm font-bold">Padding des sections</label>
+                                <span className="text-xs font-mono">
+                                    {customization.spacing?.sectionPadding || config.spacing.sectionPadding}px
+                                </span>
+                            </div>
+                            <input
+                                type="range"
+                                min="8"
+                                max="32"
+                                step="2"
+                                value={customization.spacing?.sectionPadding || config.spacing.sectionPadding}
+                                onChange={(e) => onCustomizationChange({
+                                    ...customization,
+                                    spacing: { ...customization.spacing, sectionPadding: parseInt(e.target.value) },
+                                })}
+                                className="w-full accent-brutal-lime"
+                            />
+                        </div>
+                        
+                        {/* Item Gap */}
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm font-bold">Espace entre elements</label>
+                                <span className="text-xs font-mono">
+                                    {customization.spacing?.itemGap || config.spacing.itemGap}px
+                                </span>
+                            </div>
+                            <input
+                                type="range"
+                                min="8"
+                                max="28"
+                                step="2"
+                                value={customization.spacing?.itemGap || config.spacing.itemGap}
+                                onChange={(e) => onCustomizationChange({
+                                    ...customization,
+                                    spacing: { ...customization.spacing, itemGap: parseInt(e.target.value) },
+                                })}
+                                className="w-full accent-brutal-lime"
+                            />
+                        </div>
+                    </div>
+                )}
+                
+                {/* Advanced Tab */}
+                {activeTab === 'advanced' && (
+                    <div className="space-y-5">
+                        <label className="block text-xs font-bold uppercase text-gray-500">
+                            Options avancees
+                        </label>
+                        
+                        {/* Skills Display */}
+                        <div>
+                            <label className="text-sm font-bold mb-2 block">Affichage des competences</label>
+                            <select
+                                value={customization.sections?.skills?.type || config.sections.skills.type}
+                                onChange={(e) => onCustomizationChange({
+                                    ...customization,
+                                    sections: { 
+                                        ...customization.sections, 
+                                        skills: { 
+                                            showLevel: customization.sections?.skills?.showLevel ?? config.sections.skills.showLevel,
+                                            type: e.target.value as 'bars' | 'dots' | 'percentage' | 'tags' | 'simple'
+                                        } 
+                                    },
+                                })}
+                                className="w-full border-2 border-black p-2 font-bold"
+                            >
+                                <option value="bars">Barres de progression</option>
+                                <option value="dots">Points</option>
+                                <option value="percentage">Pourcentage</option>
+                                <option value="tags">Tags/Badges</option>
+                                <option value="simple">Texte simple</option>
+                            </select>
+                        </div>
+                        
+                        {/* Languages Display */}
+                        <div>
+                            <label className="text-sm font-bold mb-2 block">Affichage des langues</label>
+                            <select
+                                value={customization.sections?.languages?.type || config.sections.languages.type}
+                                onChange={(e) => onCustomizationChange({
+                                    ...customization,
+                                    sections: { 
+                                        ...customization.sections, 
+                                        languages: { 
+                                            showLevelText: customization.sections?.languages?.showLevelText ?? config.sections.languages.showLevelText,
+                                            type: e.target.value as 'bars' | 'dots' | 'stars' | 'text' | 'flags'
+                                        } 
+                                    },
+                                })}
+                                className="w-full border-2 border-black p-2 font-bold"
+                            >
+                                <option value="bars">Barres</option>
+                                <option value="dots">Points</option>
+                                <option value="stars">Etoiles</option>
+                                <option value="text">Texte</option>
+                                <option value="flags">Drapeaux</option>
+                            </select>
+                        </div>
+                        
+                        {/* Section Title Style */}
+                        <div>
+                            <label className="text-sm font-bold mb-2 block">Style des titres</label>
+                            <select
+                                value={customization.sections?.titleStyle || config.sections.titleStyle}
+                                onChange={(e) => onCustomizationChange({
+                                    ...customization,
+                                    sections: { 
+                                        ...customization.sections, 
+                                        titleStyle: e.target.value as any 
+                                    },
+                                })}
+                                className="w-full border-2 border-black p-2 font-bold"
+                            >
+                                <option value="simple">Simple</option>
+                                <option value="underline">Souligne</option>
+                                <option value="background">Fond colore</option>
+                                <option value="border-left">Bordure gauche</option>
+                            </select>
+                        </div>
+                        
+                        {/* Use Icons */}
+                        <div>
+                            <label className="text-sm font-bold mb-2 block">Icones de section</label>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => onCustomizationChange({
+                                        ...customization,
+                                        sections: { ...customization.sections, useIcons: true },
+                                    })}
+                                    className={cn(
+                                        "flex-1 py-2 border-2 border-black font-bold text-sm",
+                                        customization.sections?.useIcons !== false ? "bg-brutal-lime" : "hover:bg-gray-100"
+                                    )}
+                                >
+                                    Afficher
+                                </button>
+                                <button
+                                    onClick={() => onCustomizationChange({
+                                        ...customization,
+                                        sections: { ...customization.sections, useIcons: false },
+                                    })}
+                                    className={cn(
+                                        "flex-1 py-2 border-2 border-black font-bold text-sm",
+                                        customization.sections?.useIcons === false ? "bg-brutal-lime" : "hover:bg-gray-100"
+                                    )}
+                                >
+                                    Masquer
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* Timeline Style */}
+                        <div>
+                            <label className="text-sm font-bold mb-2 block">Style de timeline</label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {[
+                                    { value: 'circle', label: 'Cercle' },
+                                    { value: 'square', label: 'Carre' },
+                                    { value: 'diamond', label: 'Losange' },
+                                ].map(style => (
+                                    <button
+                                        key={style.value}
+                                        onClick={() => onCustomizationChange({
+                                            ...customization,
+                                            sections: { 
+                                                ...customization.sections, 
+                                                timeline: { 
+                                                    showLine: customization.sections?.timeline?.showLine ?? config.sections.timeline.showLine,
+                                                    showDots: customization.sections?.timeline?.showDots ?? config.sections.timeline.showDots,
+                                                    position: customization.sections?.timeline?.position ?? config.sections.timeline.position,
+                                                    dotStyle: style.value as 'circle' | 'square' | 'diamond'
+                                                } 
+                                            },
+                                        })}
+                                        className={cn(
+                                            "py-2 border-2 border-black font-bold text-xs",
+                                            (customization.sections?.timeline?.dotStyle || config.sections.timeline.dotStyle) === style.value 
+                                                ? "bg-brutal-lime" 
+                                                : "hover:bg-gray-100"
+                                        )}
+                                    >
+                                        {style.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -1145,6 +1597,7 @@ const CVPreviewContent: React.FC<{ cv: CVData }> = ({ cv }) => {
 export const CVEditor: React.FC = () => {
     const cv = useCVStore((state) => state.cv);
     const importCV = useCVStore((state) => state.importCV);
+    const updatePersonalInfo = useCVStore((state) => state.updatePersonalInfo);
     const [activeSection, setActiveSection] = React.useState<SectionId>('personal');
     const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
     const [showPreview, setShowPreview] = React.useState(true);
@@ -1153,6 +1606,8 @@ export const CVEditor: React.FC = () => {
     const [showAiModal, setShowAiModal] = React.useState(false);
     const [showCustomization, setShowCustomization] = React.useState(false);
     const [customization, setCustomization] = React.useState<TemplateCustomization>({});
+    const [previewZoom, setPreviewZoom] = React.useState(100);
+    const [isEditMode, setIsEditMode] = React.useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const previewRef = React.useRef<HTMLDivElement>(null);
     const temporalStore = useTemporalStore();
@@ -1355,7 +1810,7 @@ export const CVEditor: React.FC = () => {
                             exit={{ width: 0, opacity: 0 }}
                             className="border-l-3 border-black bg-gray-200 overflow-hidden flex flex-col"
                         >
-                            {/* Preview Header with Template Selector */}
+                            {/* Preview Header with Template Selector & Controls */}
                             <div className="bg-white border-b-2 border-black p-3 flex items-center justify-between shrink-0">
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-bold">Template:</span>
@@ -1367,29 +1822,111 @@ export const CVEditor: React.FC = () => {
                                         {templateMetadata?.name || 'Choisir'}
                                     </button>
                                 </div>
-                                <button
-                                    onClick={() => setShowCustomization(true)}
-                                    className="px-3 py-1.5 border-2 border-black font-bold text-sm flex items-center gap-2 hover:bg-brutal-blue hover:text-white transition-colors"
-                                >
-                                    <Settings2 size={16} />
-                                    Personnaliser
-                                </button>
+                                
+                                {/* Edit Mode Toggle */}
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setIsEditMode(!isEditMode)}
+                                        className={cn(
+                                            "px-3 py-1.5 border-2 border-black font-bold text-sm flex items-center gap-2 transition-colors",
+                                            isEditMode ? "bg-brutal-pink text-white" : "hover:bg-gray-100"
+                                        )}
+                                        title="Mode edition: Double-cliquez sur le texte pour editer"
+                                    >
+                                        <Edit3 size={16} />
+                                        {isEditMode ? 'Édition' : 'Aperçu'}
+                                    </button>
+                                    
+                                    <button
+                                        onClick={() => setShowCustomization(true)}
+                                        className="px-3 py-1.5 border-2 border-black font-bold text-sm flex items-center gap-2 hover:bg-brutal-blue hover:text-white transition-colors"
+                                    >
+                                        <Settings2 size={16} />
+                                        Personnaliser
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {/* Zoom Controls */}
+                            <div className="bg-gray-100 border-b border-gray-300 px-4 py-2 flex items-center justify-between shrink-0">
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setPreviewZoom(Math.max(25, previewZoom - 10))}
+                                        className="p-1.5 border border-gray-400 hover:bg-white transition-colors"
+                                        disabled={previewZoom <= 25}
+                                    >
+                                        <ZoomOut size={14} />
+                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            type="range"
+                                            min="25"
+                                            max="200"
+                                            step="5"
+                                            value={previewZoom}
+                                            onChange={(e) => setPreviewZoom(parseInt(e.target.value))}
+                                            className="w-24 accent-brutal-blue"
+                                        />
+                                        <span className="text-xs font-mono w-12 text-center">{previewZoom}%</span>
+                                    </div>
+                                    <button
+                                        onClick={() => setPreviewZoom(Math.min(200, previewZoom + 10))}
+                                        className="p-1.5 border border-gray-400 hover:bg-white transition-colors"
+                                        disabled={previewZoom >= 200}
+                                    >
+                                        <ZoomIn size={14} />
+                                    </button>
+                                    <button
+                                        onClick={() => setPreviewZoom(100)}
+                                        className="p-1.5 border border-gray-400 hover:bg-white transition-colors ml-1"
+                                        title="Réinitialiser le zoom"
+                                    >
+                                        <RotateCcw size={14} />
+                                    </button>
+                                </div>
+                                
+                                {isEditMode && (
+                                    <span className="text-xs text-brutal-pink font-bold animate-pulse">
+                                        Double-cliquez sur un element pour l'editer
+                                    </span>
+                                )}
                             </div>
                             
                             {/* Preview Content */}
                             <div className="flex-1 overflow-auto p-6">
-                                <div className="bg-white shadow-2xl mx-auto" style={{ maxWidth: '210mm' }}>
-                                    <div id="cv-preview" ref={previewRef}>
+                                <div 
+                                    className="bg-white shadow-2xl mx-auto transition-transform origin-top"
+                                    style={{ 
+                                        maxWidth: '210mm',
+                                        transform: `scale(${previewZoom / 100})`,
+                                        transformOrigin: 'top center',
+                                    }}
+                                >
+                                    <div 
+                                        id="cv-preview" 
+                                        ref={previewRef}
+                                        className={cn(
+                                            "relative",
+                                            isEditMode && "ring-2 ring-brutal-pink ring-offset-2"
+                                        )}
+                                    >
                                         {TemplateComponent && templateConfig ? (
                                             <TemplateComponent 
                                                 cvData={cv as unknown as CvData} 
                                                 config={templateConfig}
-                                                mode="preview"
+                                                mode={isEditMode ? "edit" : "preview"}
                                                 ref={previewRef} 
                                             />
                                         ) : (
                                             <div className="p-8">
                                                 <CVPreviewContent cv={cv} />
+                                            </div>
+                                        )}
+                                        
+                                        {/* Edit Mode Overlay Hint */}
+                                        {isEditMode && (
+                                            <div className="absolute top-2 right-2 bg-brutal-pink text-white text-xs px-2 py-1 font-bold shadow-lg z-50">
+                                                MODE ÉDITION
                                             </div>
                                         )}
                                     </div>

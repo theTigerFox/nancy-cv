@@ -246,8 +246,8 @@ export interface TemplateProps {
     cvData: CvData;
     /** Configuration du template (avec personnalisations utilisateur) */
     config: TemplateConfig;
-    /** Mode d'affichage: 'preview' | 'print' | 'export' */
-    mode?: 'preview' | 'print' | 'export';
+    /** Mode d'affichage: 'preview' | 'print' | 'export' | 'edit' */
+    mode?: 'preview' | 'print' | 'export' | 'edit';
     /** Scale factor pour le preview */
     scale?: number;
 }

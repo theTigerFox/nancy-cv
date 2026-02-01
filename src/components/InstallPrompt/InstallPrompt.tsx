@@ -199,9 +199,9 @@ const InstallPrompt: React.FC = () => {
                                 <ArrowDown size={16} />
                             </button>
                             <button
-                                onClick={dismissPrompt}
+                                onClick={toggleMinimize}
                                 className="p-1.5 hover:bg-white/10 transition-colors"
-                                aria-label="Fermer"
+                                aria-label="Fermer (réduire)"
                             >
                                 <X size={16} />
                             </button>

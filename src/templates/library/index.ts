@@ -30,6 +30,14 @@ import classicProfessionalManifest from './classic-professional/template.json';
 import CreativeSplashTemplate from './creative-splash/CreativeSplashTemplate';
 import creativeSplashManifest from './creative-splash/template.json';
 
+// Tech Minimal
+import TechMinimalTemplate from './tech-minimal/TechMinimalTemplate';
+import techMinimalManifest from './tech-minimal/template.json';
+
+// Elegant Serif
+import ElegantSerifTemplate from './elegant-serif/ElegantSerifTemplate';
+import elegantSerifManifest from './elegant-serif/template.json';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Register Templates
 // ─────────────────────────────────────────────────────────────────────────────
@@ -72,6 +80,20 @@ export function registerAllTemplates(): void {
         '/templates/previews/creative-splash.png'
     );
 
+    // Tech Minimal
+    templateRegistry.register(
+        techMinimalManifest as TemplateManifest,
+        TechMinimalTemplate,
+        '/templates/previews/tech-minimal.png'
+    );
+
+    // Elegant Serif
+    templateRegistry.register(
+        elegantSerifManifest as TemplateManifest,
+        ElegantSerifTemplate,
+        '/templates/previews/elegant-serif.png'
+    );
+
     // Mark as initialized
     templateRegistry.setInitialized();
 
@@ -88,6 +110,8 @@ export {
     BoldModernTemplate,
     ClassicProfessionalTemplate,
     CreativeSplashTemplate,
+    TechMinimalTemplate,
+    ElegantSerifTemplate,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -100,6 +124,8 @@ export const TEMPLATE_IDS = {
     BOLD_MODERN: 'bold-modern',
     CLASSIC_PROFESSIONAL: 'classic-professional',
     CREATIVE_SPLASH: 'creative-splash',
+    TECH_MINIMAL: 'tech-minimal',
+    ELEGANT_SERIF: 'elegant-serif',
 } as const;
 
 export type TemplateId = typeof TEMPLATE_IDS[keyof typeof TEMPLATE_IDS];
