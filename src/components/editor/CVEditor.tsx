@@ -17,7 +17,8 @@ import {
     AlignLeft, AlignCenter, AlignRight, Minus, Plus
 } from 'lucide-react';
 import { useCVStore, useTemporalStore } from '../../store/cvStore';
-import { downloadJSON, importFromFile, exportToPDF, exportToPlainText, exportToImage, downloadPDF } from '../../utils/export';
+import { downloadJSON, importFromFile, exportToPlainText, exportToImage } from '../../utils/export';
+import { downloadPDF as downloadPDFNative } from '../../pdf/exportService';
 import { useFirestoreSync } from '../../hooks/useFirestoreSync';
 import { useAuth } from '../../contexts/AuthContext';
 import { templateRegistry, getTemplateConfig, getTemplateComponent } from '../../templates/registry';
@@ -1684,17 +1685,15 @@ export const CVEditor: React.FC = () => {
     }, [cv, temporalStore]);
     
     const handleExportPDF = async () => {
-        const previewEl = document.getElementById('cv-preview');
-        if (previewEl) {
-            try {
-                const filename = `cv-${cv.personalInfo.firstName || 'mon'}-${cv.personalInfo.lastName || 'cv'}`;
-                await downloadPDF(previewEl, { format: 'a4', filename, quality: 'high' });
-            } catch (error) {
-                console.error('Erreur export PDF:', error);
-                alert('Erreur lors de l\'export PDF. Verifiez que la preview est visible.');
-            }
-        } else {
-            alert('Veuillez activer l\'apercu avant d\'exporter en PDF');
+        try {
+            // Use the new @react-pdf/renderer export with real text
+            await downloadPDFNative(cv as CVData, {
+                filename: `cv-${cv.personalInfo.firstName || 'mon'}-${cv.personalInfo.lastName || 'cv'}`,
+                templateId: selectedTemplate,
+            });
+        } catch (error) {
+            console.error('Erreur export PDF:', error);
+            alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
         }
     };
     

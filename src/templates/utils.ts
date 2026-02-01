@@ -358,7 +358,7 @@ export function getLanguageCEFR(level: number | string): string {
 // Section Visibility Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { SectionConfig } from '../types/cv';
+import { SectionConfig, DEFAULT_SECTIONS_ORDER } from '../types/cv';
 
 /**
  * Vérifie si une section est visible selon les paramètres de l'utilisateur
@@ -371,7 +371,12 @@ export function isSectionVisible(
     // Si pas de données, ne pas afficher même si visible
     if (!hasData) return false;
     
-    const section = sectionsOrder.find(s => s.type === sectionType);
+    // Utiliser DEFAULT_SECTIONS_ORDER si sectionsOrder est vide (migration/backwards compat)
+    const sections = sectionsOrder && sectionsOrder.length > 0 
+        ? sectionsOrder 
+        : DEFAULT_SECTIONS_ORDER;
+    
+    const section = sections.find(s => s.type === sectionType);
     // Par défaut visible si non trouvé (backwards compatibility)
     return section?.visible ?? true;
 }

@@ -41,6 +41,7 @@ import {
     createCustomSection,
     createCustomSectionItem,
     isCVData,
+    DEFAULT_SECTIONS_ORDER,
 } from '../types/cv';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1126,18 +1127,54 @@ export const useCVStore = create<CVStore>()(
             {
                 name: 'nancy-cv-storage',
                 storage: createJSONStorage(() => localStorage),
+                version: 3, // Incrémenté pour forcer la migration
                 partialize: (state) => ({
                     cv: state.cv,
                     savedCVs: state.savedCVs,
                     activeCVId: state.activeCVId,
                 }),
+                // Migration des anciennes données du localStorage
+                migrate: (persistedState: any, version: number) => {
+                    // Toujours s'assurer que sectionsOrder existe et est valide
+                    if (persistedState?.cv) {
+                        if (!persistedState.cv.sectionsOrder || !Array.isArray(persistedState.cv.sectionsOrder) || persistedState.cv.sectionsOrder.length === 0) {
+                            persistedState.cv.sectionsOrder = [...DEFAULT_SECTIONS_ORDER];
+                        }
+                        // S'assurer que les arrays existent
+                        if (!persistedState.cv.interests) persistedState.cv.interests = [];
+                        if (!persistedState.cv.projects) persistedState.cv.projects = [];
+                        if (!persistedState.cv.certifications) persistedState.cv.certifications = [];
+                        if (!persistedState.cv.volunteer) persistedState.cv.volunteer = [];
+                        if (!persistedState.cv.references) persistedState.cv.references = [];
+                        if (!persistedState.cv.publications) persistedState.cv.publications = [];
+                        if (!persistedState.cv.awards) persistedState.cv.awards = [];
+                        if (!persistedState.cv.customSections) persistedState.cv.customSections = [];
+                        if (!persistedState.cv.skillCategories) persistedState.cv.skillCategories = [];
+                    }
+                    return persistedState;
+                },
+                // Vérification post-réhydratation pour s'assurer que sectionsOrder est toujours valide
+                onRehydrateStorage: () => (state, error) => {
+                    if (error) {
+                        console.error('Erreur de réhydratation du store:', error);
+                        return;
+                    }
+                    if (state && state.cv) {
+                        // Double vérification après réhydratation
+                        if (!state.cv.sectionsOrder || !Array.isArray(state.cv.sectionsOrder) || state.cv.sectionsOrder.length === 0) {
+                            state.cv.sectionsOrder = [...DEFAULT_SECTIONS_ORDER];
+                        }
+                    }
+                },
             }
         ),
         {
             limit: 50, // Undo history limit
-            partialize: (state) => ({
-                cv: state.cv,
-            }),
+            partialize: (state) => {
+                // Protection contre state.cv undefined pendant l'initialisation
+                if (!state || !state.cv) return {};
+                return { cv: state.cv };
+            },
         }
     )
 );

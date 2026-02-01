@@ -240,46 +240,50 @@ const AVAILABLE_SECTIONS: { id: SectionType; label: string; icon: React.ReactNod
 
 export const SectionManager: React.FC<SectionManagerProps> = ({ onClose, config }) => {
     const cv = useCVStore((state) => state.cv);
-    const sectionsOrder = useCVStore((state) => state.cv.sectionsOrder);
+    const sectionsOrder = useCVStore((state) => state.cv.sectionsOrder) || [];
     const toggleSectionVisibility = useCVStore((state) => state.toggleSectionVisibility);
     const reorderSections = useCVStore((state) => state.reorderSections);
 
+    // Ensure sectionsOrder is valid
+    const validSectionsOrder = sectionsOrder.length > 0 ? sectionsOrder : [];
+
     const toggleSection = (storeType: string) => {
+        console.log('[SectionManager] Toggling section:', storeType);
         toggleSectionVisibility(storeType);
     };
 
     const moveSection = (storeType: string, direction: 'up' | 'down') => {
-        const currentIndex = sectionsOrder.findIndex(s => s.type === storeType);
+        const currentIndex = validSectionsOrder.findIndex(s => s.type === storeType);
         if (currentIndex === -1) return;
         const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-        if (newIndex < 0 || newIndex >= sectionsOrder.length) return;
+        if (newIndex < 0 || newIndex >= validSectionsOrder.length) return;
         reorderSections(currentIndex, newIndex);
     };
 
     const getSectionDataCount = (storeType: string): number | null => {
         switch (storeType) {
-            case 'experience': return cv.experience.length || null;
-            case 'education': return cv.education.length || null;
-            case 'skills': return cv.skills.length || null;
-            case 'languages': return cv.languages.length || null;
-            case 'projects': return cv.projects.length || null;
-            case 'certifications': return cv.certifications.length || null;
-            case 'interests': return cv.interests.length || null;
-            case 'references': return cv.references.length || null;
+            case 'experience': return cv.experience?.length || null;
+            case 'education': return cv.education?.length || null;
+            case 'skills': return cv.skills?.length || null;
+            case 'languages': return cv.languages?.length || null;
+            case 'projects': return cv.projects?.length || null;
+            case 'certifications': return cv.certifications?.length || null;
+            case 'interests': return cv.interests?.length || null;
+            case 'references': return cv.references?.length || null;
             default: return null;
         }
     };
 
     const isSectionVisible = (storeType: string): boolean => {
-        const section = sectionsOrder.find(s => s.type === storeType);
+        const section = validSectionsOrder.find(s => s.type === storeType);
         return section?.visible ?? true;
     };
 
     const getSectionOrder = (): typeof AVAILABLE_SECTIONS => {
         // Trier les sections selon l'ordre dans le store
         return [...AVAILABLE_SECTIONS].sort((a, b) => {
-            const aIndex = sectionsOrder.findIndex(s => s.type === a.storeType);
-            const bIndex = sectionsOrder.findIndex(s => s.type === b.storeType);
+            const aIndex = validSectionsOrder.findIndex(s => s.type === a.storeType);
+            const bIndex = validSectionsOrder.findIndex(s => s.type === b.storeType);
             if (aIndex === -1) return 1;
             if (bIndex === -1) return -1;
             return aIndex - bIndex;

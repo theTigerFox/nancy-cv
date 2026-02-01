@@ -19,10 +19,10 @@ export interface PDFExportOptions {
 }
 
 const QUALITY_SETTINGS = {
-    low: { scale: 1, imageQuality: 0.7 },
-    medium: { scale: 1.5, imageQuality: 0.85 },
-    high: { scale: 2, imageQuality: 0.95 },
-    print: { scale: 3, imageQuality: 1 },
+    low: { scale: 2, imageQuality: 0.85 },
+    medium: { scale: 3, imageQuality: 0.92 },
+    high: { scale: 4, imageQuality: 0.98 },
+    print: { scale: 5, imageQuality: 1 },
 };
 
 const FORMAT_DIMENSIONS = {
@@ -63,6 +63,16 @@ export async function exportToPDF(
         (el as HTMLElement).style.outline = 'none';
         (el as HTMLElement).style.cursor = 'default';
     });
+    
+    // Remove link underlines and ensure clean text rendering
+    clonedElement.querySelectorAll('a').forEach(link => {
+        link.style.textDecoration = 'none';
+        link.style.color = 'inherit';
+    });
+    
+    // Optimize text rendering for PDF
+    (clonedElement.style as any).webkitFontSmoothing = 'antialiased';
+    clonedElement.style.textRendering = 'optimizeLegibility';
     
     document.body.appendChild(clonedElement);
     
@@ -147,8 +157,12 @@ export async function exportToPDF(
                     imgWidth, sourceHeight
                 );
                 
-                const imgData = pageCanvas.toDataURL('image/jpeg', qualitySettings.imageQuality);
-                pdf.addImage(imgData, 'JPEG', x, margins, scaledWidth, destHeight);
+                // Use PNG for better text clarity, fallback to high-quality JPEG
+                const imgData = qualitySettings.imageQuality >= 0.98 
+                    ? pageCanvas.toDataURL('image/png')
+                    : pageCanvas.toDataURL('image/jpeg', qualitySettings.imageQuality);
+                const imgFormat = qualitySettings.imageQuality >= 0.98 ? 'PNG' : 'JPEG';
+                pdf.addImage(imgData, imgFormat, x, margins, scaledWidth, destHeight);
             }
         }
         
