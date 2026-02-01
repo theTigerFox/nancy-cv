@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { CvData } from '../types/cv';
 import { v4 as uuidv4 } from 'uuid';

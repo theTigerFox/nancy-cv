@@ -1,34 +1,51 @@
+// ============================================================================
+// NANCY CV - Application principale
+// ============================================================================
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
-import CreatePage from './pages/CreatePage';
 import DashboardPage from './pages/DashboardPage';
-import InstallPrompt from "./components/InstallPrompt/InstallPrompt.tsx";
-import FaqPage from "./pages/FAQPage.tsx";
+import InstallPrompt from "./components/InstallPrompt/InstallPrompt";
+import FaqPage from "./pages/FAQPage";
 import MainLayout from './components/Layout/MainLayout';
+import { CVEditor } from './components/editor';
 
 function App() {
     return (
-        <Router>
-            <Routes>
-                {/* Nouvelle Landing Page Brutalist */}
-                <Route path="/" element={<HomePage />} />
+        <AuthProvider>
+            <Router>
+                <Routes>
+                    {/* Landing Page Brutalist */}
+                    <Route path="/" element={<HomePage />} />
+                    
+                    {/* Éditeur de CV - Route protégée */}
+                    <Route path="/create" element={
+                        <ProtectedRoute>
+                            <CVEditor />
+                        </ProtectedRoute>
+                    } />
+                    
+                    {/* Dashboard - Route protégée */}
+                    <Route path="/dashboard" element={
+                        <ProtectedRoute>
+                            <DashboardPage />
+                        </ProtectedRoute>
+                    } />
+                    
+                    {/* FAQ */}
+                    <Route path="/faq" element={
+                         <MainLayout>
+                            <FaqPage />
+                         </MainLayout>
+                    } />
+                </Routes>
                 
-                {/* Nouvelle Page de Création Brutalist - Sans MainLayout car elle a son propre header */}
-                <Route path="/create" element={<CreatePage />} />
-                
-                {/* Dashboard */}
-                <Route path="/dashboard" element={<DashboardPage />} />
-                
-                {/* FAQ */}
-                <Route path="/faq" element={
-                     <MainLayout>
-                        <FaqPage />
-                     </MainLayout>
-                } />
-            </Routes>
-            {/* Composant de prompt d'installation */}
-            <InstallPrompt />
-        </Router>
+                {/* Prompt d'installation PWA */}
+                <InstallPrompt />
+            </Router>
+        </AuthProvider>
     );
 }
 

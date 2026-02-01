@@ -5,6 +5,7 @@ import foxLogo from '../../assets/logo-fox.png';
 import { Menu, X, Star, Heart, Zap } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Toaster } from 'sonner';
+import { AuthButton } from '../Auth';
 
 interface MainLayoutProps {
     children: ReactNode;
@@ -64,7 +65,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                     </Link>
 
                     {/* Desktop Nav */}
-                    <nav className="hidden md:flex items-center gap-6">
+                    <nav className="hidden md:flex items-center gap-4">
                         {navItems.map((item) => {
                             const Icon = item.icon;
                             const isActive = location.pathname === item.path;
@@ -73,17 +74,20 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                                     key={item.path}
                                     to={item.path} 
                                     className={cn(
-                                        "flex items-center gap-2 px-6 py-3 font-black uppercase text-lg border-3 border-black transition-all",
+                                        "flex items-center gap-2 px-5 py-2.5 font-black uppercase text-sm border-3 border-black transition-all",
                                         isActive 
                                             ? "bg-brutal-pink text-white brutal-shadow transform -translate-y-1" 
                                             : "bg-white hover:bg-brutal-lime hover:brutal-shadow hover:-translate-y-1"
                                     )}
                                 >
-                                    <Icon size={20} strokeWidth={3} />
+                                    <Icon size={18} strokeWidth={3} />
                                     {item.label}
                                 </Link>
                             );
                         })}
+                        
+                        {/* Auth Button */}
+                        <AuthButton />
                     </nav>
 
                     {/* Mobile Menu Button */}

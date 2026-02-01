@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import nancyAvatar from '../assets/nancy.jpg';
 import foxLogoDark from '../assets/logo-fox-dark.png';
-import { ArrowRight, Star, Zap, Layout, CheckCircle, XCircle, Skull, Heart, Trophy, Sparkles } from 'lucide-react';
+import { ArrowRight, Zap, Layout, CheckCircle, XCircle, Skull, Heart, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
 import MainLayout from '../components/Layout/MainLayout';
 import { useRef } from 'react';
@@ -21,7 +21,7 @@ const itemVariants = {
     visible: {
         y: 0,
         opacity: 1,
-        transition: { type: "spring", stiffness: 100 }
+        transition: { type: "spring" as const, stiffness: 100 }
     }
 };
 

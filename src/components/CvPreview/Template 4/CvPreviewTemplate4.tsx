@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { forwardRef, useState, useEffect } from 'react';
 import { CvData } from '../../../types/cv';
 

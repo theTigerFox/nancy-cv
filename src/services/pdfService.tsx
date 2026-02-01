@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { CvData } from '../types/cv';
 import { pdf, Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';

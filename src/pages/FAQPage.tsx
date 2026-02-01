@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, BrainCircuit, Laugh, PaintBucket, HelpCircle, Coffee, Heart, Plus, Minus } from 'lucide-react';
+import { BrainCircuit, Laugh, PaintBucket, HelpCircle, Coffee, Heart, Plus, Minus } from 'lucide-react';
 import { cn } from '../lib/utils';
-import MainLayout from '../components/Layout/MainLayout';
 
 // Données des FAQ
 const faqItems = [

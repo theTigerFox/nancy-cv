@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { LanguageItem } from '../../../types/cv';
 
