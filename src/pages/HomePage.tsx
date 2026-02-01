@@ -1,163 +1,318 @@
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import nancyAvatar from '../assets/nancy.jpg';
 import foxLogoDark from '../assets/logo-fox-dark.png';
-import { ArrowRight, Star, Zap, Layout, Download } from 'lucide-react';
+import { ArrowRight, Star, Zap, Layout, CheckCircle, XCircle, Skull, Heart, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
 import MainLayout from '../components/Layout/MainLayout';
+import { useRef } from 'react';
+
+// Animation Variants
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.1 }
+    }
+};
+
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: { type: "spring", stiffness: 100 }
+    }
+};
 
 const HomePage = () => {
+    const targetRef = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: targetRef,
+        offset: ["start start", "end start"]
+    });
+
+    const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+    const rotate = useTransform(scrollYProgress, [0, 1], [0, 25]);
+    const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+
     return (
         <MainLayout>
-            {/* Hero Section */}
-            <section className="min-h-[80vh] flex flex-col justify-center items-center text-center gap-8 py-20 relative">
+            <div ref={targetRef} className="relative overflow-hidden bg-white">
                 
-                <motion.div 
-                    initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
-                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                    transition={{ type: "spring", stiffness: 200 }}
-                    className="inline-block"
-                >
-                    <span className="bg-brutal-yellow border-3 border-black px-4 py-2 font-black uppercase text-xl md:text-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-[-2deg] inline-block mb-8">
-                        For Nancy & Everyone Else
-                    </span>
-                </motion.div>
-
-                <motion.div
-                    initial={{ y: 20, opacity: 0, rotate: 2 }}
-                    animate={{ y: 0, opacity: 1, rotate: -2 }}
-                    transition={{ delay: 0.15, type: "spring", stiffness: 180 }}
-                    className="relative"
-                >
-                    <div className="bg-white border-3 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] px-6 py-5">
-                        <img
-                            src={foxLogoDark}
-                            alt="By Fox"
-                            className="h-12 md:h-16 w-auto"
-                            loading="eager"
-                        />
-                    </div>
-                    <div className="absolute -top-3 -right-5 bg-brutal-lime border-2 border-black px-2 py-1 font-black uppercase text-xs rotate-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        By
-                    </div>
-                </motion.div>
-
-                <motion.h1 
-                    className="text-6xl md:text-9xl font-black uppercase leading-none tracking-tighter"
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                >
-                    Stop Making <br/>
-                    <span className="text-brutal-pink drop-shadow-[5px_5px_0px_rgba(0,0,0,1)] text-transparent bg-clip-text bg-gradient-to-r from-brutal-pink to-purple-600" style={{ WebkitTextStroke: '3px black' }}>Ugly CVs</span>
-                </motion.h1>
-
-                <p className="text-xl md:text-2xl font-bold max-w-2xl mx-auto mt-6 bg-white border-3 border-black p-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rotate-1">
-                    The only CV generator approved by Nancy (after 500 requests). 
-                    It's brutal, it's fast, and it stops me from complaining.
-                </p>
-
-                <motion.div 
-                    className="flex flex-col md:flex-row gap-6 mt-12"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                >
-                    <Link to="/create" className="brutal-btn-pink text-2xl px-12 py-6 flex items-center gap-3 group">
-                        Start Building <ArrowRight className="group-hover:translate-x-2 transition-transform" strokeWidth={4} />
-                    </Link>
-                    <Link to="#features" className="brutal-btn text-2xl px-12 py-6">
-                        Why Tho?
-                    </Link>
-                </motion.div>
-
-                {/* Floating Elements */}
-                <div className="absolute top-20 left-10 md:left-20 animate-bounce hidden md:block">
-                    <Star size={48} className="text-brutal-yellow fill-brutal-yellow drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]" strokeWidth={3} />
-                </div>
-                <div className="absolute bottom-20 right-10 md:right-20 animate-pulse hidden md:block">
-                    <div className="w-16 h-16 rounded-full bg-brutal-lime border-3 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]"></div>
-                </div>
-            </section>
-
-            {/* Nancy's Approval Section */}
-            <section className="py-20 bg-brutal-lime border-y-3 border-black -mx-4 md:-mx-8 px-4 md:px-8 mt-12 mb-20 transform -rotate-1">
-                <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
-                    <div className="relative w-48 h-48 md:w-64 md:h-64 flex-shrink-0">
-                         <div className="absolute inset-0 bg-brutal-pink rounded-full border-3 border-black translate-x-4 translate-y-4"></div>
-                        <img src={nancyAvatar} alt="Nancy" className="w-full h-full object-cover rounded-full border-3 border-black relative z-10 grayscale hover:grayscale-0 transition-all duration-300" />
-                        <div className="absolute -top-4 -right-12 bg-white border-3 border-black p-2 font-black uppercase rotate-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-20">
-                            Approved!
-                        </div>
-                    </div>
+                {/* HERO SECTION REDESIGNED */}
+                <section className="min-h-[calc(100vh-140px)] grid grid-cols-1 lg:grid-cols-12 gap-0 relative border-b-4 border-black">
                     
-                    <div className="bg-white border-3 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
-                         <div className="absolute -top-6 left-8 text-6xl text-brutal-pink">"</div>
-                        <h2 className="text-3xl font-black uppercase mb-4">Finally, Fox made something useful.</h2>
-                        <p className="text-xl font-bold font-mono">
-                            "I kept asking him to fix my CV alignment. He got annoyed and built this entire app just to shut me up. Honestly? It's kind of a vibe. 10/10 would pester him again."
+                    {/* Left Heavy Text Area */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="lg:col-span-7 bg-white p-6 md:p-12 flex flex-col justify-center relative z-20"
+                    >
+                        
+                        {/* Interactive Badge */}
+                        <motion.div 
+                            whileHover={{ scale: 1.05, rotate: -2 }}
+                            className="inline-flex items-center gap-3 border-3 border-black bg-brutal-lime px-3 py-1 font-mono font-bold uppercase w-fit mb-6 shadow-brutal-sm rotate-2 cursor-help text-sm"
+                        >
+                            <span className="w-2 h-2 bg-red-600 rounded-full animate-ping"/>
+                            V 2.0 (Nancy Approved)
+                        </motion.div>
+
+                        <h1 className="text-5xl md:text-7xl xl:text-8xl font-black uppercase leading-[0.9] tracking-tighter mb-6 relative">
+                            <span className="block hover:text-brutal-pink transition-colors duration-300">Make a CV</span>
+                            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-brutal-pink to-purple-600" style={{ WebkitTextStroke: '2px black' }}>THAT DOESN'T</span>
+                            <span className="relative inline-block mt-1">
+                                <span className="relative z-10">SUCK.</span>
+                                <motion.div 
+                                    className="absolute -bottom-1 lg:-bottom-4 left-0 w-full h-3 lg:h-6 bg-brutal-yellow -z-10"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: '100%' }}
+                                    transition={{ delay: 0.5, duration: 0.8 }}
+                                />
+                            </span>
+                        </h1>
+
+                        <p className="font-medium text-lg md:text-xl max-w-xl leading-relaxed border-l-4 border-brutal-pink pl-4 py-2 mb-8 bg-gray-50">
+                            The only CV builder designed to stop Nancy from asking me for edits every 5 minutes. It's fast, it's brutal, and it works.
                         </p>
-                        <p className="mt-4 font-black text-right">- Nancy</p>
+
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <Link to="/create" className="group relative">
+                                <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform"></div>
+                                <button className="relative bg-brutal-pink text-white border-3 border-black px-8 py-4 font-black text-xl uppercase flex items-center gap-3 hover:-translate-y-1 hover:-translate-x-1 transition-transform cursor-pointer w-full sm:w-auto justify-center">
+                                    Start Building <Zap className="fill-white animate-pulse" size={20} />
+                                </button>
+                            </Link>
+
+                            <Link to="#demo" className="group relative">
+                                <button className="relative w-full sm:w-auto bg-white text-black border-3 border-black px-8 py-4 font-black text-xl uppercase hover:bg-brutal-yellow transition-colors shadow-brutal hover:shadow-brutal-hover cursor-pointer flex items-center justify-center gap-2">
+                                    <Skull size={20} /> See Example
+                                </button>
+                            </Link>
+                        </div>
+                    </motion.div>
+
+                    {/* Right Visual Area - Parallax */}
+                    <div className="lg:col-span-5 bg-brutal-yellow border-t-4 lg:border-t-0 lg:border-l-4 border-black relative flex items-center justify-center p-8 lg:p-12 overflow-hidden h-[400px] lg:h-auto">
+                        
+                        {/* Animated Grid Background */}
+                        <div className="absolute inset-0 opacity-10 pointer-events-none" 
+                             style={{ backgroundImage: 'linear-gradient(#000 2px, transparent 2px), linear-gradient(90deg, #000 2px, transparent 2px)', backgroundSize: '40px 40px' }}>
+                        </div>
+
+                        <motion.div style={{ y, rotate, scale }} className="relative z-10 w-full max-w-sm">
+                            <div className="aspect-[3/4] bg-white border-4 border-black shadow-[16px_16px_0px_0px_black] p-6 flex flex-col gap-4 relative md:hover:scale-105 transition-transform duration-500">
+                                <div className="absolute -top-6 -right-6 z-20">
+                                    <motion.div 
+                                        animate={{ rotate: [0, 10, -10, 0] }}
+                                        transition={{ repeat: Infinity, duration: 4 }}
+                                        className="w-20 h-20 bg-brutal-lime rounded-full border-3 border-black flex items-center justify-center font-black text-xl shadow-brutal-sm"
+                                    >
+                                        HIRED!
+                                    </motion.div>
+                                </div>
+
+                                <div className="w-24 h-24 bg-gray-200 border-2 border-black rounded-full self-center mb-4 overflow-hidden relative">
+                                    <img src={nancyAvatar} className="w-full h-full object-cover grayscale contrast-125" />
+                                </div>
+                                <div className="h-6 bg-black w-3/4 self-center skew-x-[-10deg]"></div>
+                                <div className="h-3 bg-brutal-pink w-1/2 self-center"></div>
+                                <div className="space-y-3 mt-8 opacity-50">
+                                    <div className="h-3 bg-black w-full"></div>
+                                    <div className="h-3 bg-black w-5/6"></div>
+                                    <div className="h-3 bg-black w-4/6"></div>
+                                    <div className="h-3 bg-black w-full"></div>
+                                </div>
+                                
+                                {/* Fox Logo Sticker */}
+                                <motion.div 
+                                    className="absolute -bottom-8 -left-8 bg-white border-3 border-black p-3 shadow-brutal-sm rotate-6 z-30"
+                                    whileHover={{ scale: 1.2, rotate: 0 }}
+                                > 
+                                     <img src={foxLogoDark} className="w-16 h-auto" />
+                                </motion.div>
+                            </div>
+                        </motion.div>
+
+                        {/* Floating elements */}
+                        <motion.div 
+                            className="hidden lg:block absolute top-10 left-10 text-6xl"
+                            animate={{ y: [0, -20, 0] }}
+                            transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                        >
+                            💥
+                        </motion.div>
+                        
+                        <motion.div 
+                            className="hidden lg:block absolute bottom-20 right-10 text-6xl"
+                            animate={{ y: [0, 20, 0] }}
+                            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                        >
+                            🚀
+                        </motion.div>
                     </div>
+                </section>
+
+                {/* SCROLLING MARQUEE IMPROVED */}
+                <div className="bg-black text-white py-8 border-y-4 border-white overflow-hidden -rotate-1 scale-105 z-20 relative shadow-2xl">
+                     <div className="marquee-container font-black text-4xl md:text-6xl uppercase italic tracking-tighter">
+                        <div className="marquee-content flex gap-16" style={{ animationDuration: '30s' }}>
+                             {[...Array(8)].map((_, i) => (
+                                <span key={i} className="flex items-center gap-12 whitespace-nowrap">
+                                    <span className="text-brutal-lime drop-shadow-[4px_4px_0px_rgba(255,105,180,1)]">DEATH TO DOCX</span>
+                                    <span className="text-transparent" style={{ WebkitTextStroke: '2px white' }}>RIP TIMES NEW ROMAN</span>
+                                    <span className="text-brutal-pink flex items-center gap-4">HELLO FUTURE <Heart className="fill-brutal-pink" /></span>
+                                    <span className="text-brutal-yellow" style={{ WebkitTextStroke: '2px black' }}>FOX APPROVED</span>
+                                </span>
+                             ))}
+                        </div>
+                     </div>
                 </div>
-            </section>
 
-            {/* Features (Brutalist Grid) */}
-            <section id="features" className="py-20 max-w-7xl mx-auto">
-                <h2 className="text-5xl md:text-7xl font-black text-center mb-16 uppercase stroke-text">
-                    Why use this?
-                </h2>
+                {/* COMPARISON SECTION */}
+                <section className="py-24 px-4 bg-white relative">
+                    <div className="max-w-7xl mx-auto">
+                        <motion.div 
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-center mb-20"
+                        >
+                            <h2 className="text-5xl md:text-8xl font-black mb-6 uppercase leading-none">
+                                Why your current CV <br/>
+                                <span className="relative inline-block">
+                                    <span className="relative z-10 text-white mix-blend-difference">SUCKS</span>
+                                    <span className="absolute inset-0 bg-black -rotate-2 scale-110 z-0"></span>
+                                </span>
+                            </h2>
+                        </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {/* Feature 1 */}
-                    <div className="brutal-card bg-brutal-pink/20 hover:bg-brutal-pink/40 transition-colors">
-                        <div className="w-16 h-16 bg-white border-3 border-black flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                            <Layout size={32} strokeWidth={3} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 relative">
+                            {/* VS Badge */}
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden md:flex items-center justify-center w-24 h-24 bg-brutal-yellow border-4 border-black rounded-full font-black text-3xl shadow-brutal animate-bounce">
+                                VS
+                            </div>
+
+                            {/* Bad CV */}
+                            <motion.div 
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                                variants={itemVariants}
+                                className="group border-4 border-red-500 bg-red-50 p-8 relative grayscale hover:grayscale-0 transition-all duration-300 hover:rotate-1"
+                            >
+                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-red-500 text-white font-black px-6 py-2 uppercase tracking-widest border-3 border-black shadow-sm">
+                                    The "Classic"
+                                </div>
+                                <ul className="space-y-6 mt-8 font-mono font-bold text-red-900/80 group-hover:text-red-900 text-lg">
+                                    <li className="flex items-center gap-4"><XCircle size={32} /> MS Word 97 Vibes</li>
+                                    <li className="flex items-center gap-4"><XCircle size={32} /> Zero Personality</li>
+                                    <li className="flex items-center gap-4"><XCircle size={32} /> "Motivated team player"</li>
+                                    <li className="flex items-center gap-4"><XCircle size={32} /> Straight to trash bin</li>
+                                </ul>
+                            </motion.div>
+
+                            {/* Good CV */}
+                            <motion.div 
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                                variants={itemVariants}
+                                transition={{ delay: 0.2 }}
+                                className="border-4 border-black bg-brutal-lime p-8 relative shadow-[16px_16px_0px_0px_black] hover:-translate-y-2 transition-transform duration-300"
+                            >
+                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-brutal-lime font-black px-6 py-2 uppercase tracking-widest border-3 border-white">
+                                    The Nancy Way
+                                </div>
+                                <ul className="space-y-6 mt-8 font-bold text-black text-xl">
+                                    <li className="flex items-center gap-4"><CheckCircle size={32} strokeWidth={3} /> Brutally Efficient</li>
+                                    <li className="flex items-center gap-4"><CheckCircle size={32} strokeWidth={3} /> Perfect Grid System</li>
+                                    <li className="flex items-center gap-4"><CheckCircle size={32} strokeWidth={3} /> Actually Gets Read</li>
+                                    <li className="flex items-center gap-4"><CheckCircle size={32} strokeWidth={3} /> Nancy Approved™</li>
+                                </ul>
+                            </motion.div>
                         </div>
-                        <h3 className="text-2xl font-black uppercase mb-3">Brutal Templates</h3>
-                        <p className="font-mono text-sm">
-                            Forget boring corporate templates. Use layouts that scream "HIRE ME OR REGRET IT".
-                        </p>
                     </div>
+                </section>
 
-                    {/* Feature 2 */}
-                    <div className="brutal-card bg-brutal-yellow/20 hover:bg-brutal-yellow/40 transition-colors">
-                        <div className="w-16 h-16 bg-white border-3 border-black flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                            <Zap size={32} strokeWidth={3} />
-                        </div>
-                        <h3 className="text-2xl font-black uppercase mb-3">Lazy Mode</h3>
-                        <p className="font-mono text-sm">
-                            Don't know what to write? Just mash the keyboard and let us format it nicely. (AI coming soon maybe).
-                        </p>
-                    </div>
+                {/* STEPS SECTION */}
+                <section className="py-24 bg-gray-100 border-t-4 border-black border-b-4">
+                     <div className="max-w-7xl mx-auto px-4">
+                        <motion.h2 
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            className="text-4xl md:text-6xl font-black uppercase text-center mb-16"
+                        >
+                            How Magic Happens
+                        </motion.h2>
+                        
+                        <motion.div 
+                            variants={containerVariants}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+                        >
+                            {[
+                                { num: '01', title: 'Pick Design', desc: 'Choose a template that screams "Hire Me".', icon: Layout, color: 'bg-brutal-pink' },
+                                { num: '02', title: 'Fill Info', desc: 'Use AI if you are lazy. We will not tell anyone.', icon: Sparkles, color: 'bg-brutal-yellow' },
+                                { num: '03', title: 'Get Hired', desc: 'Download PDF. Send applied. Profit.', icon: Trophy, color: 'bg-brutal-lime' },
+                            ].map((step, idx) => (
+                                <motion.div variants={itemVariants} key={idx} className="relative group cursor-default">
+                                    <div className={cn("absolute inset-0 border-3 border-black translate-x-3 translate-y-3 transition-transform duration-200 group-hover:translate-x-5 group-hover:translate-y-5", step.color)}></div>
+                                    <div className="relative bg-white border-3 border-black p-8 h-full flex flex-col justify-between group-hover:-translate-y-1 transition-transform duration-200">
+                                        <div>
+                                            <span className="text-8xl font-black text-gray-100 absolute -top-4 -right-4 z-0 group-hover:text-black/5 transition-colors">{step.num}</span>
+                                            <div className="relative z-10">
+                                                <div className="w-16 h-16 bg-black text-white flex items-center justify-center mb-6 border-3 border-transparent group-hover:bg-transparent group-hover:text-black group-hover:border-black transition-colors">
+                                                    <step.icon size={32} strokeWidth={2.5} />
+                                                </div>
+                                                <h3 className="text-3xl font-black uppercase mb-4">{step.title}</h3>
+                                                <p className="font-medium text-lg text-gray-600 border-t-4 border-black pt-4">{step.desc}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                     </div>
+                </section>
 
-                    {/* Feature 3 */}
-                    <div className="brutal-card bg-brutal-lime/20 hover:bg-brutal-lime/40 transition-colors">
-                        <div className="w-16 h-16 bg-white border-3 border-black flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                            <Download size={32} strokeWidth={3} />
-                        </div>
-                        <h3 className="text-2xl font-black uppercase mb-3">Instant PDF</h3>
-                        <p className="font-mono text-sm">
-                            Export to PDF faster than Nancy changes her mind about font sizes.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA */}
-            <section className="py-20 text-center">
-                <div className="inline-block relative group">
-                    <div className="absolute inset-0 bg-brutal-yellow border-3 border-black translate-x-4 translate-y-4 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform"></div>
-                    <div className="bg-white border-3 border-black p-12 relative z-10 max-w-3xl mx-auto">
-                        <h2 className="text-4xl md:text-6xl font-black uppercase mb-8">
-                            Ready to stop Suffering?
-                        </h2>
-                        <Link to="/create" className="brutal-btn-pink text-xl md:text-3xl px-16 py-6 inline-flex items-center gap-4 animate-shake">
-                            BUILD MY CV NOW <Zap fill="white" />
+                {/* FINAL CTA */}
+                <section className="py-32 bg-black text-white text-center px-4 relative overflow-hidden group">
+                    {/* Animated Glitch Background Effect */}
+                    <div className="absolute inset-0 opacity-20 pointer-events-none group-hover:opacity-30 transition-opacity" style={{
+                        backgroundImage: 'repeating-linear-gradient(45deg, #333 0px, #333 2px, transparent 2px, transparent 10px)',
+                        backgroundSize: '20px 20px'
+                    }}></div>
+                    
+                    <div className="relative z-10 max-w-4xl mx-auto">
+                        <motion.h2 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            whileInView={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className="text-5xl md:text-8xl font-black uppercase mb-8 leading-none"
+                        >
+                            Ready to <span className="text-brutal-pink inline-block hover:animate-shake cursor-pointer">Dominate?</span>
+                        </motion.h2>
+                        
+                        <Link to="/create" className="inline-block relative">
+                             <div className="absolute inset-0 bg-brutal-lime translate-y-2 translate-x-2 border-4 border-white"></div>
+                             <button className="relative bg-white text-black border-4 border-black px-12 py-6 font-black text-3xl uppercase hover:translate-x-1 hover:translate-y-1 active:translate-x-2 active:translate-y-2 transition-transform cursor-pointer flex items-center gap-4">
+                                START NOW <ArrowRight size={36} strokeWidth={3} />
+                            </button>
                         </Link>
+                        
+                        <div className="mt-12 flex justify-center gap-4">
+                            <span className="bg-gray-800 text-gray-400 px-3 py-1 text-xs font-mono uppercase rounded">No SignUp</span>
+                            <span className="bg-gray-800 text-gray-400 px-3 py-1 text-xs font-mono uppercase rounded">Free Forever</span>
+                            <span className="bg-gray-800 text-gray-400 px-3 py-1 text-xs font-mono uppercase rounded">Fox Like</span>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </MainLayout>
     );
 };

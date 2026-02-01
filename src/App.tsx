@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
-import EditorPage from './pages/EditorPage';
+import CreatePage from './pages/CreatePage';
 import DashboardPage from './pages/DashboardPage';
 import InstallPrompt from "./components/InstallPrompt/InstallPrompt.tsx";
 import FaqPage from "./pages/FAQPage.tsx";
@@ -13,12 +13,8 @@ function App() {
                 {/* Nouvelle Landing Page Brutalist */}
                 <Route path="/" element={<HomePage />} />
                 
-                {/* Page d'édition (Ancienne HomePage) enveloppée dans le Layout */}
-                <Route path="/create" element={
-                    <MainLayout>
-                        <EditorPage />
-                    </MainLayout>
-                } />
+                {/* Nouvelle Page de Création Brutalist - Sans MainLayout car elle a son propre header */}
+                <Route path="/create" element={<CreatePage />} />
                 
                 {/* Dashboard */}
                 <Route path="/dashboard" element={<DashboardPage />} />

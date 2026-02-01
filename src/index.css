@@ -169,6 +169,20 @@
     100% { transform: translateX(-50%); }
 }
 
+.animate-spin-slow {
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
 /* CV Preview - Garder les styles de base pour l'instant */
 .cv-preview {
   background-color: white;

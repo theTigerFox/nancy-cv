@@ -31,7 +31,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             {/* Top Bar Marquee */}
             <div className="bg-brutal-yellow border-b-3 border-black py-2 overflow-hidden relative z-50">
                 <div className="marquee-container font-mono font-bold uppercase text-sm">
-                    <div className="marquee-content gap-8 flex">
+                    <div className="marquee-content gap-8 flex" style={{ animationDuration: '60s' }}>
                         {[...Array(10)].map((_, i) => (
                             <span key={i}>★ Stop bothering Fox with your CV ★ Nancy please stop ★ Best CV Generator Ever ★</span>
                         ))}
