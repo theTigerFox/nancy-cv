@@ -16,6 +16,36 @@ import {
     getSectionIcon,
 } from '../../components';
 import { colorWithOpacity, getContrastColor } from '../../utils';
+import { EditableText, useLiveEdit } from '../../../components/editor/LivePreviewEditor';
+
+// Composant pour rendre le texte éditable en mode édition
+const EditableField: React.FC<{
+    path: string;
+    value: string;
+    style?: React.CSSProperties;
+    className?: string;
+    multiline?: boolean;
+    placeholder?: string;
+}> = ({ path, value, style, className, multiline, placeholder }) => {
+    try {
+        const { isEditMode } = useLiveEdit();
+        if (isEditMode) {
+            return (
+                <EditableText
+                    path={path}
+                    value={value || ''}
+                    style={style}
+                    className={className}
+                    multiline={multiline}
+                    placeholder={placeholder}
+                />
+            );
+        }
+    } catch {
+        // Context not available, render normally
+    }
+    return <span style={style} className={className}>{value}</span>;
+};
 
 const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
     ({ cvData, config, mode = 'preview', scale = 1 }, ref) => {
@@ -50,6 +80,9 @@ const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                         height: `${layout.photoSize}px`,
                                         objectFit: 'cover',
                                         border: `4px solid ${colors.accent}`,
+                                        borderRadius: layout.photoShape === 'circle' ? '50%' 
+                                            : layout.photoShape === 'rounded' ? '12px' 
+                                            : '0',
                                     }}
                                 />
                             </div>
@@ -74,19 +107,31 @@ const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                 {personalInfo.email && (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <span style={{ color: colors.accent }}>✉</span>
-                                        <span>{personalInfo.email}</span>
+                                        <EditableField 
+                                            path="personalInfo.email" 
+                                            value={personalInfo.email}
+                                            placeholder="email@exemple.com"
+                                        />
                                     </div>
                                 )}
                                 {personalInfo.phone && (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <span style={{ color: colors.accent }}>☎</span>
-                                        <span>{personalInfo.phone}</span>
+                                        <EditableField 
+                                            path="personalInfo.phone" 
+                                            value={personalInfo.phone}
+                                            placeholder="+33 6 00 00 00 00"
+                                        />
                                     </div>
                                 )}
                                 {personalInfo.address && (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <span style={{ color: colors.accent }}>⌂</span>
-                                        <span>{personalInfo.address}</span>
+                                        <EditableField 
+                                            path="personalInfo.address" 
+                                            value={personalInfo.address}
+                                            placeholder="Ville, Pays"
+                                        />
                                     </div>
                                 )}
                             </div>
@@ -197,7 +242,16 @@ const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                     marginBottom: '4px',
                                 }}
                             >
-                                {personalInfo.firstName} {personalInfo.lastName}
+                                <EditableField 
+                                    path="personalInfo.firstName" 
+                                    value={personalInfo.firstName}
+                                    placeholder="Prénom"
+                                />{' '}
+                                <EditableField 
+                                    path="personalInfo.lastName" 
+                                    value={personalInfo.lastName}
+                                    placeholder="Nom"
+                                />
                             </h1>
                             <p
                                 style={{
@@ -208,7 +262,11 @@ const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                     letterSpacing: '0.1em',
                                 }}
                             >
-                                {personalInfo.jobTitle}
+                                <EditableField 
+                                    path="personalInfo.jobTitle" 
+                                    value={personalInfo.jobTitle || ''}
+                                    placeholder="Titre du poste"
+                                />
                             </p>
                             
                             {/* Gold accent line */}
@@ -246,7 +304,12 @@ const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                         textAlign: 'justify',
                                     }}
                                 >
-                                    {personalInfo.description}
+                                    <EditableField 
+                                        path="personalInfo.description" 
+                                        value={personalInfo.description || ''}
+                                        multiline
+                                        placeholder="Résumé professionnel..."
+                                    />
                                 </p>
                             </section>
                         )}

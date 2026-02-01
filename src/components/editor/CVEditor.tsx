@@ -26,7 +26,8 @@ import type { TemplateConfig, TemplateCustomization, TemplateColors, TemplateTyp
 import type { CvData } from '../../types/cv.d';
 import AiModal from '../AiModal/AiModal';
 import type { CVData, Experience, Education, Skill, Language, Project } from '../../types/cv';
-import { InteractivePreviewContainer, EditableElement, useInteractivePreview } from './InteractivePreview';
+import { FontPicker, loadGoogleFonts, GOOGLE_FONTS } from './FontPicker';
+import { LiveEditProvider, EditableText, useLiveEdit } from './LivePreviewEditor';
 
 // Import all form components
 import { PersonalInfoForm } from './PersonalInfoForm';
@@ -852,35 +853,52 @@ const CustomizationPanel: React.FC<CustomizationPanelProps> = ({
                 {/* Typography Tab */}
                 {activeTab === 'typography' && (
                     <div className="space-y-5">
-                        {/* Font Presets */}
-                        <div>
-                            <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
-                                Combinaisons de polices
+                        {/* Font Pickers avec recherche */}
+                        <div className="space-y-4">
+                            <label className="block text-xs font-bold uppercase text-gray-500">
+                                Polices personnalisées
                             </label>
-                            <div className="space-y-2">
+                            
+                            <FontPicker
+                                label="Police des titres"
+                                value={customization.typography?.fontHeading || config.typography.fontHeading}
+                                onChange={(font) => updateTypography('fontHeading', font)}
+                            />
+                            
+                            <FontPicker
+                                label="Police du corps"
+                                value={customization.typography?.fontBody || config.typography.fontBody}
+                                onChange={(font) => updateTypography('fontBody', font)}
+                            />
+                        </div>
+                        
+                        {/* Font Presets */}
+                        <div className="pt-4 border-t-2 border-gray-200">
+                            <label className="block text-xs font-bold uppercase text-gray-500 mb-2">
+                                Combinaisons rapides
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
                                 {fontPresets.map(preset => (
                                     <button
                                         key={preset.name}
-                                        onClick={() => onCustomizationChange({
-                                            ...customization,
-                                            typography: {
-                                                ...customization.typography,
-                                                fontHeading: preset.heading,
-                                                fontBody: preset.body,
-                                            },
-                                        })}
-                                        className="w-full p-3 border-2 border-black text-left hover:shadow-brutal transition-all"
+                                        onClick={() => {
+                                            loadGoogleFonts([
+                                                preset.heading.replace(/['"]/g, '').split(',')[0].trim(),
+                                                preset.body.replace(/['"]/g, '').split(',')[0].trim()
+                                            ]);
+                                            onCustomizationChange({
+                                                ...customization,
+                                                typography: {
+                                                    ...customization.typography,
+                                                    fontHeading: preset.heading,
+                                                    fontBody: preset.body,
+                                                },
+                                            });
+                                        }}
+                                        className="p-2 border-2 border-black text-left hover:shadow-brutal transition-all text-xs"
                                     >
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-bold text-sm">{preset.name}</span>
-                                            <span className="text-[10px] text-gray-400">{preset.desc}</span>
-                                        </div>
-                                        <div className="text-lg mt-1" style={{ fontFamily: preset.heading }}>
-                                            Titre exemple
-                                        </div>
-                                        <div className="text-sm text-gray-600" style={{ fontFamily: preset.body }}>
-                                            Corps de texte exemple
-                                        </div>
+                                        <span className="font-bold block">{preset.name}</span>
+                                        <span className="text-[9px] text-gray-400">{preset.desc}</span>
                                     </button>
                                 ))}
                             </div>
@@ -1607,7 +1625,7 @@ export const CVEditor: React.FC = () => {
     const [showCustomization, setShowCustomization] = React.useState(false);
     const [customization, setCustomization] = React.useState<TemplateCustomization>({});
     const [previewZoom, setPreviewZoom] = React.useState(100);
-    const [isEditMode, setIsEditMode] = React.useState(false);
+    const [isEditMode, setIsEditMode] = React.useState(true); // Par défaut en mode édition
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const previewRef = React.useRef<HTMLDivElement>(null);
     const temporalStore = useTemporalStore();
@@ -1823,26 +1841,41 @@ export const CVEditor: React.FC = () => {
                                     </button>
                                 </div>
                                 
-                                {/* Edit Mode Toggle */}
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => setIsEditMode(!isEditMode)}
-                                        className={cn(
-                                            "px-3 py-1.5 border-2 border-black font-bold text-sm flex items-center gap-2 transition-colors",
-                                            isEditMode ? "bg-brutal-pink text-white" : "hover:bg-gray-100"
-                                        )}
-                                        title="Mode edition: Double-cliquez sur le texte pour editer"
-                                    >
-                                        <Edit3 size={16} />
-                                        {isEditMode ? 'Édition' : 'Aperçu'}
-                                    </button>
+                                {/* Edit/Preview Mode Switch */}
+                                <div className="flex items-center gap-3">
+                                    {/* Toggle Switch */}
+                                    <div className="flex items-center border-2 border-black overflow-hidden">
+                                        <button
+                                            onClick={() => setIsEditMode(true)}
+                                            className={cn(
+                                                "px-3 py-1.5 font-bold text-sm flex items-center gap-1.5 transition-all",
+                                                isEditMode 
+                                                    ? "bg-brutal-pink text-white" 
+                                                    : "bg-white hover:bg-gray-100"
+                                            )}
+                                        >
+                                            <Edit3 size={14} />
+                                            Édition
+                                        </button>
+                                        <button
+                                            onClick={() => setIsEditMode(false)}
+                                            className={cn(
+                                                "px-3 py-1.5 font-bold text-sm flex items-center gap-1.5 transition-all border-l-2 border-black",
+                                                !isEditMode 
+                                                    ? "bg-brutal-pink text-black" 
+                                                    : "bg-gray-400 hover:bg-gray-700"
+                                            )}
+                                        >
+                                            <Eye size={14} />
+                                            Aperçu
+                                        </button>
+                                    </div>
                                     
                                     <button
                                         onClick={() => setShowCustomization(true)}
-                                        className="px-3 py-1.5 border-2 border-black font-bold text-sm flex items-center gap-2 hover:bg-brutal-blue hover:text-white transition-colors"
+                                        className="px-3 py-1.5 border-2 border-black font-bold text-sm flex items-center gap-2 hover:bg-brutal-yellow transition-colors"
                                     >
                                         <Settings2 size={16} />
-                                        Personnaliser
                                     </button>
                                 </div>
                             </div>
@@ -1892,45 +1925,47 @@ export const CVEditor: React.FC = () => {
                                 )}
                             </div>
                             
-                            {/* Preview Content */}
+                            {/* Preview Content with Live Edit */}
                             <div className="flex-1 overflow-auto p-6">
-                                <div 
-                                    className="bg-white shadow-2xl mx-auto transition-transform origin-top"
-                                    style={{ 
-                                        maxWidth: '210mm',
-                                        transform: `scale(${previewZoom / 100})`,
-                                        transformOrigin: 'top center',
-                                    }}
-                                >
+                                <LiveEditProvider isEditMode={isEditMode}>
                                     <div 
-                                        id="cv-preview" 
-                                        ref={previewRef}
-                                        className={cn(
-                                            "relative",
-                                            isEditMode && "ring-2 ring-brutal-pink ring-offset-2"
-                                        )}
+                                        className="bg-white shadow-2xl mx-auto transition-transform origin-top"
+                                        style={{ 
+                                            maxWidth: '210mm',
+                                            transform: `scale(${previewZoom / 100})`,
+                                            transformOrigin: 'top center',
+                                        }}
                                     >
-                                        {TemplateComponent && templateConfig ? (
-                                            <TemplateComponent 
-                                                cvData={cv as unknown as CvData} 
-                                                config={templateConfig}
-                                                mode={isEditMode ? "edit" : "preview"}
-                                                ref={previewRef} 
-                                            />
-                                        ) : (
-                                            <div className="p-8">
-                                                <CVPreviewContent cv={cv} />
-                                            </div>
-                                        )}
-                                        
-                                        {/* Edit Mode Overlay Hint */}
-                                        {isEditMode && (
-                                            <div className="absolute top-2 right-2 bg-brutal-pink text-white text-xs px-2 py-1 font-bold shadow-lg z-50">
-                                                MODE ÉDITION
-                                            </div>
-                                        )}
+                                        <div 
+                                            id="cv-preview" 
+                                            ref={previewRef}
+                                            className={cn(
+                                                "relative",
+                                                isEditMode && "ring-2 ring-brutal-pink ring-offset-2"
+                                            )}
+                                        >
+                                            {TemplateComponent && templateConfig ? (
+                                                <TemplateComponent 
+                                                    cvData={cv as unknown as CvData} 
+                                                    config={templateConfig}
+                                                    mode={isEditMode ? "edit" : "preview"}
+                                                    ref={previewRef} 
+                                                />
+                                            ) : (
+                                                <div className="p-8">
+                                                    <CVPreviewContent cv={cv} />
+                                                </div>
+                                            )}
+                                            
+                                            {/* Edit Mode Overlay Badge */}
+                                            {isEditMode && (
+                                                <div className="absolute top-2 right-2 bg-brutal-pink text-white text-[10px] px-2 py-1 font-bold shadow-lg z-50 uppercase tracking-wider">
+                                                    ✏️ Édition Live
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                </LiveEditProvider>
                             </div>
                         </motion.div>
                     )}
