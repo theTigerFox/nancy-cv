@@ -5,9 +5,9 @@
 
 import React, { forwardRef } from 'react';
 import { TemplateProps } from '../../types';
-import { TemplateWrapper } from '../../components';
+import { TemplateWrapper, SkillsDisplay, LanguagesDisplay } from '../../components';
 import { colorWithOpacity } from '../../utils';
-import { Mail, Phone, MapPin, Star, Briefcase, GraduationCap } from 'lucide-react';
+import { Mail, Phone, MapPin, Briefcase, GraduationCap } from 'lucide-react';
 
 const CreativeSplashTemplate = forwardRef<HTMLDivElement, TemplateProps>(
     ({ cvData, config, mode = 'preview', scale = 1 }, ref) => {
@@ -159,33 +159,11 @@ const CreativeSplashTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                 >
                                     Compétences
                                 </h2>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                    {skills.map(skill => (
-                                        <div key={skill.id}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                                <span style={{ fontSize: `${typography.bodySize}rem`, fontWeight: 500, color: colors.text }}>
-                                                    {skill.name}
-                                                </span>
-                                                <span style={{ fontSize: `${typography.smallSize}rem`, color: colors.primary, fontWeight: 600 }}>
-                                                    {(skill.level / 10) * 100}%
-                                                </span>
-                                            </div>
-                                            <div style={{ height: '8px', backgroundColor: colors.border, borderRadius: '4px', overflow: 'hidden' }}>
-                                                <div
-                                                    style={{
-                                                        height: '100%',
-                                                        width: `${(skill.level / 10) * 100}%`,
-                                                        background: `linear-gradient(90deg, ${colors.primary}, ${colors.secondary})`,
-                                                        borderRadius: '4px',
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                <SkillsDisplay skills={skills} config={config} />
                             </section>
                         )}
 
+                        {/* Languages */}
                         {/* Languages */}
                         {languages.length > 0 && languages[0].name && (
                             <section>
@@ -204,24 +182,7 @@ const CreativeSplashTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                 >
                                     Langues
                                 </h2>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    {languages.map(lang => (
-                                        <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontSize: `${typography.bodySize}rem`, color: colors.text }}>{lang.name}</span>
-                                            <div style={{ display: 'flex', gap: '4px' }}>
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star
-                                                        key={i}
-                                                        size={14}
-                                                        fill={i < lang.level ? colors.accent : 'none'}
-                                                        stroke={i < lang.level ? colors.accent : colors.border}
-                                                        strokeWidth={2}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                <LanguagesDisplay languages={languages} config={config} />
                             </section>
                         )}
                     </div>

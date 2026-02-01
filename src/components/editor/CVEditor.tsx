@@ -278,7 +278,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                                 isSaving 
                                     ? "bg-gray-100 cursor-wait" 
                                     : isDirty 
-                                        ? "bg-brutal-blue text-white hover:bg-brutal-blue/80"
+                                        ? "bg-brutal-pink text-white hover:bg-brutal-blue/80"
                                         : "bg-gray-50 text-gray-400"
                             )}
                         >

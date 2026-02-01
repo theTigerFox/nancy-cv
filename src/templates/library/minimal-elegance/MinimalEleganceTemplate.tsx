@@ -5,7 +5,7 @@
 
 import React, { forwardRef } from 'react';
 import { TemplateProps } from '../../types';
-import { TemplateWrapper } from '../../components';
+import { TemplateWrapper, SkillsDisplay, LanguagesDisplay, Section } from '../../components';
 import { getLevelText } from '../../utils';
 
 const MinimalEleganceTemplate = forwardRef<HTMLDivElement, TemplateProps>(
@@ -218,48 +218,19 @@ const MinimalEleganceTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
                     {/* Two Column Footer: Skills + Languages */}
                     <div style={{ display: 'flex', gap: `${spacing.sectionGap * 2}px` }}>
-                        {/* Skills */}
+                        {/* Skills - Uses configurable display component */}
                         {skills.length > 0 && skills[0].name && (
                             <section style={{ flex: 1 }}>
                                 <h2 style={sectionTitleStyle}>Compétences</h2>
-                                <p
-                                    style={{
-                                        fontSize: `${typography.bodySize}rem`,
-                                        color: colors.text,
-                                        lineHeight: typography.lineHeight * 1.2,
-                                    }}
-                                >
-                                    {skills.map((skill, index) => (
-                                        <span key={skill.id}>
-                                            {skill.name}
-                                            {index < skills.length - 1 && ' · '}
-                                        </span>
-                                    ))}
-                                </p>
+                                <SkillsDisplay skills={skills} config={config} />
                             </section>
                         )}
 
-                        {/* Languages */}
+                        {/* Languages - Uses configurable display component */}
                         {languages.length > 0 && languages[0].name && (
                             <section style={{ flex: 1 }}>
                                 <h2 style={sectionTitleStyle}>Langues</h2>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    {languages.map((lang) => (
-                                        <div
-                                            key={lang.id}
-                                            style={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                fontSize: `${typography.bodySize}rem`,
-                                            }}
-                                        >
-                                            <span style={{ color: colors.text }}>{lang.name}</span>
-                                            <span style={{ color: colors.textLight }}>
-                                                {getLevelText(lang.level, 'language')}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
+                                <LanguagesDisplay languages={languages} config={config} />
                             </section>
                         )}
                     </div>

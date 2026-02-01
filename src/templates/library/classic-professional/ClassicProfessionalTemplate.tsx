@@ -5,8 +5,7 @@
 
 import React, { forwardRef } from 'react';
 import { TemplateProps } from '../../types';
-import { TemplateWrapper } from '../../components';
-import { getLevelText } from '../../utils';
+import { TemplateWrapper, SkillsDisplay, LanguagesDisplay } from '../../components';
 
 const ClassicProfessionalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
     ({ cvData, config, mode = 'preview', scale = 1 }, ref) => {
@@ -205,28 +204,7 @@ const ClassicProfessionalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                 >
                                     Compétences
                                 </h2>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    {skills.map(skill => (
-                                        <div key={skill.id}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                                <span style={{ fontSize: `${typography.bodySize}rem`, color: colors.text }}>{skill.name}</span>
-                                            </div>
-                                            <div style={{ display: 'flex', gap: '4px' }}>
-                                                {[...Array(10)].map((_, i) => (
-                                                    <div
-                                                        key={i}
-                                                        style={{
-                                                            width: '8px',
-                                                            height: '8px',
-                                                            borderRadius: '50%',
-                                                            backgroundColor: i < skill.level ? colors.primary : colors.border,
-                                                        }}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                <SkillsDisplay skills={skills} config={config} />
                             </section>
                         )}
 
@@ -246,31 +224,7 @@ const ClassicProfessionalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                 >
                                     Langues
                                 </h2>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    {languages.map(lang => (
-                                        <div key={lang.id}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                                <span style={{ fontSize: `${typography.bodySize}rem`, color: colors.text }}>{lang.name}</span>
-                                                <span style={{ fontSize: `${typography.smallSize}rem`, color: colors.textLight }}>
-                                                    {getLevelText(lang.level, 'language')}
-                                                </span>
-                                            </div>
-                                            <div style={{ display: 'flex', gap: '4px' }}>
-                                                {[...Array(5)].map((_, i) => (
-                                                    <div
-                                                        key={i}
-                                                        style={{
-                                                            width: '10px',
-                                                            height: '10px',
-                                                            borderRadius: '50%',
-                                                            backgroundColor: i < lang.level ? colors.accent : colors.border,
-                                                        }}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                <LanguagesDisplay languages={languages} config={config} />
                             </section>
                         )}
                     </div>

@@ -5,7 +5,7 @@
 
 import React, { forwardRef } from 'react';
 import { TemplateProps } from '../../types';
-import { TemplateWrapper } from '../../components';
+import { TemplateWrapper, SkillsDisplay, LanguagesDisplay } from '../../components';
 
 const ElegantSerifTemplate = forwardRef<HTMLDivElement, TemplateProps>(
     ({ cvData, config, mode = 'preview', scale = 1 }, ref) => {
@@ -226,13 +226,7 @@ const ElegantSerifTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                         Competences
                                     </span>
                                 </h2>
-                                <div style={{ textAlign: 'center', lineHeight: '2' }}>
-                                    {skills.map((skill, index) => (
-                                        <span key={skill.id} style={{ fontSize: `${typography.bodySize}rem`, color: colors.text }}>
-                                            {skill.name}{index < skills.length - 1 ? ' • ' : ''}
-                                        </span>
-                                    ))}
-                                </div>
+                                <SkillsDisplay skills={skills} config={config} />
                             </section>
                         )}
 
@@ -258,21 +252,7 @@ const ElegantSerifTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                         Langues
                                     </span>
                                 </h2>
-                                <div style={{ textAlign: 'center' }}>
-                                    {languages.map(lang => {
-                                        const levelText = ['Debutant', 'Elementaire', 'Intermediaire', 'Avance', 'Bilingue'][lang.level - 1] || '';
-                                        return (
-                                            <div key={lang.id} style={{ marginBottom: '8px' }}>
-                                                <span style={{ fontSize: `${typography.bodySize}rem`, color: colors.text, fontWeight: 500 }}>
-                                                    {lang.name}
-                                                </span>
-                                                <span style={{ fontSize: `${typography.smallSize}rem`, color: colors.textLight, fontStyle: 'italic' }}>
-                                                    {' '}— {levelText}
-                                                </span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                <LanguagesDisplay languages={languages} config={config} />
                             </section>
                         )}
                     </div>

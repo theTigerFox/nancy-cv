@@ -5,7 +5,7 @@
 
 import React, { forwardRef } from 'react';
 import { TemplateProps } from '../../types';
-import { TemplateWrapper } from '../../components';
+import { TemplateWrapper, SkillsDisplay, LanguagesDisplay } from '../../components';
 import { Mail, Phone, MapPin, Github, Globe, Linkedin, Code } from 'lucide-react';
 
 const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
@@ -83,7 +83,7 @@ const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         </section>
                     )}
 
-                    {/* Skills */}
+                    {/* Skills - Uses configurable display */}
                     {skills.length > 0 && skills[0].name && (
                         <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                             <h2
@@ -101,24 +101,7 @@ const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                 <Code size={16} style={{ color: colors.primary }} />
                                 skills
                             </h2>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                {skills.map(skill => (
-                                    <span
-                                        key={skill.id}
-                                        style={{
-                                            padding: '4px 12px',
-                                            fontSize: `${typography.smallSize}rem`,
-                                            fontFamily: typography.fontHeading,
-                                            backgroundColor: colors.backgroundAlt,
-                                            border: `1px solid ${colors.border}`,
-                                            borderRadius: '4px',
-                                            color: colors.text,
-                                        }}
-                                    >
-                                        {skill.name}
-                                    </span>
-                                ))}
-                            </div>
+                            <SkillsDisplay skills={skills} config={config} />
                         </section>
                     )}
 
@@ -211,7 +194,7 @@ const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         </section>
                     )}
 
-                    {/* Languages */}
+                    {/* Languages - Uses configurable display */}
                     {languages.length > 0 && languages[0].name && (
                         <section>
                             <h2
@@ -225,17 +208,7 @@ const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                             >
                                 languages
                             </h2>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                                {languages.map(lang => {
-                                    const levelText = ['Debutant', 'Elementaire', 'Intermediaire', 'Avance', 'Bilingue'][lang.level - 1] || '';
-                                    return (
-                                        <span key={lang.id} style={{ fontSize: `${typography.bodySize}rem`, color: colors.text }}>
-                                            <strong>{lang.name}</strong>{' '}
-                                            <span style={{ color: colors.textLight }}>/ {levelText}</span>
-                                        </span>
-                                    );
-                                })}
-                            </div>
+                            <LanguagesDisplay languages={languages} config={config} />
                         </section>
                     )}
                 </div>

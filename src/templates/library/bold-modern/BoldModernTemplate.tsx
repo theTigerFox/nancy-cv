@@ -5,8 +5,8 @@
 
 import React, { forwardRef } from 'react';
 import { TemplateProps } from '../../types';
-import { TemplateWrapper } from '../../components';
-import { colorWithOpacity, getLevelText } from '../../utils';
+import { TemplateWrapper, SkillsDisplay, LanguagesDisplay } from '../../components';
+import { colorWithOpacity } from '../../utils';
 import { Mail, Phone, MapPin, Briefcase, GraduationCap } from 'lucide-react';
 
 const BoldModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(
@@ -128,22 +128,7 @@ const BoldModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                 >
                                     Compétences
                                 </h3>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                    {skills.map(skill => (
-                                        <span
-                                            key={skill.id}
-                                            style={{
-                                                padding: '4px 12px',
-                                                backgroundColor: 'rgba(255,255,255,0.2)',
-                                                borderRadius: '20px',
-                                                fontSize: `${typography.smallSize}rem`,
-                                                fontWeight: 500,
-                                            }}
-                                        >
-                                            {skill.name}
-                                        </span>
-                                    ))}
-                                </div>
+                                <SkillsDisplay skills={skills} config={config} />
                             </div>
                         )}
 
@@ -162,28 +147,7 @@ const BoldModernTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                 >
                                     Langues
                                 </h3>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    {languages.map(lang => (
-                                        <div key={lang.id}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: `${typography.bodySize}rem` }}>
-                                                <span>{lang.name}</span>
-                                                <span style={{ opacity: 0.8, fontSize: `${typography.smallSize}rem` }}>
-                                                    {getLevelText(lang.level, 'language')}
-                                                </span>
-                                            </div>
-                                            <div style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '2px' }}>
-                                                <div
-                                                    style={{
-                                                        height: '100%',
-                                                        width: `${(lang.level / 5) * 100}%`,
-                                                        backgroundColor: '#ffffff',
-                                                        borderRadius: '2px',
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                <LanguagesDisplay languages={languages} config={config} />
                             </div>
                         )}
                     </aside>
