@@ -3,16 +3,22 @@
 // ============================================================================
 
 import React from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     User, Briefcase, GraduationCap, Wrench, Globe, FolderKanban,
     Award, Heart, Sparkles, UserCheck, LayoutGrid,
     Download, Upload, Undo2, Redo2, Eye, FileJson,
     FileText, Image as ImageIcon, Trash2, RefreshCw,
-    ChevronLeft, ChevronRight, Menu, FileDown
+    ChevronLeft, ChevronRight, Menu, FileDown, Save, Cloud, CloudOff,
+    Check, Loader2, Home, LogOut, Palette, BrainCircuit, Mail, Phone, MapPin
 } from 'lucide-react';
 import { useCVStore, useTemporalStore } from '../../store/cvStore';
 import { downloadJSON, importFromFile, exportToPDF, exportToPlainText, exportToImage } from '../../utils/export';
+import { useFirestoreSync } from '../../hooks/useFirestoreSync';
+import { useAuth } from '../../contexts/AuthContext';
+import { CV_TEMPLATES, getTemplateById } from '../CvPreview';
+import AiModal from '../AiModal/AiModal';
 import type { CVData, Experience, Education, Skill, Language, Project } from '../../types/cv';
 
 // Import all form components
@@ -154,6 +160,10 @@ interface ToolbarProps {
     onImportJSON: () => void;
     onTogglePreview: () => void;
     showPreview: boolean;
+    onSaveCloud?: () => void;
+    isSaving?: boolean;
+    lastSaved?: Date | null;
+    isAuthenticated?: boolean;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -162,18 +172,26 @@ const Toolbar: React.FC<ToolbarProps> = ({
     onImportJSON,
     onTogglePreview,
     showPreview,
+    onSaveCloud,
+    isSaving,
+    lastSaved,
+    isAuthenticated,
 }) => {
     const temporalStore = useTemporalStore();
     const clearCV = useCVStore((state) => state.clearCV);
     const loadSampleData = useCVStore((state) => state.loadSampleData);
+    const isDirty = useCVStore((state) => state.isDirty);
+    const { user, logout } = useAuth();
     const [showExportMenu, setShowExportMenu] = React.useState(false);
     const [showMoreMenu, setShowMoreMenu] = React.useState(false);
+    const [showUserMenu, setShowUserMenu] = React.useState(false);
     
     const canUndo = temporalStore.pastStates.length > 0;
     const canRedo = temporalStore.futureStates.length > 0;
     
     const exportMenuRef = React.useRef<HTMLDivElement>(null);
     const moreMenuRef = React.useRef<HTMLDivElement>(null);
+    const userMenuRef = React.useRef<HTMLDivElement>(null);
     
     React.useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -183,14 +201,39 @@ const Toolbar: React.FC<ToolbarProps> = ({
             if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
                 setShowMoreMenu(false);
             }
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+                setShowUserMenu(false);
+            }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
     
+    const formatLastSaved = (date: Date | null | undefined) => {
+        if (!date) return null;
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        if (diffMins < 1) return "À l'instant";
+        if (diffMins < 60) return `Il y a ${diffMins} min`;
+        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    };
+    
     return (
         <div className="h-14 border-b-3 border-black bg-white flex items-center justify-between px-4">
-            <div className="flex items-center gap-2">
+            {/* Left side - Navigation & Undo/Redo */}
+            <div className="flex items-center gap-3">
+                <Link
+                    to="/"
+                    className="p-2 border-2 border-black hover:bg-gray-100 transition-colors"
+                    title="Accueil"
+                >
+                    <Home size={18} />
+                </Link>
+                
+                <div className="w-px h-6 bg-gray-300" />
+                
                 <button
                     onClick={() => temporalStore.undo()}
                     disabled={!canUndo}
@@ -213,12 +256,44 @@ const Toolbar: React.FC<ToolbarProps> = ({
                 >
                     <Redo2 size={18} />
                 </button>
-                <div className="w-px h-6 bg-gray-300 mx-2" />
-                <span className="text-xs text-gray-500">
-                    {temporalStore.pastStates.length} modification{temporalStore.pastStates.length > 1 ? 's' : ''}
-                </span>
+                
+                <div className="w-px h-6 bg-gray-300" />
+                
+                {/* Cloud Save Status */}
+                {isAuthenticated && (
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={onSaveCloud}
+                            disabled={isSaving || !isDirty}
+                            className={cn(
+                                "flex items-center gap-2 px-3 py-1.5 border-2 border-black text-sm font-bold transition-colors",
+                                isSaving 
+                                    ? "bg-gray-100 cursor-wait" 
+                                    : isDirty 
+                                        ? "bg-brutal-blue text-white hover:bg-brutal-blue/80"
+                                        : "bg-gray-50 text-gray-400"
+                            )}
+                        >
+                            {isSaving ? (
+                                <Loader2 size={14} className="animate-spin" />
+                            ) : isDirty ? (
+                                <Cloud size={14} />
+                            ) : (
+                                <Check size={14} />
+                            )}
+                            {isSaving ? 'Sauvegarde...' : isDirty ? 'Sauvegarder' : 'Sauvegardé'}
+                        </button>
+                        
+                        {lastSaved && !isSaving && (
+                            <span className="text-xs text-gray-400">
+                                {formatLastSaved(lastSaved)}
+                            </span>
+                        )}
+                    </div>
+                )}
             </div>
             
+            {/* Right side - Actions & User */}
             <div className="flex items-center gap-2">
                 <button
                     onClick={onTogglePreview}
@@ -228,7 +303,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                     )}
                 >
                     <Eye size={16} />
-                    Aperçu
+                    <span className="hidden sm:inline">Aperçu</span>
                 </button>
                 
                 <button
@@ -236,7 +311,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                     className="px-4 py-2 border-2 border-black font-bold text-sm hover:bg-gray-100 transition-colors flex items-center gap-2"
                 >
                     <Upload size={16} />
-                    Importer
+                    <span className="hidden sm:inline">Importer</span>
                 </button>
                 
                 <div className="relative" ref={exportMenuRef}>
@@ -245,7 +320,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                         className="px-4 py-2 border-2 border-black font-bold text-sm bg-brutal-lime hover:bg-brutal-lime/80 transition-colors flex items-center gap-2"
                     >
                         <Download size={16} />
-                        Exporter
+                        <span className="hidden sm:inline">Exporter</span>
                     </button>
                     
                     <AnimatePresence>
@@ -337,6 +412,59 @@ const Toolbar: React.FC<ToolbarProps> = ({
                         )}
                     </AnimatePresence>
                 </div>
+                
+                {/* User Avatar */}
+                {user && (
+                    <div className="relative ml-2" ref={userMenuRef}>
+                        <button
+                            onClick={() => setShowUserMenu(!showUserMenu)}
+                            className="flex items-center"
+                        >
+                            {user.photoURL ? (
+                                <img
+                                    src={user.photoURL}
+                                    alt={user.displayName || 'Avatar'}
+                                    className="w-9 h-9 rounded-full border-2 border-black object-cover hover:border-brutal-lime transition-colors"
+                                />
+                            ) : (
+                                <div className="w-9 h-9 rounded-full border-2 border-black bg-brutal-lime flex items-center justify-center hover:bg-brutal-lime/80 transition-colors">
+                                    <User size={18} />
+                                </div>
+                            )}
+                        </button>
+                        
+                        <AnimatePresence>
+                            {showUserMenu && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute right-0 top-full mt-2 w-48 bg-white border-3 border-black shadow-brutal z-50"
+                                >
+                                    <div className="px-4 py-3 border-b-2 border-black bg-gray-50">
+                                        <p className="font-bold text-sm truncate">{user.displayName}</p>
+                                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                                    </div>
+                                    <Link
+                                        to="/dashboard"
+                                        className="w-full px-4 py-3 text-left hover:bg-gray-100 flex items-center gap-3 font-bold text-sm"
+                                        onClick={() => setShowUserMenu(false)}
+                                    >
+                                        <FolderKanban size={16} />
+                                        Mes CV
+                                    </Link>
+                                    <button
+                                        onClick={() => { logout(); setShowUserMenu(false); }}
+                                        className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center gap-3 font-bold text-sm text-red-500 border-t-2 border-gray-200"
+                                    >
+                                        <LogOut size={16} />
+                                        Déconnexion
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -344,6 +472,93 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Preview Component
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Template Selector Component
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface TemplateSelectorProps {
+    currentTemplate: string;
+    onSelectTemplate: (templateId: string) => void;
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+const TemplateSelector: React.FC<TemplateSelectorProps> = ({
+    currentTemplate,
+    onSelectTemplate,
+    isOpen,
+    onClose,
+}) => {
+    if (!isOpen) return null;
+    
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white border-4 border-black shadow-brutal max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="bg-black text-white px-6 py-4 flex items-center justify-between">
+                    <h2 className="text-xl font-black uppercase flex items-center gap-3">
+                        <Palette size={24} />
+                        Choisir un template
+                    </h2>
+                    <button onClick={onClose} className="hover:bg-white/10 p-2 transition-colors">
+                        <Trash2 size={20} />
+                    </button>
+                </div>
+                
+                <div className="p-6 overflow-y-auto max-h-[60vh]">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {CV_TEMPLATES.map((template) => (
+                            <button
+                                key={template.id}
+                                onClick={() => {
+                                    onSelectTemplate(template.id);
+                                    onClose();
+                                }}
+                                className={cn(
+                                    "p-4 border-3 border-black text-left transition-all hover:-translate-y-1",
+                                    currentTemplate === template.id
+                                        ? "bg-brutal-lime shadow-brutal"
+                                        : "bg-white hover:bg-gray-50 hover:shadow-brutal"
+                                )}
+                            >
+                                <div className="aspect-[210/297] bg-gray-100 border-2 border-black mb-3 flex items-center justify-center">
+                                    <FileText size={48} className="text-gray-300" />
+                                </div>
+                                <h3 className="font-black uppercase text-sm">{template.name}</h3>
+                                <p className="text-xs text-gray-500 mt-1">{template.description}</p>
+                                <span className={cn(
+                                    "inline-block mt-2 px-2 py-0.5 text-[10px] font-bold uppercase border-2 border-black",
+                                    template.category === 'modern' && "bg-brutal-blue text-white",
+                                    template.category === 'classic' && "bg-gray-200",
+                                    template.category === 'creative' && "bg-brutal-pink text-white",
+                                    template.category === 'minimal' && "bg-white"
+                                )}>
+                                    {template.category}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Default Preview Component (used as fallback)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CVPreviewContent: React.FC<{ cv: CVData }> = ({ cv }) => {
@@ -366,9 +581,24 @@ const CVPreviewContent: React.FC<{ cv: CVData }> = ({ cv }) => {
                     <p className="text-lg font-bold text-gray-600 mt-1">{personalInfo.jobTitle}</p>
                 )}
                 <div className="flex flex-wrap gap-4 mt-3 text-xs">
-                    {personalInfo.email && <span>📧 {personalInfo.email}</span>}
-                    {personalInfo.phone && <span>📱 {personalInfo.phone}</span>}
-                    {personalInfo.city && <span>📍 {personalInfo.city}</span>}
+                    {personalInfo.email && (
+                        <span className="flex items-center gap-1">
+                            <Mail size={12} />
+                            {personalInfo.email}
+                        </span>
+                    )}
+                    {personalInfo.phone && (
+                        <span className="flex items-center gap-1">
+                            <Phone size={12} />
+                            {personalInfo.phone}
+                        </span>
+                    )}
+                    {personalInfo.city && (
+                        <span className="flex items-center gap-1">
+                            <MapPin size={12} />
+                            {personalInfo.city}
+                        </span>
+                    )}
                 </div>
                 {personalInfo.summary && (
                     <p className="mt-4 text-gray-700">{personalInfo.summary}</p>
@@ -474,14 +704,37 @@ const CVPreviewContent: React.FC<{ cv: CVData }> = ({ cv }) => {
 
 export const CVEditor: React.FC = () => {
     const cv = useCVStore((state) => state.cv);
+    const importCV = useCVStore((state) => state.importCV);
     const [activeSection, setActiveSection] = React.useState<SectionId>('personal');
     const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
     const [showPreview, setShowPreview] = React.useState(true);
+    const [selectedTemplate, setSelectedTemplate] = React.useState('brutalist');
+    const [showTemplateSelector, setShowTemplateSelector] = React.useState(false);
+    const [showAiModal, setShowAiModal] = React.useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const previewRef = React.useRef<HTMLDivElement>(null);
     const temporalStore = useTemporalStore();
+    
+    // Get CV ID from URL params
+    const [searchParams] = useSearchParams();
+    const cvIdFromUrl = searchParams.get('cv');
+    
+    // Firestore sync
+    const { saveCV: saveToCloud, isSaving, lastSaved, isAuthenticated } = useFirestoreSync(cvIdFromUrl);
     
     const ActiveComponent = SECTIONS.find(s => s.id === activeSection)?.component || PersonalInfoForm;
     const activeConfig = SECTIONS.find(s => s.id === activeSection);
+    
+    // Get selected template component
+    const templateConfig = getTemplateById(selectedTemplate);
+    const TemplateComponent = templateConfig?.component;
+    
+    // Handler for AI generated CV
+    const handleAiGenerated = (cvData: any) => {
+        // Import the AI-generated CV data into the store
+        importCV({ data: cvData, schemaVersion: '1.0', exportedAt: new Date().toISOString(), generator: 'nancy-cv' });
+        setShowAiModal(false);
+    };
     
     React.useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -495,7 +748,12 @@ export const CVEditor: React.FC = () => {
             }
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
-                downloadJSON(cv, `cv-${Date.now()}`);
+                // Save to cloud if authenticated, otherwise download JSON
+                if (isAuthenticated) {
+                    saveToCloud();
+                } else {
+                    downloadJSON(cv, `cv-${Date.now()}`);
+                }
             }
         };
         
@@ -549,6 +807,10 @@ export const CVEditor: React.FC = () => {
                 onImportJSON={handleImportJSON}
                 onTogglePreview={() => setShowPreview(!showPreview)}
                 showPreview={showPreview}
+                onSaveCloud={saveToCloud}
+                isSaving={isSaving}
+                lastSaved={lastSaved}
+                isAuthenticated={isAuthenticated}
             />
             
             <div className="flex-1 flex overflow-hidden">
@@ -590,7 +852,7 @@ export const CVEditor: React.FC = () => {
                         </AnimatePresence>
                     </div>
                     
-                    <div className="bg-white border-t-2 border-black p-4 flex justify-between">
+                    <div className="bg-white border-t-2 border-black p-4 flex justify-between items-center">
                         <button
                             onClick={() => {
                                 const currentIndex = SECTIONS.findIndex(s => s.id === activeSection);
@@ -607,6 +869,16 @@ export const CVEditor: React.FC = () => {
                             <ChevronLeft size={18} />
                             Précédent
                         </button>
+                        
+                        {/* AI Button */}
+                        <button
+                            onClick={() => setShowAiModal(true)}
+                            className="px-4 py-2 border-2 border-black font-bold flex items-center gap-2 bg-gradient-to-r from-pink-500 to-indigo-600 text-white hover:opacity-90 transition-all"
+                        >
+                            <BrainCircuit size={18} />
+                            Générer avec IA
+                        </button>
+                        
                         <button
                             onClick={() => {
                                 const currentIndex = SECTIONS.findIndex(s => s.id === activeSection);
@@ -632,12 +904,33 @@ export const CVEditor: React.FC = () => {
                             initial={{ width: 0, opacity: 0 }}
                             animate={{ width: '50%', opacity: 1 }}
                             exit={{ width: 0, opacity: 0 }}
-                            className="border-l-3 border-black bg-gray-200 overflow-hidden"
+                            className="border-l-3 border-black bg-gray-200 overflow-hidden flex flex-col"
                         >
-                            <div className="h-full overflow-auto p-6">
+                            {/* Preview Header with Template Selector */}
+                            <div className="bg-white border-b-2 border-black p-3 flex items-center justify-between shrink-0">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-bold">Template:</span>
+                                    <button
+                                        onClick={() => setShowTemplateSelector(true)}
+                                        className="px-3 py-1.5 border-2 border-black font-bold text-sm flex items-center gap-2 hover:bg-brutal-lime transition-colors"
+                                    >
+                                        <Palette size={16} />
+                                        {templateConfig?.name || 'Choisir'}
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {/* Preview Content */}
+                            <div className="flex-1 overflow-auto p-6">
                                 <div className="bg-white shadow-2xl mx-auto" style={{ maxWidth: '210mm' }}>
-                                    <div id="cv-preview" className="p-8">
-                                        <CVPreviewContent cv={cv} />
+                                    <div id="cv-preview" ref={previewRef}>
+                                        {TemplateComponent ? (
+                                            <TemplateComponent cvData={cv} ref={previewRef} />
+                                        ) : (
+                                            <div className="p-8">
+                                                <CVPreviewContent cv={cv} />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -645,6 +938,23 @@ export const CVEditor: React.FC = () => {
                     )}
                 </AnimatePresence>
             </div>
+            
+            {/* Template Selector Modal */}
+            <AnimatePresence>
+                <TemplateSelector
+                    currentTemplate={selectedTemplate}
+                    onSelectTemplate={setSelectedTemplate}
+                    isOpen={showTemplateSelector}
+                    onClose={() => setShowTemplateSelector(false)}
+                />
+            </AnimatePresence>
+            
+            {/* AI Modal */}
+            <AiModal
+                isOpen={showAiModal}
+                onClose={() => setShowAiModal(false)}
+                onAiGenerated={handleAiGenerated}
+            />
         </div>
     );
 };
