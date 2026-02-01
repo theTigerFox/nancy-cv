@@ -29,3 +29,8 @@ dist-ssr
 *.sw?
 .env
 .qodo
+exemple_app/
+king-mode.md
+template_exemple/
+.agent/
+.github/instructions

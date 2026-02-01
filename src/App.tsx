@@ -1,16 +1,34 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
-import IntroPage from './pages/IntroPage';
+import EditorPage from './pages/EditorPage';
+import DashboardPage from './pages/DashboardPage';
 import InstallPrompt from "./components/InstallPrompt/InstallPrompt.tsx";
 import FaqPage from "./pages/FAQPage.tsx";
+import MainLayout from './components/Layout/MainLayout';
 
 function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<IntroPage />} />
-                <Route path="/create" element={<HomePage />} />
-                <Route path="/faq" element={<FaqPage />} />
+                {/* Nouvelle Landing Page Brutalist */}
+                <Route path="/" element={<HomePage />} />
+                
+                {/* Page d'édition (Ancienne HomePage) enveloppée dans le Layout */}
+                <Route path="/create" element={
+                    <MainLayout>
+                        <EditorPage />
+                    </MainLayout>
+                } />
+                
+                {/* Dashboard */}
+                <Route path="/dashboard" element={<DashboardPage />} />
+                
+                {/* FAQ */}
+                <Route path="/faq" element={
+                     <MainLayout>
+                        <FaqPage />
+                     </MainLayout>
+                } />
             </Routes>
             {/* Composant de prompt d'installation */}
             <InstallPrompt />

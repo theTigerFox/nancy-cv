@@ -1,180 +1,184 @@
-/* src/index.css */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Archivo+Black&family=Montserrat:ital,wght@0,100..900;1,100..900&family=JetBrains+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-brutal-pink: #FF69B4;
+  --color-brutal-lime: #DBFF00;
+  --color-brutal-yellow: #FFD700;
+  --color-brutal-black: #1a1a1a;
+  --color-brutal-white: #ffffff;
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+  --border-width-3: 3px;
 
-body {
-  font-family: 'Montserrat', sans-serif;
-  background-color: #f5f7fa; /* ou bg-gray-100 si tu préfères Tailwind */
-  -webkit-font-smoothing: antialiased; /* Amélioration rendu typo */
-  -moz-osx-font-smoothing: grayscale;
+  --shadow-brutal: 5px 5px 0px 0px black;
+  --shadow-brutal-sm: 3px 3px 0px 0px black;
+  --shadow-brutal-hover: 7px 7px 0px 0px black;
+  --shadow-brutal-active: 1px 1px 0px 0px black;
 }
 
-/* Styles spécifiques non couverts par Tailwind ou pour l'aperçu */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+ 
+    --primary: 300 100% 50%; /* Pink */
+    --primary-foreground: 0 0% 0%;
+ 
+    --secondary: 75 100% 50%; /* Lime */
+    --secondary-foreground: 0 0% 0%;
+ 
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+ 
+    --accent: 60 100% 50%; /* Yellow */
+    --accent-foreground: 0 0% 0%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 0 0% 0%;
+ 
+    --radius: 0px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-black;
+  }
+  body {
+    @apply bg-white text-black font-sans leading-relaxed selection:bg-brutal-pink selection:text-white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-black tracking-tight uppercase;
+    font-family: 'Archivo Black', sans-serif;
+  }
+  
+  p {
+    @apply font-medium;
+  }
+}
+
+/* Custom Brutalist Utilities */
+.brutal-border {
+  border: 3px solid black;
+}
+
+.brutal-border-sm {
+  border: 2px solid black;
+}
+
+.brutal-shadow {
+  box-shadow: var(--shadow-brutal);
+}
+
+.brutal-shadow-sm {
+  box-shadow: var(--shadow-brutal-sm);
+}
+
+.brutal-shadow-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-brutal-hover);
+}
+
+.brutal-shadow-active:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-brutal-active);
+}
+
+.brutal-btn {
+  @apply px-6 py-3 font-bold uppercase transition-all duration-200 border-3 border-black bg-white hover:bg-brutal-lime text-black shadow-brutal hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-brutal-hover active:shadow-brutal-active active:translate-x-[2px] active:translate-y-[2px] cursor-pointer;
+}
+
+.brutal-btn-pink {
+  @apply px-6 py-3 font-bold uppercase transition-all duration-200 border-3 border-black bg-brutal-pink text-white shadow-brutal hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-brutal-hover hover:bg-brutal-pink/90 active:shadow-brutal-active active:translate-x-[2px] active:translate-y-[2px] cursor-pointer;
+}
+
+.brutal-btn-lime {
+  @apply px-6 py-3 font-bold uppercase transition-all duration-200 border-3 border-black bg-brutal-lime text-black shadow-brutal hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-brutal-hover active:shadow-brutal-active active:translate-x-[2px] active:translate-y-[2px] cursor-pointer;
+}
+
+.brutal-input {
+  @apply w-full p-4 font-mono font-bold text-lg border-3 border-black focus:outline-none focus:ring-0 focus:bg-brutal-yellow transition-colors placeholder:text-gray-500 shadow-brutal-sm;
+}
+
+.brutal-card {
+    @apply border-3 border-black bg-white p-6 shadow-brutal;
+}
+
+/* Scrollbar Brutalist */
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background: white;
+    border-left: 3px solid black;
+}
+::-webkit-scrollbar-thumb {
+    background: black;
+    border: 2px solid white;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #FF00FF;
+}
+
+/* Animations simples */
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.animate-shake {
+  animation: shake 0.5s;
+}
+
+.animate-shake:hover {
+  animation: shake 0.5s infinite;
+}
+
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.marquee-content {
+    display: inline-block;
+    animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* CV Preview - Garder les styles de base pour l'instant */
 .cv-preview {
   background-color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-   /* A4 Dimensions approx en pixels pour un écran standard, mais attention à l'échelle */
-   /* Il est souvent mieux de laisser la largeur s'adapter et contrôler via container */
   width: 210mm;
-  min-height: 297mm; /* Ou utiliser aspect-ratio si supporté/voulu */
-  /* Important: Ne pas forcer la hauteur si le contenu peut dépasser */
+  min-height: 297mm;
 }
-
-.header-bg {
-  background-color: #2c3e50; /* bg-gray-800 ou autre classe tailwind */
-  color: white; /* text-white */
-}
-
-.section-title {
-  color: #2c3e50; /* text-gray-800 */
-  border-bottom: 2px solid #2c3e50; /* border-b-2 border-gray-800 */
-}
-
-/* Skill bars */
-.skill-level-bg { /* Renommé pour clarté */
-  height: 8px;
-  background-color: #e0e0e0; /* bg-gray-200 */
-  border-radius: 4px; /* rounded */
-  overflow: hidden; /* Pour que le fill ne dépasse pas */
-}
-
-.skill-level-fill {
-  height: 100%;
-  border-radius: 4px; /* rounded */
-  background-color: #3498db; /* bg-blue-500 */
-  transition: width 0.3s ease-in-out; /* Animation douce */
-}
-
-/* Language dots */
-.language-level {
-  display: inline-block;
-  width: 12px; /* w-3 */
-  height: 12px; /* h-3 */
-  border-radius: 50%; /* rounded-full */
-  margin-right: 3px; /* mr-1 */
-  background-color: #e0e0e0; /* bg-gray-300 */
-}
-
-.language-level.filled {
-  background-color: #3498db; /* bg-blue-500 */
-}
-
-/* Print Styles */
 @media print {
-  body * {
-    visibility: hidden; /* Cache tout par défaut */
-  }
-  /* Rend visible seulement l'aperçu et son contenu */
-  .cv-preview, .cv-preview * {
-    visibility: visible;
-  }
   .cv-preview {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%; /* Prend toute la largeur de la page imprimée */
-    height: auto; /* Hauteur automatique */
-    min-height: 0; /* Override min-height */
-    box-shadow: none; /* Pas d'ombre à l'impression */
+    width: 100%;
     margin: 0;
     padding: 0;
-    border: none;
   }
-  /* Cache explicitement les éléments non désirés */
-  .print\:hidden {
-    display: none !important;
-  }
-}
-
-input{
-  color: gray;
-}
-
-
-/* Variables globales */
-:root {
-  --accent-color: #6366f1;
-  --accent-light: #818cf8;
-  --accent-dark: #4f46e5;
-}
-
-/* Styles pour l'impression */
-@media print {
-  .print\:hidden {
-    display: none !important;
-  }
-  
-  body {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  
-  /* Assurez-vous que le CV est bien formaté pour l'impression */
-  #cvPreview {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    box-shadow: none !important; 
-    border-radius: 0 !important;
-  }
-  
-  /* Assurer que les couleurs s'impriment correctement */
-  #cvPreview * {
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-}
-
-/* Animations subtiles */
-@keyframes gentle-pulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-
-.animate-pulse {
-  animation: gentle-pulse 3s infinite;
-}
-
-/* Styles de transition généraux */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
-}
-
-/* Style pour les barres de compétences et de langues */
-.skill-level-bg {
-  height: 0.5rem;
-  background-color: rgba(243, 244, 246, 1);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.skill-level-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-color), var(--accent-light));
-  border-radius: 9999px;
-  transition: width 0.5s ease-out;
-}
-
-.language-level {
-  display: inline-block;
-  width: 1rem;
-  height: 0.5rem;
-  border-radius: 9999px;
-  background-color: rgba(243, 244, 246, 1);
-}
-
-.language-level.filled {
-  background-color: var(--accent-color);
-}
-
-#cvPreview{
-  transform: scale(0.88);
-  overflow: auto;
 }
