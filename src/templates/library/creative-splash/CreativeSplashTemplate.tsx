@@ -5,14 +5,18 @@
 
 import React, { forwardRef } from 'react';
 import { TemplateProps } from '../../types';
-import { TemplateWrapper, SkillsDisplay, LanguagesDisplay } from '../../components';
-import { colorWithOpacity } from '../../utils';
+import { TemplateWrapper, SkillsDisplay, LanguagesDisplay, InterestsDisplay, ProjectsDisplay, CertificationsDisplay } from '../../components';
+import { colorWithOpacity, isSectionVisible } from '../../utils';
 import { Mail, Phone, MapPin, Briefcase, GraduationCap } from 'lucide-react';
 
 const CreativeSplashTemplate = forwardRef<HTMLDivElement, TemplateProps>(
     ({ cvData, config, mode = 'preview', scale = 1 }, ref) => {
-        const { personalInfo, education, experience, skills, languages } = cvData;
+        const { personalInfo, education, experience, skills, languages, interests, projects, certifications, sectionsOrder = [] } = cvData;
         const { colors, typography, spacing, layout } = config;
+
+        const shouldShowSection = (type: string, hasData: boolean) => {
+            return isSectionVisible(type, sectionsOrder, hasData);
+        };
 
         return (
             <TemplateWrapper ref={ref} config={config} mode={mode} scale={scale}>
@@ -142,7 +146,7 @@ const CreativeSplashTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         )}
 
                         {/* Skills */}
-                        {skills.length > 0 && skills[0].name && (
+                        {shouldShowSection('skills', skills.length > 0 && !!skills[0]?.name) && (
                             <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                                 <h2
                                     style={{
@@ -165,7 +169,7 @@ const CreativeSplashTemplate = forwardRef<HTMLDivElement, TemplateProps>(
 
                         {/* Languages */}
                         {/* Languages */}
-                        {languages.length > 0 && languages[0].name && (
+                        {shouldShowSection('languages', languages.length > 0 && !!languages[0]?.name) && (
                             <section>
                                 <h2
                                     style={{
@@ -190,7 +194,7 @@ const CreativeSplashTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     {/* Right Column */}
                     <div style={{ flex: 1, padding: '32px', backgroundColor: colors.background }}>
                         {/* Experience */}
-                        {experience.length > 0 && experience[0].title && (
+                        {shouldShowSection('experience', experience.length > 0 && !!experience[0]?.title) && (
                             <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                                 <h2
                                     style={{
@@ -247,8 +251,8 @@ const CreativeSplashTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                         )}
 
                         {/* Education */}
-                        {education.length > 0 && education[0].degree && (
-                            <section>
+                        {shouldShowSection('education', education.length > 0 && !!education[0]?.degree) && (
+                            <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                                 <h2
                                     style={{
                                         fontSize: `${typography.sectionTitleSize}rem`,
@@ -291,6 +295,72 @@ const CreativeSplashTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                         </div>
                                     ))}
                                 </div>
+                            </section>
+                        )}
+
+                        {/* Projects */}
+                        {shouldShowSection('projects', projects && projects.length > 0 && !!projects[0]?.name) && (
+                            <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
+                                <h2
+                                    style={{
+                                        fontSize: `${typography.sectionTitleSize}rem`,
+                                        fontFamily: typography.fontHeading,
+                                        fontWeight: 700,
+                                        color: colors.primary,
+                                        marginBottom: '16px',
+                                        padding: '8px 16px',
+                                        backgroundColor: colorWithOpacity(colors.primary, 0.15),
+                                        borderRadius: '8px',
+                                        display: 'inline-block',
+                                    }}
+                                >
+                                    Projets
+                                </h2>
+                                <ProjectsDisplay projects={projects} config={config} />
+                            </section>
+                        )}
+
+                        {/* Certifications */}
+                        {shouldShowSection('certifications', certifications && certifications.length > 0 && !!certifications[0]?.name) && (
+                            <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
+                                <h2
+                                    style={{
+                                        fontSize: `${typography.sectionTitleSize}rem`,
+                                        fontFamily: typography.fontHeading,
+                                        fontWeight: 700,
+                                        color: colors.primary,
+                                        marginBottom: '16px',
+                                        padding: '8px 16px',
+                                        backgroundColor: colorWithOpacity(colors.primary, 0.15),
+                                        borderRadius: '8px',
+                                        display: 'inline-block',
+                                    }}
+                                >
+                                    Certifications
+                                </h2>
+                                <CertificationsDisplay certifications={certifications} config={config} />
+                            </section>
+                        )}
+
+                        {/* Interests */}
+                        {shouldShowSection('interests', interests && interests.length > 0 && !!interests[0]?.name) && (
+                            <section>
+                                <h2
+                                    style={{
+                                        fontSize: `${typography.sectionTitleSize}rem`,
+                                        fontFamily: typography.fontHeading,
+                                        fontWeight: 700,
+                                        color: colors.primary,
+                                        marginBottom: '16px',
+                                        padding: '8px 16px',
+                                        backgroundColor: colorWithOpacity(colors.primary, 0.15),
+                                        borderRadius: '8px',
+                                        display: 'inline-block',
+                                    }}
+                                >
+                                    Centres d'interet
+                                </h2>
+                                <InterestsDisplay interests={interests} config={config} />
                             </section>
                         )}
                     </div>

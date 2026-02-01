@@ -180,6 +180,32 @@ export const getUserProfile = async (uid: string): Promise<UserProfile | null> =
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
+ * Remove undefined values recursively from an object
+ * Firestore does not accept undefined values
+ */
+function removeUndefinedValues<T>(obj: T): T {
+    if (obj === null || obj === undefined) {
+        return obj;
+    }
+    
+    if (Array.isArray(obj)) {
+        return obj.map(item => removeUndefinedValues(item)) as T;
+    }
+    
+    if (typeof obj === 'object' && obj !== null) {
+        const cleaned: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined) {
+                cleaned[key] = removeUndefinedValues(value);
+            }
+        }
+        return cleaned as T;
+    }
+    
+    return obj;
+}
+
+/**
  * Sauvegarder un CV
  */
 export const saveCV = async (
@@ -192,6 +218,9 @@ export const saveCV = async (
     const finalCvId = cvId || cvData.id;
     const cvRef = doc(cvCollection, finalCvId);
     
+    // Clean the cvData to remove undefined values
+    const cleanedCvData = removeUndefinedValues(cvData);
+    
     const cvDoc: Omit<SavedCV, 'createdAt' | 'updatedAt'> & {
         createdAt?: ReturnType<typeof serverTimestamp>;
         updatedAt: ReturnType<typeof serverTimestamp>;
@@ -199,7 +228,7 @@ export const saveCV = async (
         id: finalCvId,
         userId,
         name: cvName || `${cvData.personalInfo.firstName || 'Mon'} ${cvData.personalInfo.lastName || 'CV'}`.trim() || 'Mon CV',
-        data: cvData,
+        data: cleanedCvData,
         updatedAt: serverTimestamp(),
     };
     

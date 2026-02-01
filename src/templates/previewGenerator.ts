@@ -4,23 +4,38 @@
 // ============================================================================
 
 import html2canvas from 'html2canvas';
-import { CvData } from '../types/cv.d';
+import { CVData, DEFAULT_SECTIONS_ORDER, DEFAULT_TEMPLATE_SETTINGS } from '../types/cv';
 import { TemplateConfig } from './types';
+
+// Type alias for backwards compatibility
+type CvData = CVData;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sample CV Data for Preview Generation
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const SAMPLE_CV_DATA: CvData = {
+export const SAMPLE_CV_DATA: Partial<CvData> = {
+    id: 'preview-sample',
+    name: 'Preview Sample',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    version: 1,
     personalInfo: {
         photo: '',
         firstName: 'Alexandre',
         lastName: 'Dubois',
         jobTitle: 'Directeur Marketing Digital',
+        headline: '',
         address: 'Paris, France',
+        city: 'Paris',
+        postalCode: '75001',
+        country: 'France',
         phone: '+33 6 12 34 56 78',
         email: 'alexandre.dubois@email.com',
-        description: 'Directeur Marketing Digital avec plus de 12 ans d\'expérience dans la transformation numérique d\'entreprises B2B et B2C. Expert en stratégie d\'acquisition et growth hacking.',
+        website: '',
+        socialLinks: [],
+        summary: 'Directeur Marketing Digital avec plus de 12 ans d\'experience dans la transformation numerique d\'entreprises B2B et B2C.',
+        description: 'Directeur Marketing Digital avec plus de 12 ans d\'experience dans la transformation numerique d\'entreprises B2B et B2C. Expert en strategie d\'acquisition et growth hacking.',
     },
     education: [
         {
@@ -66,10 +81,21 @@ export const SAMPLE_CV_DATA: CvData = {
         { id: 'sk-5', name: 'Management', level: 9 },
     ],
     languages: [
-        { id: 'lang-1', name: 'Français', level: 5 },
+        { id: 'lang-1', name: 'Francais', level: 5 },
         { id: 'lang-2', name: 'Anglais', level: 5 },
         { id: 'lang-3', name: 'Espagnol', level: 3 },
     ],
+    projects: [],
+    certifications: [],
+    volunteer: [],
+    interests: [],
+    references: [],
+    publications: [],
+    awards: [],
+    customSections: [],
+    skillCategories: [],
+    template: DEFAULT_TEMPLATE_SETTINGS,
+    sectionsOrder: DEFAULT_SECTIONS_ORDER,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

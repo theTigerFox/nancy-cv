@@ -5,13 +5,35 @@
 
 import React, { forwardRef } from 'react';
 import { TemplateProps } from '../../types';
-import { TemplateWrapper, SkillsDisplay, LanguagesDisplay, Section } from '../../components';
-import { getLevelText } from '../../utils';
+import { 
+    TemplateWrapper, 
+    SkillsDisplay, 
+    LanguagesDisplay, 
+    InterestsDisplay,
+    ProjectsDisplay,
+    CertificationsDisplay 
+} from '../../components';
+import { getLevelText, isSectionVisible } from '../../utils';
 
 const MinimalEleganceTemplate = forwardRef<HTMLDivElement, TemplateProps>(
     ({ cvData, config, mode = 'preview', scale = 1 }, ref) => {
-        const { personalInfo, education, experience, skills, languages } = cvData;
+        const { 
+            personalInfo, 
+            education, 
+            experience, 
+            skills, 
+            languages,
+            interests,
+            projects,
+            certifications,
+            sectionsOrder = []
+        } = cvData;
         const { colors, typography, spacing } = config;
+
+        // Helper pour vérifier si une section doit être affichée
+        const shouldShowSection = (type: string, hasData: boolean) => {
+            return isSectionVisible(type, sectionsOrder, hasData);
+        };
 
         // Style pour les titres de section
         const sectionTitleStyle: React.CSSProperties = {
@@ -87,7 +109,7 @@ const MinimalEleganceTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     <div style={dividerStyle} />
 
                     {/* Profile / Description */}
-                    {personalInfo.description && (
+                    {shouldShowSection('summary', !!personalInfo.description) && (
                         <>
                             <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                                 <h2 style={sectionTitleStyle}>Profil</h2>
@@ -108,7 +130,7 @@ const MinimalEleganceTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     )}
 
                     {/* Experience */}
-                    {experience.length > 0 && experience[0].title && (
+                    {shouldShowSection('experience', experience.length > 0 && !!experience[0]?.title) && (
                         <>
                             <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                                 <h2 style={sectionTitleStyle}>Expérience</h2>
@@ -168,7 +190,7 @@ const MinimalEleganceTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     )}
 
                     {/* Education */}
-                    {education.length > 0 && education[0].degree && (
+                    {shouldShowSection('education', education.length > 0 && !!education[0]?.degree) && (
                         <>
                             <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                                 <h2 style={sectionTitleStyle}>Formation</h2>
@@ -219,21 +241,54 @@ const MinimalEleganceTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     {/* Two Column Footer: Skills + Languages */}
                     <div style={{ display: 'flex', gap: `${spacing.sectionGap * 2}px` }}>
                         {/* Skills - Uses configurable display component */}
-                        {skills.length > 0 && skills[0].name && (
+                        {shouldShowSection('skills', skills.length > 0 && !!skills[0]?.name) && (
                             <section style={{ flex: 1 }}>
-                                <h2 style={sectionTitleStyle}>Compétences</h2>
+                                <h2 style={sectionTitleStyle}>Competences</h2>
                                 <SkillsDisplay skills={skills} config={config} />
                             </section>
                         )}
 
                         {/* Languages - Uses configurable display component */}
-                        {languages.length > 0 && languages[0].name && (
+                        {shouldShowSection('languages', languages.length > 0 && !!languages[0]?.name) && (
                             <section style={{ flex: 1 }}>
                                 <h2 style={sectionTitleStyle}>Langues</h2>
                                 <LanguagesDisplay languages={languages} config={config} />
                             </section>
                         )}
                     </div>
+
+                    {/* Projects */}
+                    {shouldShowSection('projects', projects && projects.length > 0 && !!projects[0]?.name) && (
+                        <>
+                            <div style={dividerStyle} />
+                            <section>
+                                <h2 style={sectionTitleStyle}>Projets</h2>
+                                <ProjectsDisplay projects={projects} config={config} />
+                            </section>
+                        </>
+                    )}
+
+                    {/* Certifications */}
+                    {shouldShowSection('certifications', certifications && certifications.length > 0 && !!certifications[0]?.name) && (
+                        <>
+                            <div style={dividerStyle} />
+                            <section>
+                                <h2 style={sectionTitleStyle}>Certifications</h2>
+                                <CertificationsDisplay certifications={certifications} config={config} />
+                            </section>
+                        </>
+                    )}
+
+                    {/* Interests */}
+                    {shouldShowSection('interests', interests && interests.length > 0 && !!interests[0]?.name) && (
+                        <>
+                            <div style={dividerStyle} />
+                            <section>
+                                <h2 style={sectionTitleStyle}>Centres d'interet</h2>
+                                <InterestsDisplay interests={interests} config={config} />
+                            </section>
+                        </>
+                    )}
 
                 </div>
             </TemplateWrapper>

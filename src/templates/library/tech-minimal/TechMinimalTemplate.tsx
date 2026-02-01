@@ -5,13 +5,18 @@
 
 import React, { forwardRef } from 'react';
 import { TemplateProps } from '../../types';
-import { TemplateWrapper, SkillsDisplay, LanguagesDisplay } from '../../components';
+import { TemplateWrapper, SkillsDisplay, LanguagesDisplay, InterestsDisplay, ProjectsDisplay, CertificationsDisplay } from '../../components';
+import { isSectionVisible } from '../../utils';
 import { Mail, Phone, MapPin, Github, Globe, Linkedin, Code } from 'lucide-react';
 
 const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
     ({ cvData, config, mode = 'preview', scale = 1 }, ref) => {
-        const { personalInfo, education, experience, skills, languages } = cvData;
+        const { personalInfo, education, experience, skills, languages, interests, projects, certifications, sectionsOrder = [] } = cvData;
         const { colors, typography, spacing } = config;
+
+        const shouldShowSection = (type: string, hasData: boolean) => {
+            return isSectionVisible(type, sectionsOrder, hasData);
+        };
 
         return (
             <TemplateWrapper ref={ref} config={config} mode={mode} scale={scale}>
@@ -84,7 +89,7 @@ const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     )}
 
                     {/* Skills - Uses configurable display */}
-                    {skills.length > 0 && skills[0].name && (
+                    {shouldShowSection('skills', skills.length > 0 && !!skills[0]?.name) && (
                         <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                             <h2
                                 style={{
@@ -106,7 +111,7 @@ const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     )}
 
                     {/* Experience */}
-                    {experience.length > 0 && experience[0].title && (
+                    {shouldShowSection('experience', experience.length > 0 && !!experience[0]?.title) && (
                         <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                             <h2
                                 style={{
@@ -157,7 +162,7 @@ const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     )}
 
                     {/* Education */}
-                    {education.length > 0 && education[0].degree && (
+                    {shouldShowSection('education', education.length > 0 && !!education[0]?.degree) && (
                         <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                             <h2
                                 style={{
@@ -195,8 +200,8 @@ const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                     )}
 
                     {/* Languages - Uses configurable display */}
-                    {languages.length > 0 && languages[0].name && (
-                        <section>
+                    {shouldShowSection('languages', languages.length > 0 && !!languages[0]?.name) && (
+                        <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
                             <h2
                                 style={{
                                     fontSize: `${typography.sectionTitleSize}rem`,
@@ -209,6 +214,60 @@ const TechMinimalTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                 languages
                             </h2>
                             <LanguagesDisplay languages={languages} config={config} />
+                        </section>
+                    )}
+
+                    {/* Projects */}
+                    {shouldShowSection('projects', projects && projects.length > 0 && !!projects[0]?.name) && (
+                        <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
+                            <h2
+                                style={{
+                                    fontSize: `${typography.sectionTitleSize}rem`,
+                                    fontFamily: typography.fontHeading,
+                                    fontWeight: 600,
+                                    color: colors.text,
+                                    marginBottom: '12px',
+                                }}
+                            >
+                                projects
+                            </h2>
+                            <ProjectsDisplay projects={projects} config={config} />
+                        </section>
+                    )}
+
+                    {/* Certifications */}
+                    {shouldShowSection('certifications', certifications && certifications.length > 0 && !!certifications[0]?.name) && (
+                        <section style={{ marginBottom: `${spacing.sectionGap}px` }}>
+                            <h2
+                                style={{
+                                    fontSize: `${typography.sectionTitleSize}rem`,
+                                    fontFamily: typography.fontHeading,
+                                    fontWeight: 600,
+                                    color: colors.text,
+                                    marginBottom: '12px',
+                                }}
+                            >
+                                certifications
+                            </h2>
+                            <CertificationsDisplay certifications={certifications} config={config} />
+                        </section>
+                    )}
+
+                    {/* Interests */}
+                    {shouldShowSection('interests', interests && interests.length > 0 && !!interests[0]?.name) && (
+                        <section>
+                            <h2
+                                style={{
+                                    fontSize: `${typography.sectionTitleSize}rem`,
+                                    fontFamily: typography.fontHeading,
+                                    fontWeight: 600,
+                                    color: colors.text,
+                                    marginBottom: '12px',
+                                }}
+                            >
+                                interests
+                            </h2>
+                            <InterestsDisplay interests={interests} config={config} />
                         </section>
                     )}
                 </div>

@@ -12,7 +12,8 @@ import {
     getContrastColor, 
     colorWithOpacity,
     getLevelText,
-    getLanguageCEFR 
+    getLanguageCEFR,
+    normalizeLanguageLevel 
 } from './utils';
 import { 
     Mail, 
@@ -201,7 +202,7 @@ const UniversalEditorOverlay: React.FC<UniversalEditorOverlayProps> = ({
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Section Manager Component
+// Section Manager Component - Connected to Store
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface SectionManagerProps {
@@ -209,51 +210,54 @@ interface SectionManagerProps {
     config: TemplateConfig;
 }
 
-const AVAILABLE_SECTIONS: { id: SectionType; label: string; icon: React.ReactNode }[] = [
-    { id: 'personal-info', label: 'Informations personnelles', icon: <User size={16} /> },
-    { id: 'description', label: 'Profil / Description', icon: <User size={16} /> },
-    { id: 'experience', label: 'Experience professionnelle', icon: <Briefcase size={16} /> },
-    { id: 'education', label: 'Formation', icon: <GraduationCap size={16} /> },
-    { id: 'skills', label: 'Competences', icon: <Code size={16} /> },
-    { id: 'languages', label: 'Langues', icon: <Languages size={16} /> },
-    { id: 'projects', label: 'Projets', icon: <Globe size={16} /> },
-    { id: 'certifications', label: 'Certifications', icon: <Award size={16} /> },
-    { id: 'interests', label: 'Centres d\'interet', icon: <Star size={16} /> },
-    { id: 'references', label: 'References', icon: <User size={16} /> },
+// Map des types de section entre l'UI et le store
+const SECTION_TYPE_MAP: Record<SectionType, string> = {
+    'personal-info': 'personal',
+    'contact': 'personal', // Contact fait partie de personal
+    'description': 'summary',
+    'experience': 'experience',
+    'education': 'education',
+    'skills': 'skills',
+    'languages': 'languages',
+    'projects': 'projects',
+    'certifications': 'certifications',
+    'interests': 'interests',
+    'references': 'references',
+};
+
+const AVAILABLE_SECTIONS: { id: SectionType; label: string; icon: React.ReactNode; storeType: string }[] = [
+    { id: 'personal-info', label: 'Informations personnelles', icon: <User size={16} />, storeType: 'personal' },
+    { id: 'description', label: 'Profil / Description', icon: <User size={16} />, storeType: 'summary' },
+    { id: 'experience', label: 'Experience professionnelle', icon: <Briefcase size={16} />, storeType: 'experience' },
+    { id: 'education', label: 'Formation', icon: <GraduationCap size={16} />, storeType: 'education' },
+    { id: 'skills', label: 'Competences', icon: <Code size={16} />, storeType: 'skills' },
+    { id: 'languages', label: 'Langues', icon: <Languages size={16} />, storeType: 'languages' },
+    { id: 'projects', label: 'Projets', icon: <Globe size={16} />, storeType: 'projects' },
+    { id: 'certifications', label: 'Certifications', icon: <Award size={16} />, storeType: 'certifications' },
+    { id: 'interests', label: 'Centres d\'interet', icon: <Star size={16} />, storeType: 'interests' },
+    { id: 'references', label: 'References', icon: <User size={16} />, storeType: 'references' },
 ];
 
 export const SectionManager: React.FC<SectionManagerProps> = ({ onClose, config }) => {
     const cv = useCVStore((state) => state.cv);
-    const [visibleSections, setVisibleSections] = useState<SectionType[]>([
-        'personal-info', 'description', 'experience', 'education', 'skills', 'languages'
-    ]);
-    const [sectionOrder, setSectionOrder] = useState<SectionType[]>([
-        'personal-info', 'description', 'experience', 'education', 'skills', 'languages',
-        'projects', 'certifications', 'interests', 'references'
-    ]);
+    const sectionsOrder = useCVStore((state) => state.cv.sectionsOrder);
+    const toggleSectionVisibility = useCVStore((state) => state.toggleSectionVisibility);
+    const reorderSections = useCVStore((state) => state.reorderSections);
 
-    const toggleSection = (sectionId: SectionType) => {
-        setVisibleSections(prev => 
-            prev.includes(sectionId)
-                ? prev.filter(s => s !== sectionId)
-                : [...prev, sectionId]
-        );
+    const toggleSection = (storeType: string) => {
+        toggleSectionVisibility(storeType);
     };
 
-    const moveSection = (sectionId: SectionType, direction: 'up' | 'down') => {
-        setSectionOrder(prev => {
-            const index = prev.indexOf(sectionId);
-            if (index === -1) return prev;
-            const newIndex = direction === 'up' ? index - 1 : index + 1;
-            if (newIndex < 0 || newIndex >= prev.length) return prev;
-            const newOrder = [...prev];
-            [newOrder[index], newOrder[newIndex]] = [newOrder[newIndex], newOrder[index]];
-            return newOrder;
-        });
+    const moveSection = (storeType: string, direction: 'up' | 'down') => {
+        const currentIndex = sectionsOrder.findIndex(s => s.type === storeType);
+        if (currentIndex === -1) return;
+        const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+        if (newIndex < 0 || newIndex >= sectionsOrder.length) return;
+        reorderSections(currentIndex, newIndex);
     };
 
-    const getSectionDataCount = (sectionId: SectionType): number | null => {
-        switch (sectionId) {
+    const getSectionDataCount = (storeType: string): number | null => {
+        switch (storeType) {
             case 'experience': return cv.experience.length || null;
             case 'education': return cv.education.length || null;
             case 'skills': return cv.skills.length || null;
@@ -264,6 +268,22 @@ export const SectionManager: React.FC<SectionManagerProps> = ({ onClose, config 
             case 'references': return cv.references.length || null;
             default: return null;
         }
+    };
+
+    const isSectionVisible = (storeType: string): boolean => {
+        const section = sectionsOrder.find(s => s.type === storeType);
+        return section?.visible ?? true;
+    };
+
+    const getSectionOrder = (): typeof AVAILABLE_SECTIONS => {
+        // Trier les sections selon l'ordre dans le store
+        return [...AVAILABLE_SECTIONS].sort((a, b) => {
+            const aIndex = sectionsOrder.findIndex(s => s.type === a.storeType);
+            const bIndex = sectionsOrder.findIndex(s => s.type === b.storeType);
+            if (aIndex === -1) return 1;
+            if (bIndex === -1) return -1;
+            return aIndex - bIndex;
+        });
     };
 
     return (
@@ -300,15 +320,13 @@ export const SectionManager: React.FC<SectionManagerProps> = ({ onClose, config 
                     </p>
 
                     <div className="space-y-2">
-                        {sectionOrder.map((sectionId, index) => {
-                            const section = AVAILABLE_SECTIONS.find(s => s.id === sectionId);
-                            if (!section) return null;
-                            const isVisible = visibleSections.includes(sectionId);
-                            const count = getSectionDataCount(sectionId);
+                        {getSectionOrder().map((section, index) => {
+                            const isVisible = isSectionVisible(section.storeType);
+                            const count = getSectionDataCount(section.storeType);
 
                             return (
                                 <div
-                                    key={sectionId}
+                                    key={section.id}
                                     className={`flex items-center gap-3 p-3 border-2 transition-all ${
                                         isVisible 
                                             ? 'border-black bg-white' 
@@ -317,15 +335,15 @@ export const SectionManager: React.FC<SectionManagerProps> = ({ onClose, config 
                                 >
                                     <div className="flex flex-col gap-0.5">
                                         <button
-                                            onClick={() => moveSection(sectionId, 'up')}
+                                            onClick={() => moveSection(section.storeType, 'up')}
                                             disabled={index === 0}
                                             className="p-0.5 hover:bg-gray-200 disabled:opacity-30 transition-colors"
                                         >
                                             <ChevronUp size={14} />
                                         </button>
                                         <button
-                                            onClick={() => moveSection(sectionId, 'down')}
-                                            disabled={index === sectionOrder.length - 1}
+                                            onClick={() => moveSection(section.storeType, 'down')}
+                                            disabled={index === getSectionOrder().length - 1}
                                             className="p-0.5 hover:bg-gray-200 disabled:opacity-30 transition-colors"
                                         >
                                             <ChevronDown size={14} />
@@ -343,7 +361,7 @@ export const SectionManager: React.FC<SectionManagerProps> = ({ onClose, config 
                                     </div>
 
                                     <button
-                                        onClick={() => toggleSection(sectionId)}
+                                        onClick={() => toggleSection(section.storeType)}
                                         className={`p-2 border-2 transition-all ${
                                             isVisible
                                                 ? 'bg-[#bfff00] border-black'
@@ -363,7 +381,7 @@ export const SectionManager: React.FC<SectionManagerProps> = ({ onClose, config 
                         onClick={onClose}
                         className="w-full py-2 bg-black text-white font-bold hover:bg-gray-800 transition-colors"
                     >
-                        Appliquer
+                        Fermer
                     </button>
                 </div>
             </motion.div>
@@ -930,7 +948,9 @@ export const LanguagesDisplay: React.FC<LanguagesDisplayProps> = ({ languages, c
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: `${spacing.itemGap}px` }}>
-            {languages.map(lang => (
+            {languages.map(lang => {
+                const numLevel = normalizeLanguageLevel(lang.level);
+                return (
                 <div key={lang.id}>
                     <div
                         style={{
@@ -961,7 +981,7 @@ export const LanguagesDisplay: React.FC<LanguagesDisplayProps> = ({ languages, c
                             <div
                                 style={{
                                     height: '100%',
-                                    width: `${(lang.level / 5) * 100}%`,
+                                    width: `${(numLevel / 5) * 100}%`,
                                     backgroundColor: colors.primary,
                                     borderRadius: '3px',
                                 }}
@@ -978,7 +998,7 @@ export const LanguagesDisplay: React.FC<LanguagesDisplayProps> = ({ languages, c
                                         width: '10px',
                                         height: '10px',
                                         borderRadius: '50%',
-                                        backgroundColor: i < lang.level ? colors.primary : colorWithOpacity(colors.border, 0.5),
+                                        backgroundColor: i < numLevel ? colors.primary : colorWithOpacity(colors.border, 0.5),
                                     }}
                                 />
                             ))}
@@ -991,14 +1011,15 @@ export const LanguagesDisplay: React.FC<LanguagesDisplayProps> = ({ languages, c
                                 <Star
                                     key={i}
                                     size={14}
-                                    fill={i < lang.level ? colors.primary : 'none'}
+                                    fill={i < numLevel ? colors.primary : 'none'}
                                     stroke={colors.primary}
                                 />
                             ))}
                         </div>
                     )}
                 </div>
-            ))}
+                );
+            })}
         </div>
     );
 };
@@ -1181,6 +1202,228 @@ export const Photo: React.FC<PhotoProps> = ({ src, config, className = '' }) => 
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Interests Display Component
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface InterestsDisplayProps {
+    interests: CvData['interests'];
+    config: TemplateConfig;
+    layout?: 'tags' | 'list' | 'grid';
+}
+
+export const InterestsDisplay: React.FC<InterestsDisplayProps> = ({ 
+    interests, 
+    config,
+    layout = 'tags'
+}) => {
+    const { colors, typography, spacing } = config;
+    
+    const visibleInterests = interests.filter(i => i.visible !== false);
+    
+    if (visibleInterests.length === 0) return null;
+
+    if (layout === 'list') {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: `${spacing.itemGap / 2}px` }}>
+                {visibleInterests.map(interest => (
+                    <div 
+                        key={interest.id}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontSize: `${typography.bodySize}rem`,
+                            color: colors.text,
+                        }}
+                    >
+                        <span style={{ color: colors.primary }}>•</span>
+                        <span>{interest.name}</span>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+    if (layout === 'grid') {
+        return (
+            <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(2, 1fr)', 
+                gap: `${spacing.itemGap}px` 
+            }}>
+                {visibleInterests.map(interest => (
+                    <div 
+                        key={interest.id}
+                        style={{
+                            padding: '8px 12px',
+                            backgroundColor: colorWithOpacity(colors.primary, 0.05),
+                            borderRadius: '4px',
+                            fontSize: `${typography.bodySize}rem`,
+                            color: colors.text,
+                        }}
+                    >
+                        {interest.name}
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+    // Default: tags
+    return (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {visibleInterests.map(interest => (
+                <span
+                    key={interest.id}
+                    style={{
+                        padding: '4px 12px',
+                        backgroundColor: colorWithOpacity(colors.primary, 0.1),
+                        color: colors.primary,
+                        borderRadius: '9999px',
+                        fontSize: `${typography.smallSize}rem`,
+                        fontWeight: 500,
+                    }}
+                >
+                    {interest.name}
+                </span>
+            ))}
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Projects Display Component
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface ProjectsDisplayProps {
+    projects: CvData['projects'];
+    config: TemplateConfig;
+}
+
+export const ProjectsDisplay: React.FC<ProjectsDisplayProps> = ({ projects, config }) => {
+    const { colors, typography, spacing } = config;
+    
+    const visibleProjects = projects.filter(p => p.visible !== false);
+    
+    if (visibleProjects.length === 0) return null;
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: `${spacing.itemGap}px` }}>
+            {visibleProjects.map(project => (
+                <div key={project.id}>
+                    <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'flex-start',
+                        marginBottom: '4px'
+                    }}>
+                        <h4 style={{ 
+                            fontSize: `${typography.bodySize * 1.05}rem`, 
+                            fontWeight: 600,
+                            color: colors.primary 
+                        }}>
+                            {project.name}
+                        </h4>
+                        {project.url && (
+                            <a 
+                                href={project.url}
+                                style={{ 
+                                    fontSize: `${typography.smallSize}rem`,
+                                    color: colors.textLight,
+                                    textDecoration: 'none'
+                                }}
+                            >
+                                Voir le projet
+                            </a>
+                        )}
+                    </div>
+                    {project.description && (
+                        <p style={{ 
+                            fontSize: `${typography.bodySize}rem`,
+                            color: colors.text,
+                            lineHeight: typography.lineHeight,
+                            marginBottom: '6px'
+                        }}>
+                            {project.description}
+                        </p>
+                    )}
+                    {project.technologies && project.technologies.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                            {project.technologies.map((tech, i) => (
+                                <span 
+                                    key={i}
+                                    style={{
+                                        padding: '2px 8px',
+                                        backgroundColor: colorWithOpacity(colors.border, 0.5),
+                                        borderRadius: '4px',
+                                        fontSize: `${typography.smallSize * 0.9}rem`,
+                                        color: colors.textLight,
+                                    }}
+                                >
+                                    {tech}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Certifications Display Component
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface CertificationsDisplayProps {
+    certifications: CvData['certifications'];
+    config: TemplateConfig;
+}
+
+export const CertificationsDisplay: React.FC<CertificationsDisplayProps> = ({ certifications, config }) => {
+    const { colors, typography, spacing } = config;
+    
+    const visibleCerts = certifications.filter(c => c.visible !== false);
+    
+    if (visibleCerts.length === 0) return null;
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: `${spacing.itemGap}px` }}>
+            {visibleCerts.map(cert => (
+                <div key={cert.id}>
+                    <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'baseline' 
+                    }}>
+                        <h4 style={{ 
+                            fontSize: `${typography.bodySize}rem`, 
+                            fontWeight: 600,
+                            color: colors.text
+                        }}>
+                            {cert.name}
+                        </h4>
+                        <span style={{ 
+                            fontSize: `${typography.smallSize}rem`,
+                            color: colors.textLight 
+                        }}>
+                            {cert.date}
+                        </span>
+                    </div>
+                    <p style={{ 
+                        fontSize: `${typography.bodySize}rem`,
+                        color: colors.textLight,
+                        fontStyle: 'italic'
+                    }}>
+                        {cert.issuer}
+                    </p>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Section Icons
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1193,6 +1436,7 @@ export const SECTION_ICONS = {
     languages: Languages,
     certifications: Award,
     projects: Globe,
+    interests: Star,
 };
 
 export const getSectionIcon = (section: string, size: number = 18) => {

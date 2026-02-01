@@ -6,7 +6,7 @@
 import React, { forwardRef, ElementType } from 'react';
 import { TemplateProps } from '../../types';
 import { TemplateWrapper } from '../../components';
-import { colorWithOpacity, getContrastColor } from '../../utils';
+import { colorWithOpacity, getContrastColor, normalizeLanguageLevel } from '../../utils';
 import { 
     InlineText, 
     InlineColor,
@@ -227,12 +227,12 @@ const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                         />
                                     </div>
                                 )}
-                                {(personalInfo.linkedIn || isInEditMode) && (
+                                {(personalInfo.socialLinks?.find(s => s.platform === 'linkedin')?.url || isInEditMode) && (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <span style={{ color: colors.accent, fontWeight: 'bold', fontSize: '0.7em' }}>in</span>
                                         <EditableField 
-                                            path="personalInfo.linkedIn" 
-                                            value={personalInfo.linkedIn || ''}
+                                            path="personalInfo.socialLinks.linkedin" 
+                                            value={personalInfo.socialLinks?.find(s => s.platform === 'linkedin')?.url || ''}
                                             placeholder="linkedin.com/in/..."
                                         />
                                     </div>
@@ -315,7 +315,9 @@ const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                         Langues
                                     </h3>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        {languages.map((lang, index) => (
+                                        {languages.map((lang, index) => {
+                                            const numLevel = normalizeLanguageLevel(lang.level);
+                                            return (
                                             <EditableListItem key={lang.id} index={index}>
                                                 <div style={{ 
                                                     display: 'flex', 
@@ -336,7 +338,7 @@ const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                                                     width: '8px',
                                                                     height: '8px',
                                                                     borderRadius: '50%',
-                                                                    backgroundColor: i < lang.level 
+                                                                    backgroundColor: i < numLevel 
                                                                         ? colors.accent 
                                                                         : colorWithOpacity(sidebarText, 0.2),
                                                                     transition: 'background-color 0.2s ease',
@@ -346,7 +348,8 @@ const ExecutiveProTemplate = forwardRef<HTMLDivElement, TemplateProps>(
                                                     </div>
                                                 </div>
                                             </EditableListItem>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </EditableSectionWrapper>

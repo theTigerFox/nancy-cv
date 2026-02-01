@@ -44,83 +44,132 @@ export async function exportToPDF(
     const qualitySettings = QUALITY_SETTINGS[quality];
     const dimensions = FORMAT_DIMENSIONS[format];
     
-    // Capture du canvas
-    const canvas = await html2canvas(element, {
-        scale: qualitySettings.scale,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
+    // Ensure element is valid and visible
+    if (!element || element.offsetWidth === 0 || element.offsetHeight === 0) {
+        throw new Error('Element invalide ou non visible pour l\'export PDF');
+    }
+    
+    // Clone element for clean capture (remove edit-mode artifacts)
+    const clonedElement = element.cloneNode(true) as HTMLElement;
+    clonedElement.style.transform = 'none';
+    clonedElement.style.position = 'absolute';
+    clonedElement.style.left = '-9999px';
+    clonedElement.style.top = '0';
+    clonedElement.style.width = '210mm';
+    clonedElement.classList.remove('edit-mode');
+    
+    // Remove edit mode indicators
+    clonedElement.querySelectorAll('[data-inline-editor], [data-universal-editor]').forEach(el => {
+        (el as HTMLElement).style.outline = 'none';
+        (el as HTMLElement).style.cursor = 'default';
     });
     
-    // Dimensions du PDF
-    const pdfWidth = dimensions.width - (margins * 2);
-    const pdfHeight = dimensions.height - (margins * 2);
+    document.body.appendChild(clonedElement);
     
-    // Ratio de l'image
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight) * qualitySettings.scale;
-    
-    const scaledWidth = imgWidth * ratio;
-    const scaledHeight = imgHeight * ratio;
-    
-    // Création du PDF
-    const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: format,
-    });
-    
-    // Centrer l'image
-    const x = margins + (pdfWidth - scaledWidth) / 2;
-    const y = margins;
-    
-    // Calcul du nombre de pages nécessaires
-    const pageHeight = pdfHeight;
-    const totalPages = Math.ceil(scaledHeight / pageHeight);
-    
-    for (let page = 0; page < totalPages; page++) {
-        if (page > 0) {
-            pdf.addPage();
+    try {
+        // Capture du canvas
+        const canvas = await html2canvas(clonedElement, {
+            scale: qualitySettings.scale,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            width: clonedElement.scrollWidth,
+            height: clonedElement.scrollHeight,
+        });
+        
+        // Validate canvas dimensions
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        
+        if (imgWidth === 0 || imgHeight === 0) {
+            throw new Error('Canvas capture echouee - dimensions invalides');
         }
         
-        const sourceY = page * (pageHeight / ratio) * qualitySettings.scale;
-        const sourceHeight = Math.min((pageHeight / ratio) * qualitySettings.scale, imgHeight - sourceY);
-        const destHeight = sourceHeight * ratio;
+        // Dimensions du PDF en mm
+        const pdfWidth = dimensions.width - (margins * 2);
+        const pdfHeight = dimensions.height - (margins * 2);
         
-        // Créer un canvas pour cette page
-        const pageCanvas = document.createElement('canvas');
-        pageCanvas.width = imgWidth;
-        pageCanvas.height = sourceHeight;
+        // Calculer le ratio pour ajuster l'image a la page
+        const widthRatio = pdfWidth / (imgWidth / qualitySettings.scale);
+        const heightRatio = pdfHeight / (imgHeight / qualitySettings.scale);
+        const ratio = Math.min(widthRatio, heightRatio, 1); // Ne pas agrandir
         
-        const ctx = pageCanvas.getContext('2d');
-        if (ctx) {
-            ctx.drawImage(
-                canvas,
-                0, sourceY,
-                imgWidth, sourceHeight,
-                0, 0,
-                imgWidth, sourceHeight
+        const scaledWidth = (imgWidth / qualitySettings.scale) * ratio;
+        const scaledHeight = (imgHeight / qualitySettings.scale) * ratio;
+        
+        // Création du PDF
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: format,
+        });
+        
+        // Centrer horizontalement
+        const x = margins + (pdfWidth - scaledWidth) / 2;
+        
+        // Calculer le nombre de pages necessaires
+        const pageContentHeight = pdfHeight;
+        const totalContentHeight = scaledHeight;
+        const totalPages = Math.ceil(totalContentHeight / pageContentHeight);
+        
+        for (let page = 0; page < totalPages; page++) {
+            if (page > 0) {
+                pdf.addPage();
+            }
+            
+            // Calculer quelle portion du canvas afficher
+            const sourceY = (page * pageContentHeight / ratio) * qualitySettings.scale;
+            const sourceHeight = Math.min(
+                (pageContentHeight / ratio) * qualitySettings.scale,
+                imgHeight - sourceY
             );
             
-            const imgData = pageCanvas.toDataURL('image/jpeg', qualitySettings.imageQuality);
-            pdf.addImage(imgData, 'JPEG', x, y, scaledWidth, destHeight);
+            if (sourceHeight <= 0) continue;
+            
+            const destHeight = (sourceHeight / qualitySettings.scale) * ratio;
+            
+            // Créer un canvas pour cette page
+            const pageCanvas = document.createElement('canvas');
+            pageCanvas.width = imgWidth;
+            pageCanvas.height = Math.ceil(sourceHeight);
+            
+            const ctx = pageCanvas.getContext('2d');
+            if (ctx) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+                
+                ctx.drawImage(
+                    canvas,
+                    0, sourceY,
+                    imgWidth, sourceHeight,
+                    0, 0,
+                    imgWidth, sourceHeight
+                );
+                
+                const imgData = pageCanvas.toDataURL('image/jpeg', qualitySettings.imageQuality);
+                pdf.addImage(imgData, 'JPEG', x, margins, scaledWidth, destHeight);
+            }
         }
+        
+        // Watermark optionnel
+        if (showWatermark) {
+            const pageCount = pdf.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                pdf.setPage(i);
+                pdf.setFontSize(8);
+                pdf.setTextColor(200, 200, 200);
+                pdf.text('Cree avec Nancy CV - nancycv.app', dimensions.width / 2, dimensions.height - 5, {
+                    align: 'center',
+                });
+            }
+        }
+        
+        return pdf.output('blob');
+    } finally {
+        // Always cleanup
+        document.body.removeChild(clonedElement);
     }
-    
-    // Watermark optionnel
-    if (showWatermark) {
-        pdf.setFontSize(8);
-        pdf.setTextColor(200, 200, 200);
-        pdf.text('Créé avec Nancy CV - nancycv.app', dimensions.width / 2, dimensions.height - 5, {
-            align: 'center',
-        });
-    }
-    
-    return pdf.output('blob');
 }
 
 export async function downloadPDF(

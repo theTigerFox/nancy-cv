@@ -292,26 +292,100 @@ export const COLOR_PRESETS: Record<string, Partial<TemplateColors>> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
+ * Convertit un niveau (string ou number) en nombre
+ */
+export function normalizeLanguageLevel(level: number | string): number {
+    if (typeof level === 'number') return level;
+    // Convertit les codes CECR en nombres 1-5
+    const cefrToNumber: Record<string, number> = {
+        'A1': 1,
+        'A2': 2,
+        'B1': 3,
+        'B2': 4,
+        'C1': 5,
+        'C2': 5,
+        'native': 5,
+    };
+    return cefrToNumber[level] || 1;
+}
+
+/**
  * Convertit un niveau numérique en texte
  */
-export function getLevelText(level: number, type: 'skill' | 'language'): string {
+export function getLevelText(level: number | string, type: 'skill' | 'language'): string {
+    const numLevel = typeof level === 'number' ? level : normalizeLanguageLevel(level);
+    
     if (type === 'skill') {
-        if (level <= 2) return 'Débutant';
-        if (level <= 4) return 'Intermédiaire';
-        if (level <= 6) return 'Avancé';
-        if (level <= 8) return 'Expert';
-        return 'Maître';
+        if (numLevel <= 2) return 'Debutant';
+        if (numLevel <= 4) return 'Intermediaire';
+        if (numLevel <= 6) return 'Avance';
+        if (numLevel <= 8) return 'Expert';
+        return 'Maitre';
     } else {
+        // Si c'est déjà un code CECR string, le retourner directement
+        if (typeof level === 'string') {
+            const labels: Record<string, string> = {
+                'A1': 'Notions',
+                'A2': 'Elementaire',
+                'B1': 'Intermediaire',
+                'B2': 'Avance',
+                'C1': 'Courant',
+                'C2': 'Bilingue',
+                'native': 'Langue maternelle',
+            };
+            return labels[level] || level;
+        }
         // Language levels 1-5
-        const levels = ['Notions', 'Élémentaire', 'Intermédiaire', 'Avancé', 'Bilingue'];
-        return levels[Math.min(level - 1, 4)] || 'Notions';
+        const levels = ['Notions', 'Elementaire', 'Intermediaire', 'Avance', 'Bilingue'];
+        return levels[Math.min(numLevel - 1, 4)] || 'Notions';
     }
 }
 
 /**
  * Convertit un niveau de langue en code CECR
  */
-export function getLanguageCEFR(level: number): string {
+export function getLanguageCEFR(level: number | string): string {
+    // Si c'est déjà un code CECR, le retourner
+    if (typeof level === 'string') {
+        if (level === 'native') return 'C2';
+        return level;
+    }
     const levels = ['A1', 'A2/B1', 'B1/B2', 'B2/C1', 'C1/C2'];
     return levels[Math.min(level - 1, 4)] || 'A1';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Section Visibility Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { SectionConfig } from '../types/cv';
+
+/**
+ * Vérifie si une section est visible selon les paramètres de l'utilisateur
+ */
+export function isSectionVisible(
+    sectionType: string,
+    sectionsOrder: SectionConfig[],
+    hasData: boolean = true
+): boolean {
+    // Si pas de données, ne pas afficher même si visible
+    if (!hasData) return false;
+    
+    const section = sectionsOrder.find(s => s.type === sectionType);
+    // Par défaut visible si non trouvé (backwards compatibility)
+    return section?.visible ?? true;
+}
+
+/**
+ * Retourne les sections dans l'ordre défini par l'utilisateur
+ */
+export function getSortedSections(sectionsOrder: SectionConfig[]): SectionConfig[] {
+    return [...sectionsOrder].sort((a, b) => a.order - b.order);
+}
+
+/**
+ * Retourne les sections visibles dans l'ordre
+ */
+export function getVisibleSections(sectionsOrder: SectionConfig[]): SectionConfig[] {
+    return getSortedSections(sectionsOrder).filter(s => s.visible);
 }
