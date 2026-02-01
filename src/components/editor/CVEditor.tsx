@@ -27,7 +27,7 @@ import type { CvData } from '../../types/cv.d';
 import AiModal from '../AiModal/AiModal';
 import type { CVData, Experience, Education, Skill, Language, Project } from '../../types/cv';
 import { FontPicker, loadGoogleFonts, GOOGLE_FONTS } from './FontPicker';
-import { LiveEditProvider, EditableText, useLiveEdit } from './LivePreviewEditor';
+import { InlineEditorProvider } from './InlineEditor';
 
 // Import all form components
 import { PersonalInfoForm } from './PersonalInfoForm';
@@ -1698,6 +1698,41 @@ export const CVEditor: React.FC = () => {
         fileInputRef.current?.click();
     };
     
+    // Handler pour les mises à jour de customisation depuis l'éditeur inline
+    const handleCustomizationUpdate = React.useCallback((path: string, value: any) => {
+        const parts = path.split('.');
+        const category = parts[0] as keyof TemplateCustomization;
+        const field = parts.slice(1).join('.');
+        
+        setCustomization(prev => {
+            const newCustomization = { ...prev };
+            
+            if (category === 'colors') {
+                newCustomization.colors = {
+                    ...prev.colors,
+                    [field]: value,
+                };
+            } else if (category === 'typography') {
+                newCustomization.typography = {
+                    ...prev.typography,
+                    [field]: value,
+                };
+            } else if (category === 'spacing') {
+                newCustomization.spacing = {
+                    ...prev.spacing,
+                    [field]: value,
+                };
+            } else if (category === 'layout') {
+                newCustomization.layout = {
+                    ...prev.layout,
+                    [field]: value,
+                };
+            }
+            
+            return newCustomization;
+        });
+    }, []);
+    
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -1927,7 +1962,10 @@ export const CVEditor: React.FC = () => {
                             
                             {/* Preview Content with Live Edit */}
                             <div className="flex-1 overflow-auto p-6">
-                                <LiveEditProvider isEditMode={isEditMode}>
+                                <InlineEditorProvider 
+                                    isEditMode={isEditMode}
+                                    onCustomizationUpdate={handleCustomizationUpdate}
+                                >
                                     <div 
                                         className="bg-white shadow-2xl mx-auto transition-transform origin-top"
                                         style={{ 
@@ -1960,12 +1998,12 @@ export const CVEditor: React.FC = () => {
                                             {/* Edit Mode Overlay Badge */}
                                             {isEditMode && (
                                                 <div className="absolute top-2 right-2 bg-brutal-pink text-white text-[10px] px-2 py-1 font-bold shadow-lg z-50 uppercase tracking-wider">
-                                                    ✏️ Édition Live
+                                                    Edition Live
                                                 </div>
                                             )}
                                         </div>
                                     </div>
-                                </LiveEditProvider>
+                                </InlineEditorProvider>
                             </div>
                         </motion.div>
                     )}
