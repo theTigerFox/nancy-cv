@@ -2,13 +2,11 @@
 // NANCY CV - PDF Module Index
 // ============================================================================
 
-// Styles & Utilities
-export * from './styles';
-
-// Components
-export * from './components';
+// Types & Utilities
+export * from './types';
 
 // Templates
+export { BoldModernPDF } from './templates/BoldModernPDF';
 export { MinimalElegancePDF } from './templates/MinimalElegancePDF';
 
 // Export Service

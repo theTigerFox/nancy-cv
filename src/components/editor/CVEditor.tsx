@@ -1687,9 +1687,11 @@ export const CVEditor: React.FC = () => {
     const handleExportPDF = async () => {
         try {
             // Use the new @react-pdf/renderer export with real text
+            // Pass the template config to ensure PDF matches the preview
             await downloadPDFNative(cv as CVData, {
                 filename: `cv-${cv.personalInfo.firstName || 'mon'}-${cv.personalInfo.lastName || 'cv'}`,
                 templateId: selectedTemplate,
+                config: templateConfig || undefined,
             });
         } catch (error) {
             console.error('Erreur export PDF:', error);
