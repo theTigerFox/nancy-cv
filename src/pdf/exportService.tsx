@@ -1,6 +1,7 @@
 // ============================================================================
 // NANCY CV - PDF Export Service
 // Service professionnel d'export PDF avec @react-pdf/renderer
+// CHAQUE template a son propre composant PDF dédié - aucun fallback
 // ============================================================================
 
 import React from 'react';
@@ -8,9 +9,16 @@ import { pdf } from '@react-pdf/renderer';
 import type { CVData } from '../types/cv';
 import type { TemplateConfig, TemplateColors, TemplateTypography, TemplateSpacing, TemplateLayout, TemplateSections } from '../templates/types';
 
-// Import PDF templates
+// ─────────────────────────────────────────────────────────────────────────────
+// Import TOUS les templates PDF dédiés
+// ─────────────────────────────────────────────────────────────────────────────
 import { BoldModernPDF } from './templates/BoldModernPDF';
 import { MinimalElegancePDF } from './templates/MinimalElegancePDF';
+import { ExecutiveProPDF } from './templates/ExecutiveProPDF';
+import { ClassicProfessionalPDF } from './templates/ClassicProfessionalPDF';
+import { CreativeSplashPDF } from './templates/CreativeSplashPDF';
+import { TechMinimalPDF } from './templates/TechMinimalPDF';
+import { ElegantSerifPDF } from './templates/ElegantSerifPDF';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PDF Config Type (subset of TemplateConfig for PDF rendering)
@@ -36,27 +44,21 @@ export interface PDFExportOptions {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Template Mapping
+// Template IDs - Liste exhaustive des templates supportés
 // ─────────────────────────────────────────────────────────────────────────────
 
-type PDFTemplateType = 'bold-modern' | 'minimal-elegance' | 'sidebar-left' | 'single';
-
-// Map template IDs to their PDF layout type
-const templateLayoutMap: Record<string, PDFTemplateType> = {
-    // Sidebar left templates (colorful sidebar on left)
-    'bold-modern': 'bold-modern',
-    'creative-splash': 'bold-modern',
-    
-    // Single column minimal templates
-    'minimal-elegance': 'minimal-elegance',
-    'executive-pro': 'minimal-elegance',
-    'classic-professional': 'minimal-elegance',
-    'tech-minimal': 'minimal-elegance',
-    'elegant-serif': 'minimal-elegance',
-};
+type SupportedTemplateId = 
+    | 'bold-modern'
+    | 'minimal-elegance'
+    | 'executive-pro'
+    | 'classic-professional'
+    | 'creative-splash'
+    | 'tech-minimal'
+    | 'elegant-serif';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Get PDF Component based on template and config
+// Get PDF Component - Mapping direct template → composant PDF dédié
+// AUCUN fallback - chaque template a son propre rendu exact
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getPDFDocument(
@@ -64,27 +66,46 @@ function getPDFDocument(
     templateId: string,
     config: PDFTemplateConfig
 ): React.ReactElement {
-    // Determine template type from ID or config layout
-    let templateType: PDFTemplateType = templateLayoutMap[templateId] || 'minimal-elegance';
-    
-    // Override based on config layout type if available
-    if (config?.layout?.type) {
-        if (config.layout.type === 'sidebar-left' || config.layout.type === 'sidebar-right') {
-            templateType = 'bold-modern';
-        } else if (config.layout.type === 'single') {
-            templateType = 'minimal-elegance';
-        }
-    }
-    
-    // Cast to TemplateConfig for component props (metadata not needed for PDF)
+    // Cast to TemplateConfig for component props
     const templateConfig = config as unknown as TemplateConfig;
     
-    // Return appropriate PDF component
-    switch (templateType) {
+    // Mapping direct - chaque template utilise son propre composant PDF
+    switch (templateId as SupportedTemplateId) {
+        // ══════════════════════════════════════════════════════════════════════
+        // Templates avec sidebar gauche
+        // ══════════════════════════════════════════════════════════════════════
         case 'bold-modern':
             return <BoldModernPDF cvData={cvData} config={templateConfig} />;
+        
+        case 'executive-pro':
+            return <ExecutiveProPDF cvData={cvData} config={templateConfig} />;
+        
+        // ══════════════════════════════════════════════════════════════════════
+        // Templates créatifs avec header coloré
+        // ══════════════════════════════════════════════════════════════════════
+        case 'creative-splash':
+            return <CreativeSplashPDF cvData={cvData} config={templateConfig} />;
+        
+        // ══════════════════════════════════════════════════════════════════════
+        // Templates single column
+        // ══════════════════════════════════════════════════════════════════════
         case 'minimal-elegance':
+            return <MinimalElegancePDF cvData={cvData} config={templateConfig} />;
+        
+        case 'classic-professional':
+            return <ClassicProfessionalPDF cvData={cvData} config={templateConfig} />;
+        
+        case 'tech-minimal':
+            return <TechMinimalPDF cvData={cvData} config={templateConfig} />;
+        
+        case 'elegant-serif':
+            return <ElegantSerifPDF cvData={cvData} config={templateConfig} />;
+        
+        // ══════════════════════════════════════════════════════════════════════
+        // Fallback pour templates non reconnus (ne devrait jamais arriver)
+        // ══════════════════════════════════════════════════════════════════════
         default:
+            console.warn(`Template PDF non trouvé pour: ${templateId}, utilisation de MinimalElegancePDF`);
             return <MinimalElegancePDF cvData={cvData} config={templateConfig} />;
     }
 }
@@ -98,8 +119,21 @@ export async function generatePDFBlob(
     templateId: string = 'minimal-elegance',
     config?: TemplateConfig | PDFTemplateConfig
 ): Promise<Blob> {
-    // Use config if provided, otherwise get default
+    // Debug log
+    console.log('[PDF Export] Génération PDF:', {
+        templateId,
+        hasConfigProvided: !!config,
+        configColors: config?.colors?.primary,
+    });
+    
+    // Use config if provided, otherwise get default for this specific template
     const effectiveConfig = (config || getDefaultConfig(templateId)) as PDFTemplateConfig;
+    
+    console.log('[PDF Export] Config effective:', {
+        templateId,
+        primaryColor: effectiveConfig.colors?.primary,
+        layoutType: effectiveConfig.layout?.type,
+    });
     
     // Get the appropriate PDF document
     const pdfDocument = getPDFDocument(cvData, templateId, effectiveConfig);
@@ -187,11 +221,14 @@ function sanitizeFilename(name: string): string {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Default Configs for templates
+// Default Configs for ALL templates
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getDefaultConfig(templateId: string): PDFTemplateConfig {
     const configs: Record<string, PDFTemplateConfig> = {
+        // ══════════════════════════════════════════════════════════════════════
+        // Bold Modern - Sidebar violette avec gradient
+        // ══════════════════════════════════════════════════════════════════════
         'bold-modern': {
             colors: {
                 primary: '#6366f1',
@@ -237,6 +274,108 @@ function getDefaultConfig(templateId: string): PDFTemplateConfig {
                 titleStyle: 'simple',
             },
         },
+        
+        // ══════════════════════════════════════════════════════════════════════
+        // Executive Pro - Sidebar bleu foncé avec accent doré
+        // ══════════════════════════════════════════════════════════════════════
+        'executive-pro': {
+            colors: {
+                primary: '#1e3a5f',
+                secondary: '#2d4a6f',
+                text: '#1e293b',
+                textLight: '#64748b',
+                background: '#ffffff',
+                backgroundAlt: '#f8fafc',
+                border: '#e2e8f0',
+                accent: '#c9a227',
+            },
+            typography: {
+                fontHeading: 'Helvetica-Bold',
+                fontBody: 'Helvetica',
+                baseFontSize: 14,
+                nameSize: 2.2,
+                jobTitleSize: 1.1,
+                sectionTitleSize: 0.95,
+                bodySize: 0.875,
+                smallSize: 0.75,
+                lineHeight: 1.6,
+                letterSpacing: '0.02em',
+            },
+            spacing: {
+                pageMargin: 0,
+                sectionGap: 20,
+                sectionPadding: 24,
+                itemGap: 14,
+            },
+            layout: {
+                type: 'sidebar-left',
+                sidebarWidth: 32,
+                showPhoto: true,
+                photoPosition: 'sidebar',
+                photoShape: 'square',
+                photoSize: 120,
+            },
+            sections: {
+                skills: { type: 'bars', showLevel: true },
+                languages: { type: 'dots', showLevelText: true },
+                timeline: { showLine: false, showDots: false, position: 'none', dotStyle: 'circle' },
+                useIcons: true,
+                titleStyle: 'border-left',
+            },
+        },
+        
+        // ══════════════════════════════════════════════════════════════════════
+        // Creative Splash - Header rose avec deux colonnes
+        // ══════════════════════════════════════════════════════════════════════
+        'creative-splash': {
+            colors: {
+                primary: '#f43f5e',
+                secondary: '#ec4899',
+                text: '#1f2937',
+                textLight: '#6b7280',
+                background: '#ffffff',
+                backgroundAlt: '#fef2f2',
+                border: '#fecdd3',
+                accent: '#fbbf24',
+            },
+            typography: {
+                fontHeading: 'Helvetica-Bold',
+                fontBody: 'Helvetica',
+                baseFontSize: 14,
+                nameSize: 2.4,
+                jobTitleSize: 1.1,
+                sectionTitleSize: 0.9,
+                bodySize: 0.85,
+                smallSize: 0.7,
+                lineHeight: 1.5,
+                letterSpacing: '0.05em',
+            },
+            spacing: {
+                pageMargin: 0,
+                sectionGap: 20,
+                sectionPadding: 16,
+                itemGap: 10,
+            },
+            layout: {
+                type: 'two-column',
+                sidebarWidth: 35,
+                showPhoto: true,
+                photoPosition: 'header',
+                photoShape: 'circle',
+                photoSize: 100,
+            },
+            sections: {
+                skills: { type: 'tags', showLevel: false },
+                languages: { type: 'text', showLevelText: true },
+                timeline: { showLine: true, showDots: false, position: 'left', dotStyle: 'circle' },
+                useIcons: false,
+                titleStyle: 'underline',
+            },
+        },
+        
+        // ══════════════════════════════════════════════════════════════════════
+        // Minimal Elegance - Colonne unique, centré, minimaliste
+        // ══════════════════════════════════════════════════════════════════════
         'minimal-elegance': {
             colors: {
                 primary: '#1a1a1a',
@@ -282,7 +421,159 @@ function getDefaultConfig(templateId: string): PDFTemplateConfig {
                 titleStyle: 'simple',
             },
         },
+        
+        // ══════════════════════════════════════════════════════════════════════
+        // Classic Professional - Colonne unique, titres soulignés
+        // ══════════════════════════════════════════════════════════════════════
+        'classic-professional': {
+            colors: {
+                primary: '#1e3a5f',
+                secondary: '#2563eb',
+                text: '#333333',
+                textLight: '#666666',
+                background: '#ffffff',
+                backgroundAlt: '#f5f5f5',
+                border: '#dddddd',
+                accent: '#1e3a5f',
+            },
+            typography: {
+                fontHeading: 'Helvetica-Bold',
+                fontBody: 'Helvetica',
+                baseFontSize: 14,
+                nameSize: 2.4,
+                jobTitleSize: 1.1,
+                sectionTitleSize: 0.95,
+                bodySize: 0.9,
+                smallSize: 0.75,
+                lineHeight: 1.6,
+                letterSpacing: '0.03em',
+            },
+            spacing: {
+                pageMargin: 40,
+                sectionGap: 20,
+                sectionPadding: 0,
+                itemGap: 12,
+            },
+            layout: {
+                type: 'single',
+                sidebarWidth: 0,
+                showPhoto: true,
+                photoPosition: 'header',
+                photoShape: 'rounded',
+                photoSize: 90,
+            },
+            sections: {
+                skills: { type: 'simple', showLevel: false },
+                languages: { type: 'text', showLevelText: true },
+                timeline: { showLine: false, showDots: false, position: 'none', dotStyle: 'circle' },
+                useIcons: false,
+                titleStyle: 'underline',
+            },
+        },
+        
+        // ══════════════════════════════════════════════════════════════════════
+        // Tech Minimal - Style tech, tags, accent cyan
+        // ══════════════════════════════════════════════════════════════════════
+        'tech-minimal': {
+            colors: {
+                primary: '#0ea5e9',
+                secondary: '#0284c7',
+                text: '#0f172a',
+                textLight: '#64748b',
+                background: '#ffffff',
+                backgroundAlt: '#f8fafc',
+                border: '#e2e8f0',
+                accent: '#0ea5e9',
+            },
+            typography: {
+                fontHeading: 'Helvetica-Bold',
+                fontBody: 'Helvetica',
+                baseFontSize: 14,
+                nameSize: 2.2,
+                jobTitleSize: 1.0,
+                sectionTitleSize: 1.0,
+                bodySize: 0.875,
+                smallSize: 0.75,
+                lineHeight: 1.6,
+                letterSpacing: '0.05em',
+            },
+            spacing: {
+                pageMargin: 40,
+                sectionGap: 20,
+                sectionPadding: 0,
+                itemGap: 16,
+            },
+            layout: {
+                type: 'single',
+                sidebarWidth: 0,
+                showPhoto: false,
+                photoPosition: 'header',
+                photoShape: 'circle',
+                photoSize: 0,
+            },
+            sections: {
+                skills: { type: 'tags', showLevel: false },
+                languages: { type: 'bars', showLevelText: false },
+                timeline: { showLine: true, showDots: true, position: 'left', dotStyle: 'square' },
+                useIcons: true,
+                titleStyle: 'simple',
+            },
+        },
+        
+        // ══════════════════════════════════════════════════════════════════════
+        // Elegant Serif - Typographie serif, tons bruns
+        // ══════════════════════════════════════════════════════════════════════
+        'elegant-serif': {
+            colors: {
+                primary: '#92400e',
+                secondary: '#b45309',
+                text: '#1c1917',
+                textLight: '#78716c',
+                background: '#fffbeb',
+                backgroundAlt: '#fef7ed',
+                border: '#e7e5e4',
+                accent: '#d97706',
+            },
+            typography: {
+                fontHeading: 'Times-Bold',
+                fontBody: 'Times-Roman',
+                baseFontSize: 14,
+                nameSize: 2.6,
+                jobTitleSize: 1.1,
+                sectionTitleSize: 0.9,
+                bodySize: 0.9,
+                smallSize: 0.75,
+                lineHeight: 1.7,
+                letterSpacing: '0.1em',
+            },
+            spacing: {
+                pageMargin: 48,
+                sectionGap: 24,
+                sectionPadding: 0,
+                itemGap: 14,
+            },
+            layout: {
+                type: 'single',
+                sidebarWidth: 0,
+                showPhoto: true,
+                photoPosition: 'header',
+                photoShape: 'circle',
+                photoSize: 100,
+            },
+            sections: {
+                skills: { type: 'tags', showLevel: false },
+                languages: { type: 'text', showLevelText: true },
+                timeline: { showLine: false, showDots: false, position: 'none', dotStyle: 'circle' },
+                useIcons: false,
+                titleStyle: 'simple',
+            },
+        },
     };
     
-    return configs[templateId] || configs['minimal-elegance'];
+    // Retourner le config du template ou fallback sur minimal-elegance
+    const selectedConfig = configs[templateId];
+    if (!selectedConfig) {
+        console.warn(`[PDF Export] Config non trouvée pour template: ${templateId}, utilisation de minimal-elegance`);
+    }
+    return selectedConfig || configs['minimal-elegance'];
 }

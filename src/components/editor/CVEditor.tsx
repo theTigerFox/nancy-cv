@@ -19,6 +19,7 @@ import {
 import { useCVStore, useTemporalStore } from '../../store/cvStore';
 import { downloadJSON, importFromFile, exportToPlainText, exportToImage } from '../../utils/export';
 import { downloadPDF as downloadPDFNative } from '../../pdf/exportService';
+import { downloadPDFHighFidelity } from '../../pdf/wysiwygExport';
 import { useFirestoreSync } from '../../hooks/useFirestoreSync';
 import { useAuth } from '../../contexts/AuthContext';
 import { templateRegistry, getTemplateConfig, getTemplateComponent } from '../../templates/registry';
@@ -1620,20 +1621,45 @@ export const CVEditor: React.FC = () => {
     const [activeSection, setActiveSection] = React.useState<SectionId>('personal');
     const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
     const [showPreview, setShowPreview] = React.useState(true);
-    const [selectedTemplate, setSelectedTemplate] = React.useState<string>(TEMPLATE_IDS.EXECUTIVE_PRO);
+    
+    // Template selection - persisted in localStorage
+    const [selectedTemplate, setSelectedTemplate] = React.useState<string>(() => {
+        const saved = localStorage.getItem('nancy-cv-selected-template');
+        return saved || TEMPLATE_IDS.EXECUTIVE_PRO;
+    });
+    
     const [showTemplateSelector, setShowTemplateSelector] = React.useState(false);
     const [showAiModal, setShowAiModal] = React.useState(false);
     const [showCustomization, setShowCustomization] = React.useState(false);
-    const [customization, setCustomization] = React.useState<TemplateCustomization>({});
+    
+    // Customization - also persisted
+    const [customization, setCustomization] = React.useState<TemplateCustomization>(() => {
+        const saved = localStorage.getItem('nancy-cv-customization');
+        return saved ? JSON.parse(saved) : {};
+    });
+    
     const [previewZoom, setPreviewZoom] = React.useState(100);
     const [isEditMode, setIsEditMode] = React.useState(true); // Par défaut en mode édition
+    const [isExportingPDF, setIsExportingPDF] = React.useState(false); // Loading state for PDF export
+    const [templatesReady, setTemplatesReady] = React.useState(false); // Track template registration
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const previewRef = React.useRef<HTMLDivElement>(null);
     const temporalStore = useTemporalStore();
     
-    // Initialise les templates au montage
+    // Persist template selection
+    React.useEffect(() => {
+        localStorage.setItem('nancy-cv-selected-template', selectedTemplate);
+    }, [selectedTemplate]);
+    
+    // Persist customization
+    React.useEffect(() => {
+        localStorage.setItem('nancy-cv-customization', JSON.stringify(customization));
+    }, [customization]);
+    
+    // Initialise les templates au montage - MUST trigger re-render when done
     React.useEffect(() => {
         registerAllTemplates();
+        setTemplatesReady(true); // Force re-render after templates are registered
     }, []);
     
     // Get CV ID from URL params
@@ -1685,17 +1711,22 @@ export const CVEditor: React.FC = () => {
     }, [cv, temporalStore]);
     
     const handleExportPDF = async () => {
+        if (isExportingPDF) return; // Prevent double-click
+        
+        setIsExportingPDF(true);
+        
         try {
-            // Use the new @react-pdf/renderer export with real text
-            // Pass the template config to ensure PDF matches the preview
-            await downloadPDFNative(cv as CVData, {
+            const previewElement = document.getElementById('cv-preview');
+            
+            await downloadPDFHighFidelity(cv as CVData, {
                 filename: `cv-${cv.personalInfo.firstName || 'mon'}-${cv.personalInfo.lastName || 'cv'}`,
-                templateId: selectedTemplate,
-                config: templateConfig || undefined,
+                previewElement,
             });
         } catch (error) {
             console.error('Erreur export PDF:', error);
             alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
+        } finally {
+            setIsExportingPDF(false);
         }
     };
     
@@ -1759,6 +1790,28 @@ export const CVEditor: React.FC = () => {
     
     return (
         <div className="h-screen flex flex-col bg-gray-100">
+            {/* PDF Export Loading Overlay */}
+            {isExportingPDF && (
+                <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center">
+                    <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm mx-4">
+                        <div className="relative">
+                            <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
+                            <div className="w-16 h-16 border-4 border-brutal-pink border-t-transparent rounded-full animate-spin absolute inset-0"></div>
+                        </div>
+                        <div className="text-center">
+                            <h3 className="font-bold text-lg text-gray-900">Génération du PDF...</h3>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Création d'un PDF vectoriel haute fidélité
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            <span>Texte sélectionnable • Compatible ATS</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
             <input
                 ref={fileInputRef}
                 type="file"
@@ -1985,6 +2038,7 @@ export const CVEditor: React.FC = () => {
                                     >
                                         <div 
                                             id="cv-preview" 
+                                            data-cv-preview="true"
                                             ref={previewRef}
                                             className={cn(
                                                 "relative",

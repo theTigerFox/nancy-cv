@@ -419,10 +419,15 @@ export const TemplateWrapper = forwardRef<HTMLDivElement, TemplateWrapperProps>(
         const updatePersonalInfo = useCVStore((state) => state.updatePersonalInfo);
         const cv = useCVStore((state) => state.cv);
 
+        // A4 dimensions at 96 DPI (consistent with PDF export)
+        const A4_WIDTH = 794; // 210mm at 96 DPI
+        const A4_HEIGHT = 1123; // 297mm at 96 DPI
+
         const style: React.CSSProperties = {
             ...Object.fromEntries(Object.entries(cssVars)),
-            maxWidth: '210mm',
-            minHeight: '297mm',
+            width: `${A4_WIDTH}px`,
+            maxWidth: `${A4_WIDTH}px`,
+            minHeight: `${A4_HEIGHT}px`,
             backgroundColor: config.colors.background,
             color: config.colors.text,
             fontFamily: config.typography.fontBody,

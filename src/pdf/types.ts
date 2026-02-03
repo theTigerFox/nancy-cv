@@ -118,7 +118,18 @@ export function formatDateRange(startDate?: string, endDate?: string, current?: 
 // Language level utilities
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function getLanguageLevelText(level: string): string {
+export function getLanguageLevelText(level: string | number): string {
+    // Handle numeric levels
+    if (typeof level === 'number') {
+        if (level >= 9) return 'Langue maternelle';
+        if (level >= 7) return 'Avancé';
+        if (level >= 5) return 'Intermédiaire avancé';
+        if (level >= 3) return 'Intermédiaire';
+        if (level >= 2) return 'Élémentaire';
+        return 'Débutant';
+    }
+    
+    // Handle string levels
     const levels: Record<string, string> = {
         A1: 'Débutant',
         A2: 'Élémentaire',
