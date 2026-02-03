@@ -80,13 +80,40 @@ function prepareHTMLForPDF(element: HTMLElement): string {
     cvContent = templateEl as HTMLElement;
   }
   
+  // CRITICAL: Convert all mm dimensions to px for consistent rendering
+  // 1mm = 3.7795px at 96 DPI
+  const MM_TO_PX = 3.7795;
+  cvContent.querySelectorAll('*').forEach(el => {
+    const htmlEl = el as HTMLElement;
+    const style = htmlEl.getAttribute('style');
+    if (style && style.includes('mm')) {
+      // Replace mm values with px equivalents
+      const newStyle = style.replace(/(\d+(?:\.\d+)?)\s*mm/g, (match, num) => {
+        const px = Math.round(parseFloat(num) * MM_TO_PX);
+        return `${px}px`;
+      });
+      htmlEl.setAttribute('style', newStyle);
+    }
+  });
+  
   // Remove transform (zoom scaling) but keep all other styles
   const currentStyle = cvContent.getAttribute('style') || '';
-  const styleProps = currentStyle.split(';').filter(s => {
+  let styleProps = currentStyle.split(';').filter(s => {
     const prop = s.trim().toLowerCase();
     return prop && 
            !prop.startsWith('transform:') && 
            !prop.startsWith('transform-origin:');
+  });
+  
+  // Convert any mm in root style too
+  styleProps = styleProps.map(s => {
+    if (s.includes('mm')) {
+      return s.replace(/(\d+(?:\.\d+)?)\s*mm/g, (match, num) => {
+        const px = Math.round(parseFloat(num) * MM_TO_PX);
+        return `${px}px`;
+      });
+    }
+    return s;
   });
   
   // Force exact A4 dimensions
@@ -110,10 +137,10 @@ function prepareHTMLForPDF(element: HTMLElement): string {
   <meta name="viewport" content="width=${A4_WIDTH_PX}">
   <title>CV</title>
   
-  <!-- Google Fonts - ALL fonts used by templates -->
+  <!-- Google Fonts - ALL fonts used by ALL templates -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&family=Source+Sans+3:wght@200;300;400;500;600;700;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&family=Source+Sans+3:wght@200;300;400;500;600;700;900&family=Source+Serif+4:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
     /* Reset */
@@ -145,6 +172,18 @@ function prepareHTMLForPDF(element: HTMLElement): string {
       width: ${A4_WIDTH_PX}px !important;
       max-width: ${A4_WIDTH_PX}px !important;
       overflow: visible;
+    }
+    
+    /* Font fallbacks - ensure Source Sans Pro maps to Source Sans 3 */
+    @font-face {
+      font-family: 'Source Sans Pro';
+      src: local('Source Sans 3'), local('Source Sans Pro');
+    }
+    
+    /* Font fallbacks - ensure Source Serif Pro maps to Source Serif 4 */
+    @font-face {
+      font-family: 'Source Serif Pro';
+      src: local('Source Serif 4'), local('Source Serif Pro');
     }
     
     /* Hide any remaining UI elements */
