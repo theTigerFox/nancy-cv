@@ -1342,7 +1342,7 @@ export const ProjectsDisplay: React.FC<ProjectsDisplayProps> = ({ projects, conf
                                     textDecoration: 'none'
                                 }}
                             >
-                                Voir le projet
+                                {project.url.replace(/^https?:\/\//, '').slice(0, 30)}{project.url.replace(/^https?:\/\//, '').length > 30 ? '...' : ''}
                             </a>
                         )}
                     </div>

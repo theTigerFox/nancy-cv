@@ -5,6 +5,7 @@
 import React from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+
 import {
     User, Briefcase, GraduationCap, Wrench, Globe, FolderKanban,
     Award, Heart, Sparkles, UserCheck, LayoutGrid,

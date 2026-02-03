@@ -530,7 +530,7 @@ export const BoldModernPDF: React.FC<BoldModernPDFProps> = ({ cvData, config }) 
                                         <Text style={styles.projectName}>{project.name}</Text>
                                         {project.url && (
                                             <Link src={project.url} style={styles.projectLink}>
-                                                Voir le projet
+                                                {project.url.replace(/^https?:\/\//, '').slice(0, 30)}{project.url.replace(/^https?:\/\//, '').length > 30 ? '...' : ''}
                                             </Link>
                                         )}
                                     </View>
