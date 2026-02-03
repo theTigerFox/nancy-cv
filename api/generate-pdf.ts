@@ -27,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     browser = await puppeteer.launch({
       args: chromium.args,
       executablePath: await chromium.executablePath(),
-      headless: 'new',
+      headless: true,
     });
 
     const page = await browser.newPage();
@@ -43,8 +43,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       timeout: 30000,
     });
 
-    // Wait for fonts
-    await page.evaluate(async () => { await document.fonts.ready; });
+    // Wait for fonts to load properly
+    await page.evaluate(async () => { 
+      await document.fonts.ready;
+    });
+    
+    // Wait for complete rendering
     await new Promise(r => setTimeout(r, 500));
 
     const pdfBuffer = await page.pdf({

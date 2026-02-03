@@ -27,7 +27,7 @@
     },
     "typography": {
         "fontHeading": "'Merriweather', serif",
-        "fontBody": "'Source Sans Pro', sans-serif",
+        "fontBody": "'Source Sans 3', sans-serif",
         "baseFontSize": 14,
         "nameSize": 2.2,
         "jobTitleSize": 1.15,

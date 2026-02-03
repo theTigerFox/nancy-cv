@@ -27,7 +27,7 @@
     },
     "typography": {
         "fontHeading": "'Playfair Display', serif",
-        "fontBody": "'Source Sans Pro', sans-serif",
+        "fontBody": "'Source Sans 3', sans-serif",
         "baseFontSize": 15,
         "nameSize": 2.8,
         "jobTitleSize": 1.3,

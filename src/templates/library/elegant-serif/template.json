@@ -27,7 +27,7 @@
     },
     "typography": {
         "fontHeading": "'Cormorant Garamond', serif",
-        "fontBody": "'Source Serif Pro', serif",
+        "fontBody": "'Source Serif 4', serif",
         "baseFontSize": 14,
         "nameSize": 2.8,
         "jobTitleSize": 1.2,

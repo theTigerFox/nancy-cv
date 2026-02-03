@@ -41,13 +41,12 @@ function prepareHTMLForPDF(element: HTMLElement): string {
     '[data-no-print]',
     '.no-print',
     '[contenteditable="true"]',
-    // Edit mode badge and UI
-    '.absolute.top-2.right-2', // Edition Live badge
-    '[class*="ring-"]', // Edit mode rings
-    '[class*="z-50"]', // Overlay elements
-    // Section manager and floating buttons
+    '.absolute.top-2.right-2',
+    '[class*="ring-"]',
+    '[class*="z-50"]',
+    '[class*="z-["]',
     '[class*="fixed"]',
-    // Any element with "Edition" or "edit" in text that's an overlay
+    '[data-universal-editor]',
   ].join(', ');
   
   clone.querySelectorAll(elementsToRemove).forEach(el => {
@@ -58,6 +57,9 @@ function prepareHTMLForPDF(element: HTMLElement): string {
       el.remove();
     }
   });
+  
+  // Additional cleanup: Remove any remaining buttons by tagName
+  Array.from(clone.getElementsByTagName('button')).forEach(btn => btn.remove());
   
   // Also remove any element containing "Edition Live" text
   clone.querySelectorAll('div').forEach(el => {
@@ -116,14 +118,13 @@ function prepareHTMLForPDF(element: HTMLElement): string {
     return s;
   });
   
-  // Force exact A4 dimensions
+  // Force exact A4 dimensions - keep original box model
   styleProps.push(
     `width: ${A4_WIDTH_PX}px`,
     `max-width: ${A4_WIDTH_PX}px`,
     `min-height: ${A4_HEIGHT_PX}px`,
     `height: auto`,
     'margin: 0',
-    'padding: 0',
     'box-shadow: none',
     'overflow: visible'
   );
@@ -143,14 +144,17 @@ function prepareHTMLForPDF(element: HTMLElement): string {
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&family=Source+Sans+3:wght@200;300;400;500;600;700;900&family=Source+Serif+4:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
-    /* Reset */
-    * {
+    /* Reset - Ciblé pour éviter les margins par défaut des éléments HTML */
+    *, *::before, *::after {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
       color-adjust: exact !important;
+    }
+    
+    /* Reset margins par défaut des éléments typiques */
+    h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
+      margin: 0;
     }
     
     @page {
@@ -159,10 +163,10 @@ function prepareHTMLForPDF(element: HTMLElement): string {
     }
     
     html, body {
-      width: ${A4_WIDTH_PX}px;
-      min-height: ${A4_HEIGHT_PX}px;
       margin: 0;
       padding: 0;
+      width: ${A4_WIDTH_PX}px;
+      min-height: ${A4_HEIGHT_PX}px;
       background: white;
       overflow: visible;
     }
@@ -174,16 +178,32 @@ function prepareHTMLForPDF(element: HTMLElement): string {
       overflow: visible;
     }
     
-    /* Font fallbacks - ensure Source Sans Pro maps to Source Sans 3 */
-    @font-face {
-      font-family: 'Source Sans Pro';
-      src: local('Source Sans 3'), local('Source Sans Pro');
+    /* Ensure all elements respect box-sizing */
+    .cv-template, .cv-template * {
+      box-sizing: border-box;
     }
     
-    /* Font fallbacks - ensure Source Serif Pro maps to Source Serif 4 */
+    /* Font aliases - Map old names to new Google Fonts names */
+    /* Source Sans Pro -> Source Sans 3 */
+    @font-face {
+      font-family: 'Source Sans Pro';
+      font-style: normal;
+      font-weight: 200 900;
+      src: url('https://fonts.gstatic.com/s/sourcesans3/v15/nwpBtKy2OAdR1K-IwhWudF-R9QMylBJAV3Bo8Kw461EN_io6npfB.woff2') format('woff2');
+    }
+    
+    /* Source Serif Pro -> Source Serif 4 */
     @font-face {
       font-family: 'Source Serif Pro';
-      src: local('Source Serif 4'), local('Source Serif Pro');
+      font-style: normal;
+      font-weight: 200 900;
+      src: url('https://fonts.gstatic.com/s/sourceserif4/v8/vEFy2_tTDB4M7-auWDN0ahZJW3IX2ih5nk3AucvUHf6OAVIJmeUDygwjihdqrhxXD-wGvjU.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Source Serif Pro';
+      font-style: italic;
+      font-weight: 200 900;
+      src: url('https://fonts.gstatic.com/s/sourceserif4/v8/vEF02_tTDB4M7-auWDN0ahZJW1ge6NmXpVAHV83Bfb_US2D2QYxoUKIkn98pxl9dC84.woff2') format('woff2');
     }
     
     /* Hide any remaining UI elements */
